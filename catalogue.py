@@ -113,9 +113,6 @@ class Catalogue(ABC):
 			# Calculate the azimuth between the source-receiver pair
 			dist, az, baz = gps2dist_azimuth(evlat, evlon, slat, slon)
 
-			print(otime, window_range, float(arrival.traveltime))
-			print(type(window_range), type(arrival.traveltime))
-
 			# Calculate reference time for window to download
 			window_beg = otime + float(arrival.traveltime) - window_range
 			window_end = otime + float(arrival.traveltime) + window_range
@@ -146,7 +143,6 @@ class Catalogue(ABC):
 					os.system('scp {} {}/tmp/.'.format(next_to_grab, self.path))
 
 				files = sorted(glob.glob('{}/tmp/*_{}_{}2.m'.format(self.path, stat.upper(), comp)))
-				print(files)
 
 				try:
 					file = files[0]
@@ -155,17 +151,17 @@ class Catalogue(ABC):
 					continue
 
 				st = read('{}/tmp/*_{}_{}2.m'.format(self.path, stat.upper(), comp))
-				print(st)
 
 				# Trim and save the file locally
 				try:
 					st.trim(window_beg, window_end)
 					tr = st[0]
-					print(tr)
 
 					# Generate name of output file
 					if not os.path.exists('{}/data/{}'.format(self.path, stat.upper())):
 						os.makedirs('{}/data/{}'.format(self.path, stat.upper()))
+
+					print("bleep")
 					name = '{}/data/{}/event.{}.{}.{}'.format(self.path, stat.upper(), sourceid, stat.upper(), comp.lower())
 					print(name)
 

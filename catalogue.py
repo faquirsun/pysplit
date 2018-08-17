@@ -113,6 +113,8 @@ class Catalogue(ABC):
 			# Calculate the azimuth between the source-receiver pair
 			dist, az, baz = gps2dist_azimuth(evlat, evlon, slat, slon)
 
+			print(otime, evlat, evlon, evdep, stat, slat, slon, sdep, dist, az, baz)
+
 			# Calculate reference time for window to download
 			window_beg = otime + float(arrival.traveltime) - window_range
 			window_end = otime + float(arrival.traveltime) + window_range
@@ -120,6 +122,8 @@ class Catalogue(ABC):
 			# Reference times for SAC file
 			o = otime - window_beg
 			t0 = window_range
+
+			print(o, t0)
 
 			# Download and trim each file from the archive
 			for comp in ['Z', 'N', 'E']:

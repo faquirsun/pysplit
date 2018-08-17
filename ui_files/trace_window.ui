@@ -447,7 +447,7 @@
       <x>1240</x>
       <y>680</y>
       <width>430</width>
-      <height>100</height>
+      <height>150</height>
      </rect>
     </property>
     <property name="title">
@@ -498,9 +498,9 @@
      <property name="geometry">
       <rect>
        <x>220</x>
-       <y>140</y>
-       <width>310</width>
-       <height>41</height>
+       <y>110</y>
+       <width>200</width>
+       <height>30</height>
       </rect>
      </property>
      <property name="text">

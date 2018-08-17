@@ -276,8 +276,9 @@ class PySplit(qt.QMainWindow):
 		self.mpl.show()
 		self.mpl.canvas.ax.clear()
 		self.catalogue.plot_geographic(self.mpl.canvas.ax)
-		if self.station_plot_tickbox.isChecked():
-			self.catalogue.plot_stations(self.mpl.canvas.ax)
+		#if self.station_plot_tickbox.isChecked():
+			#self.catalogue.plot_stations(self.mpl.canvas.ax)
+		self.catalogue.plot_stations(self.mpl.canvas.ax)
 		self.mpl.canvas.draw()
 		self.statusbar.showMessage("Catalogue load complete.")
 

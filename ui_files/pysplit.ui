@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1750</width>
-    <height>1090</height>
+    <width>1700</width>
+    <height>1030</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -24,8 +24,8 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>2420</width>
-    <height>1491</height>
+    <width>1700</width>
+    <height>1030</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -328,7 +328,7 @@
          <x>10</x>
          <y>10</y>
          <width>600</width>
-         <height>400</height>
+         <height>340</height>
         </rect>
        </property>
        <layout class="QFormLayout" name="teleseismic_form">
@@ -448,7 +448,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>580</y>
+      <y>530</y>
       <width>211</width>
       <height>430</height>
      </rect>
@@ -481,8 +481,8 @@
      <rect>
       <x>650</x>
       <y>20</y>
-      <width>1090</width>
-      <height>990</height>
+      <width>1040</width>
+      <height>940</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -500,7 +500,7 @@
        <x>0</x>
        <y>30</y>
        <width>760</width>
-       <height>960</height>
+       <height>910</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -531,7 +531,7 @@
      <widget class="QCheckBox" name="station_plot_tickbox">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>20</x>
         <y>120</y>
         <width>156</width>
         <height>41</height>
@@ -547,7 +547,7 @@
      <widget class="QCheckBox" name="picked_plot_tickbox">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>20</x>
         <y>40</y>
         <width>130</width>
         <height>41</height>
@@ -566,7 +566,7 @@
      <widget class="QCheckBox" name="unpicked_plot_tickbox">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>20</x>
         <y>80</y>
         <width>156</width>
         <height>41</height>
@@ -585,8 +585,8 @@
       <rect>
        <x>780</x>
        <y>300</y>
-       <width>300</width>
-       <height>360</height>
+       <width>260</width>
+       <height>320</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -600,8 +600,8 @@
        <rect>
         <x>0</x>
         <y>50</y>
-        <width>300</width>
-        <height>310</height>
+        <width>260</width>
+        <height>270</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_5" columnstretch="4,5">
@@ -756,12 +756,12 @@
       <rect>
        <x>780</x>
        <y>680</y>
-       <width>300</width>
-       <height>300</height>
+       <width>260</width>
+       <height>260</height>
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="station_info_page">
       <widget class="QGroupBox" name="groupBox_2">
@@ -769,8 +769,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>300</width>
-         <height>300</height>
+         <width>260</width>
+         <height>260</height>
         </rect>
        </property>
        <property name="title">
@@ -781,8 +781,8 @@
          <rect>
           <x>0</x>
           <y>50</y>
-          <width>300</width>
-          <height>250</height>
+          <width>260</width>
+          <height>210</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout_3" columnstretch="4,5">
@@ -928,8 +928,8 @@
          <rect>
           <x>0</x>
           <y>50</y>
-          <width>300</width>
-          <height>250</height>
+          <width>260</width>
+          <height>210</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout_4" columnstretch="4,5">
@@ -1083,7 +1083,7 @@
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>580</y>
+      <y>530</y>
       <width>380</width>
       <height>430</height>
      </rect>
@@ -1117,7 +1117,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1750</width>
+     <width>1700</width>
      <height>33</height>
     </rect>
    </property>

@@ -249,7 +249,7 @@
     <bool>false</bool>
    </property>
    <property name="placeholderText">
-    <string>Default: YYYY/DDD/*_&lt;STAT&gt;_&lt;COMP&gt;2.m</string>
+    <string>Default: {year}/{jday}/*_{stat}_{comp}2.m</string>
    </property>
   </widget>
  </widget>
@@ -287,7 +287,7 @@
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
    <receiver>Dialog</receiver>
-   <slot>reject()</slot>
+   <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>605</x>

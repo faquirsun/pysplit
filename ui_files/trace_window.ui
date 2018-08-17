@@ -10,7 +10,19 @@
     <height>1855</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="minimumSize">
+   <size>
+    <width>2420</width>
+    <height>1855</height>
+   </size>
+  </property>
+  <property name="maximumSize">
    <size>
     <width>2420</width>
     <height>1855</height>
@@ -20,6 +32,12 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <widget class="QGroupBox" name="z_comp_box">
     <property name="geometry">
      <rect>
@@ -40,6 +58,12 @@
        <width>1791</width>
        <height>531</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>1791</width>
+       <height>531</height>
+      </size>
      </property>
     </widget>
    </widget>
@@ -64,6 +88,12 @@
        <height>531</height>
       </rect>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>1791</width>
+       <height>531</height>
+      </size>
+     </property>
     </widget>
    </widget>
    <widget class="QGroupBox" name="e_comp_box">
@@ -86,6 +116,12 @@
        <width>1791</width>
        <height>531</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>1791</width>
+       <height>531</height>
+      </size>
      </property>
     </widget>
    </widget>

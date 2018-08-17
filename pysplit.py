@@ -60,6 +60,9 @@ class PySplit(qt.QMainWindow):
 		self.catalogue_info_page.hide()
 		self.station_info_page.hide()
 
+		# Set initial filter to None
+		self.filt = None
+
 		# Specify input options and disable them on load
 		self.input_options = [self.startDate_input, self.endDate_input, self.minMag_input, self.centreLon_input, self.centreLat_input, self.minRad_input, self.maxRad_input, self.tele_load_button]
 
@@ -72,14 +75,17 @@ class PySplit(qt.QMainWindow):
 		self.actionNew_catalogue.triggered.connect(self.newCatalogue)
 		self.actionLoad_catalogue.triggered.connect(self.loadCatalogue)
 
+		# Settings menu connections
+		self.actionDefault_filter.triggered.connect(self.defaultFilter)
+
 		# Map connections
-		self.mpl.canvas.mpl_connect('pick_event', self._on_pick)
+		self.mpl.canvas.mpl_connect('pick_event', self._onPick)
 
 		# Station list connection
 		self.station_list.doubleClicked.connect(self.stationSelect)
 
 		# Event list connection
-		#self.event_list.doubleClicked.connect(self.pickEvent)
+		self.event_list.doubleClicked.connect(self.eventSelect)
 
 		# Catalogue generation button connection
 		self.tele_load_button.clicked.connect(self.generate_teleseismic_catalogue)
@@ -90,11 +96,28 @@ class PySplit(qt.QMainWindow):
 		self.load_arrivals_button.clicked.connect(self.load_arrivals)
 		self.load_waveforms_button.clicked.connect(self.load_waveforms)
 
-		self.picked_plot_tickbox.stateChanged.connect(self.pick_state_changed)
-		self.unpicked_plot_tickbox.stateChanged.connect(self.unpicked_state_changed)
-		self.station_plot_tickbox.stateChanged.connect(self.station_state_changed)
+		# Plot option tickboxes connection
+		self.picked_plot_tickbox.stateChanged.connect(self.pickStateChanged)
+		self.unpicked_plot_tickbox.stateChanged.connect(self.unpickedStateChanged)
+		self.station_plot_tickbox.stateChanged.connect(self.stationStateChanged)
 
-	def unpicked_state_changed(self, int):
+	def keyPressEvent(self, event):
+		if event.key() == Qt.Key_Control:
+			print("Ctrl toggled on")
+			self.ctrl_toggle = True
+		if event.key() == Qt.Key_Shift:
+			print("Shift toggled on")
+			self.shift_toggle = True
+
+	def keyReleaseEvent(self, event):
+		if event.key() == Qt.Key_Control:
+			print("Ctrl toggled off")
+			self.ctrl_toggle = False
+		if event.key() == Qt.Key_Shift:
+			print("Shift toggled off")
+			self.shift_toggle = False
+
+	def unpickedStateChanged(self, int):
 		if self.unpicked_plot_tickbox.isChecked():
 			pass
 			#self.catalogue.station_points.set_visible(True)
@@ -102,19 +125,19 @@ class PySplit(qt.QMainWindow):
 			pass
 			#self.catalogue.station_points.set_visible(False)
 
-	def station_state_changed(self, int):
+	def stationStateChanged(self, int):
 		if self.station_plot_tickbox.isChecked():
 			self.catalogue.station_points.set_visible(True)
 		else:
 			self.catalogue.station_points.set_visible(False)
 
-	def pick_state_changed(self, int):
+	def pickStateChanged(self, int):
 		if self.picked_plot_tickbox.isChecked():
 			self.catalogue.pick_points.set_visible(True)
 		else:
 			self.catalogue.pick_points.set_visible(False)
 
-	def _on_pick(self, event):
+	def _onPick(self, event):
 	    artist = event.artist
 	    xmouse, ymouse = event.mouseevent.xdata, event.mouseevent.ydata
 	    xy = artist.get_offsets()
@@ -125,16 +148,32 @@ class PySplit(qt.QMainWindow):
 	    # If station
 	    if "STAT" in label:
 	    	stat = label.split(": ")[1]
-	    	self._update_station_information(stat)
+	    	self._updateStationInformation(stat)
 
 	    # If event
 	    if "EVENT" in label:
 	    	evt = label.split(": ")[1]
-	    	self._update_event_information(evt)
+	    	self._updateEventInformation(evt)
 
 	    	# Open an instance of Picker (TESTING)
-	    	self.pickerWindow = PickingWindow(self.catalogue)
-	    	self.pickerWindow.plot_event(1261, "ASK")
+	    	if self.actionPick_mode.isChecked():
+		    	self.pickerWindow = PickingWindow(self.catalogue)
+		    	self.pickerWindow.plot_event(1261, "ASK")
+
+	def defaultFilter(self):
+		self.defaultFilterDialogue = DefaultFilterDialogue()
+
+		if self.defaultFilterDialogue.exec_():
+			# Read the default filter parameters
+			try:
+				self.low_freq  = float(self.defaultFilterDialogue.input_lowFreq.text())
+				self.high_freq = float(self.defaultFilterDialogue.input_highFreq.text())
+
+				self.filt = [self.low_freq, self.high_freq]
+			except:
+				qt.QMessageBox.about(self, "Error!", "You did something wrong dickhead, try again")
+		else:
+			return
 
 	def newCatalogue(self):
 		self.newCatalogueDialogue = NewCatalogueDialogue()
@@ -148,64 +187,88 @@ class PySplit(qt.QMainWindow):
 			self.receiver_file  = self.newCatalogueDialogue.recBox.text()
 
 			if self.newCatalogueDialogue.tele_radio.isChecked():
-				# Set catalogue type and data source
 				self.catalogue_type = "teleseismic"
-				self.data_source = "IRIS"
-				self.label_catTypeDisp.setText("Teleseismic")
-
-				self.status_page.hide()
-				self.teleseismic_input_page.show()
-				self.station_info_page.hide()
-				self.catalogue_info_page.show()
-
-				# Create an instance of the Teleseismic Catalogue class
-				self.catalogue = cat.TeleseismicCatalogue("{}/{}".format(self.catalogue_path, self.catalogue_name), self.archive_path, self.receiver_file)
-
 			elif self.newCatalogueDialogue.local_radio.isChecked():
-				# Set catalogue type
 				self.catalogue_type = "local"
-				self.label_catTypeDisp.setText("Local")
+			else:
+				qt.QMessageBox.about(self, "Error!", "You must select a catalogue type.")
 
-				self.teleseismic_input_page.hide()
-				self.status_page.show()
-				self.catalogue_info_page.hide()
-				self.station_info_page.show()
+		else:
+			return
 
-				# Open input file dialogue
-				self.localInputDialogue = LocalInputDialogue()
+		if self.catalogue_type == "teleseismic":
+			# Set catalogue type and data source labels
+			self.data_source = "IRIS"
+			self.label_catTypeDisp.setText("Teleseismic")
 
-				if self.localInputDialogue.exec_():
-					# Read in input file
-					self.local_input_file = self.localInputDialogue.inpBox.text()
+			self.status_page.hide()
+			self.teleseismic_input_page.show()
+			self.station_info_page.hide()
+			self.catalogue_info_page.show()
 
-					# Set data source
-					self.data_source = self.local_input_file
+			# Create an instance of the Teleseismic Catalogue class
+			self.catalogue = cat.TeleseismicCatalogue("{}/{}".format(self.catalogue_path, self.catalogue_name), self.archive_path, self.receiver_file)
 
-					# Create an instance of the Local Catalogue class
-					self.catalogue = cat.LocalCatalogue("{}/{}".format(self.catalogue_path, self.catalogue_name), self.archive_path, self.receiver_file)
+		elif self.catalogue_type == "local":
+			# Set catalogue type label
+			self.label_catTypeDisp.setText("Local")
 
-					# Create the catalogue metafile - this contains general information about the catalogue
-					# and is read in when an existing catalogue is loaded
-					self._generate_catalogue_metafile()
-					self.generate_catalogue()
+			self.teleseismic_input_page.hide()
+			self.status_page.show()
+			self.catalogue_info_page.hide()
+			self.station_info_page.show()
 
-					# Plot the map of the catalogue
-					self.plotter()
+			# Open input file dialogue
+			self.getLocalInput()
 
-			# Set the catalogue name label
-			self.label_catNameDisp.setText(self.catalogue_name)
+			# Create an instance of the Local Catalogue class
+			self.catalogue = cat.LocalCatalogue("{}/{}".format(self.catalogue_path, self.catalogue_name), self.archive_path, self.receiver_file)
 
-			# Populate the station list
-			model = QtGui.QStandardItemModel(self.station_list)
-			for receiver in self.catalogue.receiver_df.stat.values:
-				item = QtGui.QStandardItem(receiver)
-				model.appendRow(item)
-			self.station_list.setModel(model)
-			self.station_list.setEditTriggers(qt.QAbstractItemView.NoEditTriggers)
+			# Create the catalogue metafile - this contains general information about the catalogue
+			# and is read in when an existing catalogue is loaded
+			self._generate_catalogue_metafile()
+			self.generate_catalogue()
 
-			# Enable the station and event selection lists
-			self.station_list.setEnabled(True)
-			self.event_list.setEnabled(True)
+			# Plot the map of the catalogue
+			self.plotter()
+
+		# Set the catalogue name label
+		self.label_catNameDisp.setText(self.catalogue_name)
+
+		# Populate the station list
+		model = QtGui.QStandardItemModel(self.station_list)
+		for receiver in self.catalogue.receiver_df.stat.values:
+			item = QtGui.QStandardItem(receiver)
+			model.appendRow(item)
+		self.station_list.setModel(model)
+		self.station_list.setEditTriggers(qt.QAbstractItemView.NoEditTriggers)
+
+		# Enable the station and event selection lists
+		self.station_list.setEnabled(True)
+		self.event_list.setEnabled(True)
+
+	def getLocalInput(self):
+		self.localInputDialogue = LocalInputDialogue()
+
+		if self.localInputDialogue.exec_():
+			# Read in input file
+			self.local_input_file = self.localInputDialogue.inpBox.text()
+
+			if not os.path.isfile(self.local_input_file):
+				qt.QMessageBox(self, "Error!", "The input file you have chosen does not exist...")
+				return
+
+			# Check if the events have been picked
+			if self.localInputDialogue.picked_Radio.isChecked():
+				self.picked = True
+			else:
+				self.picked = False
+
+		else:
+			return
+
+		# Set data source
+		self.data_source = self.local_input_file
 
 
 	def plotter(self):
@@ -220,13 +283,13 @@ class PySplit(qt.QMainWindow):
 
 	def stationSelect(self, index):
 		# Parse station selected
-		station = self.station_list.model().data(index)
+		self.station = self.station_list.model().data(index)
 
 		# Load station information and print to display
-		self._update_station_information(station)
+		self._updateStationInformation(self.station)
 
 		# Filter and load the corresponding events
-		station_path = "{}/{}/data/{}".format(self.catalogue_path, self.catalogue_name, station.upper())
+		station_path = "{}/{}/data/{}".format(self.catalogue_path, self.catalogue_name, self.station.upper())
 
 		events = glob.glob('{}/*.z'.format(station_path))
 
@@ -239,7 +302,19 @@ class PySplit(qt.QMainWindow):
 		self.event_list.setModel(model)
 		self.event_list.setEditTriggers(qt.QAbstractItemView.NoEditTriggers)
 
-	def _update_station_information(self, station):
+	def eventSelect(self, index):
+		# Parse event selected
+		self.event = self.event_list.model().data(index).split(" ")[1]
+
+		# Load event information and print to display
+		self._updateEventInformation(self.event)
+
+		# If in Pick mode, open up picking window
+		if self.actionPick_mode.isChecked():
+			self.pickingWindow = PickingWindow(self.catalogue)
+			self.pickingWindow.plot_event(self.event, self.station, self.filt)
+
+	def _updateStationInformation(self, station):
 		station_info = self.catalogue.receiver_df.query('stat == @station')
 		self.label_statName.setText(station)
 		self.label_statLon.setText(f"{station_info.lon.values[0]:.4f}")
@@ -248,7 +323,7 @@ class PySplit(qt.QMainWindow):
 		self.label_statDep.setText(station_info.st_dep.values[0].isoformat().split("T")[0])
 		self.label_statRet.setText(station_info.et_dep.values[0].isoformat().split("T")[0])
 
-	def _update_event_information(self, event):
+	def _updateEventInformation(self, event):
 		event_info = self.catalogue.source_df.query('sourceid == @event')
 		self.label_eventOdate.setText(event_info.otime.values[0].isoformat().split("T")[0])
 		self.label_eventOtime.setText(event_info.otime.values[0].isoformat().split("T")[1])
@@ -525,6 +600,19 @@ class LocalInputDialogue(qt.QDialog):
 
 		self.inpBox.setText(self.input_file)
 
+class DefaultFilterDialogue(qt.QDialog):
+
+	def __init__(self):
+		super(DefaultFilterDialogue, self).__init__()
+
+		self.initUI()
+
+	def initUI(self):
+		uic.loadUi('ui_files/default_filter_dialogue.ui', self)
+
+		self.setWindowTitle('PySplit - Set default filter')
+		self.show()
+
 class PickingWindow(qt.QMainWindow):
 
 	def __init__(self, catalogue):
@@ -548,55 +636,203 @@ class PickingWindow(qt.QMainWindow):
 		self.n_comp_plot.canvas.mpl_connect('motion_notify_event', self._on_move)
 		self.e_comp_plot.canvas.mpl_connect('motion_notify_event', self._on_move)
 
+		# Connect to clicks
+		self.z_comp_plot.canvas.mpl_connect('button_press_event', self._on_click)
+		self.n_comp_plot.canvas.mpl_connect('button_press_event', self._on_click)
+		self.e_comp_plot.canvas.mpl_connect('button_press_event', self._on_click)
+
 	def _on_move(self, event):
-		if event.inaxes is self.z_comp_plot.canvas.ax:
+		z_canvas = self.z_comp_plot.canvas
+		n_canvas = self.n_comp_plot.canvas
+		e_canvas = self.e_comp_plot.canvas
+		if event.inaxes is z_canvas.ax or n_canvas.ax or e_canvas.ax:
+			# Grab the x position of the pointer
 			x = event.xdata
-			self.cursor.set_data([x, x], self.ydat)
-			self.cursor.set_visible(True)
-			self.z_comp_plot.canvas.draw()
 
-		if event.inaxes is self.n_comp_plot.canvas.ax:
-			x = event.xdata
-			self.cursor.set_data([x, x], self.ydat)
-			self.cursor.set_visible(True)
-			self.n_comp_plot.canvas.draw()
+			# Set the x value of the cursor to the current position
+			self.zcursor.set_data([x, x], self.zydat)
+			self.ncursor.set_data([x, x], self.nydat)
+			self.ecursor.set_data([x, x], self.eydat)
 
-		if event.inaxes is self.e_comp_plot.canvas.ax:
-			x = event.xdata
-			self.cursor.set_data([x, x], self.ydat)
-			self.cursor.set_visible(True)
-			self.e_comp_plot.canvas.draw()
+			# restore the background region
+			z_canvas.restore_region(self.z_background)
+			n_canvas.restore_region(self.n_background)
+			e_canvas.restore_region(self.e_background)
+
+			# redraw just the current cursor
+			z_canvas.ax.draw_artist(self.zcursor)
+			n_canvas.ax.draw_artist(self.ncursor)
+			e_canvas.ax.draw_artist(self.ecursor)
+
+			if self.w_beg_line:
+				# Redraw the window line
+				z_canvas.ax.draw_artist(self.z_window_beg)
+				n_canvas.ax.draw_artist(self.n_window_beg)
+				e_canvas.ax.draw_artist(self.e_window_beg)
+
+			if self.pick_line:
+				# Redraw the pick line
+				z_canvas.ax.draw_artist(self.z_pick)
+				n_canvas.ax.draw_artist(self.n_pick)
+				e_canvas.ax.draw_artist(self.e_pick)
+
+			if self.w_end_line:
+				# Redraw the window line
+				z_canvas.ax.draw_artist(self.z_window_end)
+				n_canvas.ax.draw_artist(self.n_window_end)
+				e_canvas.ax.draw_artist(self.e_window_end)				
+
+			# blit just the redrawn area
+			z_canvas.blit(z_canvas.ax.bbox)
+			n_canvas.blit(n_canvas.ax.bbox)
+			e_canvas.blit(e_canvas.ax.bbox)
+
+	def _on_click(self, event):
+		z_canvas = self.z_comp_plot.canvas
+		n_canvas = self.n_comp_plot.canvas
+		e_canvas = self.e_comp_plot.canvas		
+		# Left-clicking handles the window start time
+		if event.button == 1:
+			# Set the window start line to be redrawn on move
+			self.w_beg_line = True
+
+			# Add the window beginning to the event stats
+			self.event._add_stat("window_beg", event.xdata)
+
+			# Make a vertical line artist
+			self.z_window_beg = z_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+			self.n_window_beg = n_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+			self.e_window_beg = e_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+
+			# Restore the background region
+			z_canvas.restore_region(self.z_background)
+			n_canvas.restore_region(self.n_background)
+			e_canvas.restore_region(self.e_background)
+
+			# Redraw the window line
+			z_canvas.ax.draw_artist(self.z_window_beg)
+			n_canvas.ax.draw_artist(self.n_window_beg)
+			e_canvas.ax.draw_artist(self.e_window_beg)
+
+			# blit the redrawn area
+			z_canvas.blit(z_canvas.ax.bbox)
+			n_canvas.blit(n_canvas.ax.bbox)
+			e_canvas.blit(e_canvas.ax.bbox)
+
+		# Middle-clicking handles the arrival pick time
+		if event.button == 2:
+			# Set the pick line to be redrawn on move
+			self.pick_line = True
+
+			# Add the pick to the event stats
+			self.event._add_stat("pick", event.xdata)
+
+			# Make a vertical line artist
+			self.z_pick = z_canvas.ax.axvline(event.xdata, linewidth=1, color="red", animated=True)
+			self.n_pick = n_canvas.ax.axvline(event.xdata, linewidth=1, color="red", animated=True)
+			self.e_pick = e_canvas.ax.axvline(event.xdata, linewidth=1, color="red", animated=True)
+
+			# Restore the background region
+			z_canvas.restore_region(self.z_background)
+			n_canvas.restore_region(self.n_background)
+			e_canvas.restore_region(self.e_background)
+
+			# Redraw the window line
+			z_canvas.ax.draw_artist(self.z_pick)
+			n_canvas.ax.draw_artist(self.n_pick)
+			e_canvas.ax.draw_artist(self.e_pick)
+
+			# blit the redrawn area
+			z_canvas.blit(z_canvas.ax.bbox)
+			n_canvas.blit(n_canvas.ax.bbox)
+			e_canvas.blit(e_canvas.ax.bbox)
+
+		# Right-clicking handles the window end time
+		if event.button == 3:
+			# Set the window end line to be redrawn on move
+			self.w_end_line = True
+
+			# Add the window ending to the event stats
+			self.event._add_stat("window_end", event.xdata)
+
+			# Make a vertical line artist
+			self.z_window_end = z_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+			self.n_window_end = n_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+			self.e_window_end = e_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+
+			# Restore the background region
+			z_canvas.restore_region(self.z_background)
+			n_canvas.restore_region(self.n_background)
+			e_canvas.restore_region(self.e_background)
+
+			# Redraw the window line
+			z_canvas.ax.draw_artist(self.z_window_end)
+			n_canvas.ax.draw_artist(self.n_window_end)
+			e_canvas.ax.draw_artist(self.e_window_end)
+
+			# blit the redrawn area
+			z_canvas.blit(z_canvas.ax.bbox)
+			n_canvas.blit(n_canvas.ax.bbox)
+			e_canvas.blit(e_canvas.ax.bbox)			
 
 	def plot_event(self, event_id, station, filt=None):
 
 		# Clear the canvases
 		self.z_comp_plot.canvas.ax.clear()
 		self.n_comp_plot.canvas.ax.clear()
-		self.e_comp_plot.canvas.ax.clear()
+		self.e_comp_plot.canvas.ax.clear()#
+
+		# Make the window and pick lines not show on move
+		self.w_beg_line = False
+		self.pick_line  = False
+		self.w_end_line = False
+
+		self.z_background = None
+		self.n_background = None
+		self.e_background = None
+
+		# Create an instance of the Event class
+		self.event = evt.Event("{}/data/{}/event.{}.{}.*".format(self.catalogue_path, station.upper(), event_id, station.upper()))
+
+		if not filt == None:
+			self.event.stream.filter("bandpass", freqmin=filt[0], freqmax=filt[1])
+
+		self.event.plot_traces(self.z_comp_plot.canvas.ax, self.n_comp_plot.canvas.ax, self.e_comp_plot.canvas.ax)
+
+		# Connect to each trace to grab the background once Qt has done resizing
+		self.z_comp_plot.canvas.mpl_connect('draw_event', self._z_draw_event)
+		self.n_comp_plot.canvas.mpl_connect('draw_event', self._n_draw_event)
+		self.e_comp_plot.canvas.mpl_connect('draw_event', self._e_draw_event)
+
+		# Draw when Qt has done all resizing
+		self.z_comp_plot.canvas.draw_idle()
+		self.n_comp_plot.canvas.draw_idle()
+		self.e_comp_plot.canvas.draw_idle()
 
 		# Initialise the cursor to track mouse position on the axes
-		self.cursor = self.z_comp_plot.canvas.ax.axvline(5, linewidth=1, color='0.5', visible=False)
-		_, self.ydat = self.cursor.get_data()
+		self.zcursor = self.z_comp_plot.canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
+		_, self.zydat = self.zcursor.get_data()
+		self.ncursor = self.n_comp_plot.canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
+		_, self.nydat = self.ncursor.get_data()
+		self.ecursor = self.e_comp_plot.canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
+		_, self.eydat = self.ecursor.get_data()
 
 		self.connect()
 
 		# Update the station and event information
-		#self._update_station_information(station)
-		#self._update_event_information(event_id)
+		self._updateStationInformation(station)
+		self._updateEventInformation(event_id)
 
-		# Create an instance of the Event class
-		event = evt.Event("{}/data/{}/event.{}.{}.*".format(self.catalogue_path, station.upper(), event_id, station.upper()))
+	def _z_draw_event(self, evt):
+		self.z_background = evt.canvas.copy_from_bbox(evt.canvas.ax.bbox)
 
-		if not filt == None:
-			event.filter("bandpass", freqmin=filt[0], freqmax=filt[1])
+	def _n_draw_event(self, evt):
+		self.n_background = evt.canvas.copy_from_bbox(evt.canvas.ax.bbox)
 
-		event.plot_traces(self.z_comp_plot.canvas.ax, self.n_comp_plot.canvas.ax, self.e_comp_plot.canvas.ax)
+	def _e_draw_event(self, evt):
+		self.e_background = evt.canvas.copy_from_bbox(evt.canvas.ax.bbox)
 
-		self.z_comp_plot.canvas.draw()
-		self.n_comp_plot.canvas.draw()
-		self.e_comp_plot.canvas.draw()
-
-	def _update_station_information(self, station):
+	def _updateStationInformation(self, station):
 		station_info = self.catalogue.receiver_df.query('stat == @station')
 		self.label_statName.setText(station)
 		self.label_statLon.setText(f"{station_info.lon.values[0]:.4f}")
@@ -605,7 +841,7 @@ class PickingWindow(qt.QMainWindow):
 		self.label_statDep.setText(station_info.st_dep.values[0].isoformat().split("T")[0])
 		self.label_statRet.setText(station_info.et_dep.values[0].isoformat().split("T")[0])
 
-	def _update_event_information(self, event):
+	def _updateEventInformation(self, event):
 		event_info = self.catalogue.source_df.query('sourceid == @event')
 		self.label_eventOdate.setText(event_info.otime.values[0].isoformat().split("T")[0])
 		self.label_eventOtime.setText(event_info.otime.values[0].isoformat().split("T")[1])

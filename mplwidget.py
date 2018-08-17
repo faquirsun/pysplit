@@ -1,4 +1,4 @@
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore
 import PyQt5.QtWidgets as qt
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -14,10 +14,10 @@ class MplCanvas(FigureCanvas):
 
 		# initialisation of the canvas
 		FigureCanvas.__init__(self, self.fig)
-		#FigureCanvas.setSizePolicy(self, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+		FigureCanvas.setSizePolicy(self, qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)
 
 		# notify the system of updated policy
-		#FigureCanvas.updateGeometry(self)
+		FigureCanvas.updateGeometry(self)
 
 
 class MplWidget(qt.QWidget):

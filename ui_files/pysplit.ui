@@ -509,6 +509,12 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>1191</width>
+       <height>1350</height>
+      </size>
+     </property>
     </widget>
     <widget class="QGroupBox" name="groupBox">
      <property name="geometry">
@@ -1131,8 +1137,15 @@
     <addaction name="actionAnalyse_mode"/>
     <addaction name="actionPick_and_analyse_mode"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="actionDefault_filter"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuMode"/>
+   <addaction name="menuSettings"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionNew_catalogue">
@@ -1177,6 +1190,9 @@
    <property name="text">
     <string>Pick mode</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
   </action>
   <action name="actionPick_and_analyse_mode">
    <property name="checkable">
@@ -1192,6 +1208,17 @@
    </property>
    <property name="text">
     <string>Analyse mode</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionDefault_filter">
+   <property name="text">
+    <string>Default filter</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
  </widget>

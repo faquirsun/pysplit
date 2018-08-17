@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>831</width>
-    <height>235</height>
+    <width>606</width>
+    <height>195</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +16,9 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>440</x>
-     <y>180</y>
-     <width>341</width>
+     <x>240</x>
+     <y>140</y>
+     <width>350</width>
      <height>32</height>
     </rect>
    </property>
@@ -29,60 +29,45 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QWidget" name="formLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>-20</x>
-     <y>40</y>
-     <width>191</width>
-     <height>61</height>
+     <x>20</x>
+     <y>30</y>
+     <width>570</width>
+     <height>85</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Input file:</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="inpBox">
-   <property name="geometry">
-    <rect>
-     <x>180</x>
-     <y>50</y>
-     <width>471</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="placeholderText">
-    <string>Accepted formats: .hyp</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="inpButton">
-   <property name="geometry">
-    <rect>
-     <x>660</x>
-     <y>50</y>
-     <width>141</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Browse</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="picked_Radio">
-   <property name="geometry">
-    <rect>
-     <x>530</x>
-     <y>120</y>
-     <width>140</width>
-     <height>34</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Picked?</string>
-   </property>
+   <layout class="QFormLayout" name="formLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_lowFreq">
+      <property name="text">
+       <string>Lowpass frequency</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLineEdit" name="input_lowFreq">
+      <property name="placeholderText">
+       <string>e.g. 2 Hz</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_highFreq">
+      <property name="text">
+       <string>Highpass frequency</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLineEdit" name="input_highFreq">
+      <property name="placeholderText">
+       <string>e.g. 8 Hz</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>

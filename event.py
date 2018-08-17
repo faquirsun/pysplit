@@ -24,11 +24,18 @@ class Event(object):
 
 	def __init__(self, file_path):
 
+		# Read in event files
 		self.stream = read(file_path)
 
+		# Select the 3 components
 		self.Z_comp = self.stream.select(channel="*Z")[0]
 		self.N_comp = self.stream.select(channel="*N")[0]
 		self.E_comp = self.stream.select(channel="*E")[0]
+
+		# Add window dictionary to 
+		self.Z_comp.stats.window = {'window_beg': None, 'window_end': None}
+		self.N_comp.stats.window = {'window_beg': None, 'window_end': None}
+		self.E_comp.stats.window = {'window_beg': None, 'window_end': None}
 
 		# Need to find filter parameters
 		self.filter_min, self.filter_max = (1, 10)
@@ -88,3 +95,19 @@ class Event(object):
 		Z_ax.plot(self.Z_comp.times(type="relative"), self.Z_comp.data)
 		N_ax.plot(self.N_comp.times(type="relative"), self.N_comp.data)
 		E_ax.plot(self.E_comp.times(type="relative"), self.E_comp.data)
+
+	def _add_stat(self, stat, value):
+		if stat == "window_beg":
+			self.Z_comp.stats.window.window_beg = value
+			self.N_comp.stats.window.window_beg = value
+			self.E_comp.stats.window.window_beg = value
+
+		if stat == "window_end":
+			self.Z_comp.stats.window.window_end = value
+			self.N_comp.stats.window.window_beg = value
+			self.E_comp.stats.window.window_beg = value
+
+		if stat == "pick":
+			self.Z_comp.stats.pick = value
+			self.N_comp.stats.pick = value
+			self.E_comp.stats.pick = value

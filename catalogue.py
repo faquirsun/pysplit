@@ -146,6 +146,7 @@ class Catalogue(ABC):
 					os.system('scp {} {}/tmp/.'.format(next_to_grab, self.path))
 
 				files = sorted(glob.glob('{}/tmp/*_{}_{}2.m'.format(self.path, stat.upper(), comp)))
+				print(files)
 
 				try:
 					file = files[0]
@@ -154,16 +155,19 @@ class Catalogue(ABC):
 					continue
 
 				st = read('{}/tmp/*_{}_{}2.m'.format(self.path, stat.upper(), comp))
+				print(st)
 
 				# Trim and save the file locally
 				try:
 					st.trim(window_beg, window_end)
 					tr = st[0]
+					print(tr)
 
 					# Generate name of output file
 					if not os.path.exists('{}/data/{}'.format(self.path, stat.upper())):
 						os.makedirs('{}/data/{}'.format(self.path, stat.upper()))
 					name = '{}/data/{}/event.{}.{}.{}'.format(self.path, stat.upper(), sourceid, stat.upper(), comp.lower())
+					print(name)
 
 					# Write the trimmed data to a SAC file
 					tr.write(name, format="SAC")
@@ -194,7 +198,8 @@ class Catalogue(ABC):
 					for l in files:
 						os.remove(l)
 					del files
-				except IndexError:
+				except:
+					print("Error here")
 					for l in files:
 						os.remove(l)
 					del files

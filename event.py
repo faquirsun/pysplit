@@ -37,9 +37,6 @@ class Event(object):
 		self.N_comp.stats.window = {'window_beg': None, 'window_end': None}
 		self.E_comp.stats.window = {'window_beg': None, 'window_end': None}
 
-		# Need to find filter parameters
-		self.filter_min, self.filter_max = (1, 10)
-
 		self.delta = self.Z_comp.stats.delta
 
 	def unsplit(self, phi, dt):
@@ -69,26 +66,35 @@ class Event(object):
 	def _make_rot_matrix(self, phi):
 		return np.array([[np.cos(phi), -np.sin(phi)], [np.sin(phi), np.cos(phi)]])
 
-	def filter_with_sac(self, tr, minfreq, maxfreq, n_poles=2, zero_phase=True):
+	def filter_sac(self, tr, minfreq, maxfreq, n_poles=2, zero_phase=True):
 
 		if zero_phase:
 			p = 2
 		else:
 			p = 1
 	
-		temp_text = """sac<< EOF > /dev/null\nr f.sac\nrmean\ndif\nmul -1\ntaper\nbp c {:f} {:f} n {:d} p {:d} \nwrite over\nq\nEOF\n"""
+		temp_text = """sac<< EOF > /dev/null\nr f.sac\nrmean\ntaper\nbp c {:f} {:f} n {:d} p {:d} \nwrite over\nq\nEOF\n"""
 		temp_dir = os.path.join(os.path.expanduser('~'), 'filter_temp')
 		if not(os.path.exists(temp_dir)):
 			os.makedirs(temp_dir)
 
 		tr.write('{}/f.sac'.format(temp_dir), "SAC")
 		text = temp_text.format(minfreq, maxfreq, n_poles, p)
-		print(text)
 		os.chdir(temp_dir)
 		open('s', 'w+').write(text)
 		os.system('bash s')
 		tr = obspy.read('{}/f.sac'.format(temp_dir))[0]
 		return tr
+
+	def filter_obspy(self, type, minfreq, maxfreq, n_poles=2, zero_phase=True):
+		tmp_stream = self.stream.copy()
+
+		tmp_stream.filter(type=type, freqmin=minfreq, freqmax=maxfreq, corners=n_poles, zerophase=zero_phase)
+
+		# Select the 3 components
+		self.Z_comp = tmp_stream.select(channel="*Z")[0]
+		self.N_comp = tmp_stream.select(channel="*N")[0]
+		self.E_comp = tmp_stream.select(channel="*E")[0]
 
 	def plot_traces(self, Z_ax, N_ax, E_ax):
 

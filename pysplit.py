@@ -641,6 +641,9 @@ class PickingWindow(qt.QMainWindow):
 		self.n_comp_plot.canvas.mpl_connect('button_press_event', self._on_click)
 		self.e_comp_plot.canvas.mpl_connect('button_press_event', self._on_click)
 
+		# Connect to filter button
+		self.button_applyFilter.clicked.connect(self.applyFilter)
+
 	def _on_move(self, event):
 		z_canvas = self.z_comp_plot.canvas
 		n_canvas = self.n_comp_plot.canvas
@@ -714,6 +717,18 @@ class PickingWindow(qt.QMainWindow):
 			n_canvas.ax.draw_artist(self.n_window_beg)
 			e_canvas.ax.draw_artist(self.e_window_beg)
 
+			if self.pick_line:
+				# Redraw the pick line
+				z_canvas.ax.draw_artist(self.z_pick)
+				n_canvas.ax.draw_artist(self.n_pick)
+				e_canvas.ax.draw_artist(self.e_pick)
+
+			if self.w_end_line:
+				# Redraw the window line
+				z_canvas.ax.draw_artist(self.z_window_end)
+				n_canvas.ax.draw_artist(self.n_window_end)
+				e_canvas.ax.draw_artist(self.e_window_end)	
+
 			# blit the redrawn area
 			z_canvas.blit(z_canvas.ax.bbox)
 			n_canvas.blit(n_canvas.ax.bbox)
@@ -737,10 +752,22 @@ class PickingWindow(qt.QMainWindow):
 			n_canvas.restore_region(self.n_background)
 			e_canvas.restore_region(self.e_background)
 
-			# Redraw the window line
+			if self.w_beg_line:
+				# Redraw the window line
+				z_canvas.ax.draw_artist(self.z_window_beg)
+				n_canvas.ax.draw_artist(self.n_window_beg)
+				e_canvas.ax.draw_artist(self.e_window_beg)
+
+			# Redraw the pick line
 			z_canvas.ax.draw_artist(self.z_pick)
 			n_canvas.ax.draw_artist(self.n_pick)
 			e_canvas.ax.draw_artist(self.e_pick)
+
+			if self.w_end_line:
+				# Redraw the window line
+				z_canvas.ax.draw_artist(self.z_window_end)
+				n_canvas.ax.draw_artist(self.n_window_end)
+				e_canvas.ax.draw_artist(self.e_window_end)
 
 			# blit the redrawn area
 			z_canvas.blit(z_canvas.ax.bbox)
@@ -765,6 +792,18 @@ class PickingWindow(qt.QMainWindow):
 			n_canvas.restore_region(self.n_background)
 			e_canvas.restore_region(self.e_background)
 
+			if self.w_beg_line:
+				# Redraw the window line
+				z_canvas.ax.draw_artist(self.z_window_beg)
+				n_canvas.ax.draw_artist(self.n_window_beg)
+				e_canvas.ax.draw_artist(self.e_window_beg)
+
+			if self.pick_line:
+				# Redraw the pick line
+				z_canvas.ax.draw_artist(self.z_pick)
+				n_canvas.ax.draw_artist(self.n_pick)
+				e_canvas.ax.draw_artist(self.e_pick)
+
 			# Redraw the window line
 			z_canvas.ax.draw_artist(self.z_window_end)
 			n_canvas.ax.draw_artist(self.n_window_end)
@@ -773,14 +812,25 @@ class PickingWindow(qt.QMainWindow):
 			# blit the redrawn area
 			z_canvas.blit(z_canvas.ax.bbox)
 			n_canvas.blit(n_canvas.ax.bbox)
-			e_canvas.blit(e_canvas.ax.bbox)			
+			e_canvas.blit(e_canvas.ax.bbox)
+
+	def applyFilter(self):
+		min_freq = float(self.input_minFreq.text())
+		max_freq = float(self.input_maxFreq.text())
+
+		filt = [min_freq, max_freq]
+
+		self.plot_event(self.event_id, self.station, filt)
 
 	def plot_event(self, event_id, station, filt=None):
+
+		self.event_id = event_id
+		self.station  = station
 
 		# Clear the canvases
 		self.z_comp_plot.canvas.ax.clear()
 		self.n_comp_plot.canvas.ax.clear()
-		self.e_comp_plot.canvas.ax.clear()#
+		self.e_comp_plot.canvas.ax.clear()
 
 		# Make the window and pick lines not show on move
 		self.w_beg_line = False
@@ -795,7 +845,7 @@ class PickingWindow(qt.QMainWindow):
 		self.event = evt.Event("{}/data/{}/event.{}.{}.*".format(self.catalogue_path, station.upper(), event_id, station.upper()))
 
 		if not filt == None:
-			self.event.stream.filter("bandpass", freqmin=filt[0], freqmax=filt[1])
+			self.event.filter_obspy("bandpass", filt[0], filt[1])
 
 		self.event.plot_traces(self.z_comp_plot.canvas.ax, self.n_comp_plot.canvas.ax, self.e_comp_plot.canvas.ax)
 

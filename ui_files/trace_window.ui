@@ -125,7 +125,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox_3">
+   <widget class="QGroupBox" name="eventInfo">
     <property name="geometry">
      <rect>
       <x>1850</x>
@@ -296,7 +296,7 @@
      </layout>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox_2">
+   <widget class="QGroupBox" name="stationInfo">
     <property name="geometry">
      <rect>
       <x>1850</x>
@@ -439,6 +439,73 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="filterSettings">
+    <property name="geometry">
+     <rect>
+      <x>1860</x>
+      <y>1090</y>
+      <width>540</width>
+      <height>190</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Filter settings</string>
+    </property>
+    <widget class="QWidget" name="formLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>30</y>
+       <width>540</width>
+       <height>100</height>
+      </rect>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <property name="verticalSpacing">
+       <number>18</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_minFreq">
+        <property name="styleSheet">
+         <string notr="true">font-weight: bold;</string>
+        </property>
+        <property name="text">
+         <string>Min. frequency</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="input_minFreq"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_maxFreq">
+        <property name="styleSheet">
+         <string notr="true">font-weight: bold;</string>
+        </property>
+        <property name="text">
+         <string>Max. frequency</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="input_maxFreq"/>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QPushButton" name="button_applyFilter">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>140</y>
+       <width>310</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Apply filter</string>
+     </property>
     </widget>
    </widget>
   </widget>

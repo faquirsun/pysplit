@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2420</width>
-    <height>1855</height>
+    <width>1900</width>
+    <height>1390</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,14 +18,14 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>2420</width>
-    <height>1855</height>
+    <width>0</width>
+    <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>2420</width>
-    <height>1855</height>
+    <width>1900</width>
+    <height>1390</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -43,8 +43,8 @@
      <rect>
       <x>30</x>
       <y>30</y>
-      <width>1791</width>
-      <height>561</height>
+      <width>1250</width>
+      <height>390</height>
      </rect>
     </property>
     <property name="title">
@@ -55,14 +55,14 @@
       <rect>
        <x>0</x>
        <y>30</y>
-       <width>1791</width>
-       <height>531</height>
+       <width>1250</width>
+       <height>360</height>
       </rect>
      </property>
      <property name="minimumSize">
       <size>
-       <width>1791</width>
-       <height>531</height>
+       <width>0</width>
+       <height>0</height>
       </size>
      </property>
     </widget>
@@ -71,9 +71,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>620</y>
-      <width>1791</width>
-      <height>561</height>
+      <y>470</y>
+      <width>1250</width>
+      <height>390</height>
      </rect>
     </property>
     <property name="title">
@@ -84,14 +84,14 @@
       <rect>
        <x>0</x>
        <y>30</y>
-       <width>1791</width>
-       <height>531</height>
+       <width>1250</width>
+       <height>360</height>
       </rect>
      </property>
      <property name="minimumSize">
       <size>
-       <width>1791</width>
-       <height>531</height>
+       <width>0</width>
+       <height>0</height>
       </size>
      </property>
     </widget>
@@ -100,9 +100,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>1210</y>
-      <width>1791</width>
-      <height>561</height>
+      <y>910</y>
+      <width>1250</width>
+      <height>390</height>
      </rect>
     </property>
     <property name="title">
@@ -113,14 +113,14 @@
       <rect>
        <x>0</x>
        <y>30</y>
-       <width>1791</width>
-       <height>531</height>
+       <width>1250</width>
+       <height>360</height>
       </rect>
      </property>
      <property name="minimumSize">
       <size>
-       <width>1791</width>
-       <height>531</height>
+       <width>0</width>
+       <height>0</height>
       </size>
      </property>
     </widget>
@@ -128,8 +128,8 @@
    <widget class="QGroupBox" name="eventInfo">
     <property name="geometry">
      <rect>
-      <x>1850</x>
-      <y>60</y>
+      <x>1320</x>
+      <y>30</y>
       <width>550</width>
       <height>490</height>
      </rect>
@@ -299,8 +299,8 @@
    <widget class="QGroupBox" name="stationInfo">
     <property name="geometry">
      <rect>
-      <x>1850</x>
-      <y>570</y>
+      <x>1320</x>
+      <y>550</y>
       <width>550</width>
       <height>490</height>
      </rect>
@@ -444,8 +444,8 @@
    <widget class="QGroupBox" name="filterSettings">
     <property name="geometry">
      <rect>
-      <x>1860</x>
-      <y>1090</y>
+      <x>1330</x>
+      <y>1060</y>
       <width>540</width>
       <height>190</height>
      </rect>
@@ -514,7 +514,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>2420</width>
+     <width>1900</width>
      <height>33</height>
     </rect>
    </property>

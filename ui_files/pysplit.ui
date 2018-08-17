@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1700</width>
-    <height>1030</height>
+    <height>1080</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,7 +25,7 @@
   <property name="maximumSize">
    <size>
     <width>1700</width>
-    <height>1030</height>
+    <height>1088</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -46,8 +46,8 @@
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>620</width>
-      <height>560</height>
+      <width>610</width>
+      <height>510</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -325,10 +325,10 @@
       <widget class="QWidget" name="formLayoutWidget">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>0</x>
          <y>10</y>
-         <width>600</width>
-         <height>340</height>
+         <width>610</width>
+         <height>350</height>
         </rect>
        </property>
        <layout class="QFormLayout" name="teleseismic_form">
@@ -349,6 +349,9 @@
         </property>
         <item row="0" column="0">
          <widget class="QLabel" name="label_startDate">
+          <property name="styleSheet">
+           <string notr="true">font-weight: bold;</string>
+          </property>
           <property name="text">
            <string>Start date:</string>
           </property>
@@ -363,6 +366,9 @@
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_endDate">
+          <property name="styleSheet">
+           <string notr="true">font-weight: bold;</string>
+          </property>
           <property name="text">
            <string>End date:</string>
           </property>
@@ -373,6 +379,9 @@
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_minMag">
+          <property name="styleSheet">
+           <string notr="true">font-weight: bold;</string>
+          </property>
           <property name="text">
            <string>Min. Magnitude:</string>
           </property>
@@ -387,6 +396,9 @@
         </item>
         <item row="3" column="0">
          <widget class="QLabel" name="label_centreLon">
+          <property name="styleSheet">
+           <string notr="true">font-weight: bold;</string>
+          </property>
           <property name="text">
            <string>Central longitude:</string>
           </property>
@@ -397,6 +409,9 @@
         </item>
         <item row="4" column="0">
          <widget class="QLabel" name="label_centreLat">
+          <property name="styleSheet">
+           <string notr="true">font-weight: bold;</string>
+          </property>
           <property name="text">
            <string>Central latitude:</string>
           </property>
@@ -407,6 +422,9 @@
         </item>
         <item row="5" column="0">
          <widget class="QLabel" name="label_minRad">
+          <property name="styleSheet">
+           <string notr="true">font-weight: bold;</string>
+          </property>
           <property name="text">
            <string>Min. radius around centre:</string>
           </property>
@@ -417,6 +435,9 @@
         </item>
         <item row="6" column="0">
          <widget class="QLabel" name="label_maxRad">
+          <property name="styleSheet">
+           <string notr="true">font-weight: bold;</string>
+          </property>
           <property name="text">
            <string>Max. radius around centre:</string>
           </property>
@@ -447,10 +468,10 @@
    <widget class="QGroupBox" name="station_box">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>530</y>
-      <width>211</width>
-      <height>430</height>
+      <x>40</x>
+      <y>540</y>
+      <width>260</width>
+      <height>460</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -470,8 +491,8 @@
       <rect>
        <x>0</x>
        <y>40</y>
-       <width>211</width>
-       <height>390</height>
+       <width>260</width>
+       <height>420</height>
       </rect>
      </property>
     </widget>
@@ -482,7 +503,7 @@
       <x>650</x>
       <y>20</y>
       <width>1040</width>
-      <height>940</height>
+      <height>980</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -500,7 +521,7 @@
        <x>0</x>
        <y>30</y>
        <width>760</width>
-       <height>910</height>
+       <height>950</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -584,7 +605,7 @@
      <property name="geometry">
       <rect>
        <x>780</x>
-       <y>300</y>
+       <y>310</y>
        <width>260</width>
        <height>320</height>
       </rect>
@@ -761,7 +782,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="station_info_page">
       <widget class="QGroupBox" name="groupBox_2">
@@ -780,9 +801,9 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>50</y>
+          <y>30</y>
           <width>260</width>
-          <height>210</height>
+          <height>230</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout_3" columnstretch="4,5">
@@ -927,9 +948,9 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>50</y>
+          <y>30</y>
           <width>260</width>
-          <height>210</height>
+          <height>230</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout_4" columnstretch="4,5">
@@ -1082,10 +1103,10 @@
    <widget class="QGroupBox" name="event_box">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>530</y>
-      <width>380</width>
-      <height>430</height>
+      <x>350</x>
+      <y>540</y>
+      <width>260</width>
+      <height>460</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -1105,8 +1126,8 @@
       <rect>
        <x>0</x>
        <y>40</y>
-       <width>380</width>
-       <height>390</height>
+       <width>260</width>
+       <height>420</height>
       </rect>
      </property>
     </widget>

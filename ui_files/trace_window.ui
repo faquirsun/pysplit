@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1686</width>
-    <height>1089</height>
+    <width>1500</width>
+    <height>1080</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -42,7 +42,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>30</y>
+      <y>20</y>
       <width>1180</width>
       <height>310</height>
      </rect>
@@ -71,7 +71,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>360</y>
+      <y>350</y>
       <width>1180</width>
       <height>310</height>
      </rect>
@@ -100,7 +100,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>690</y>
+      <y>680</y>
       <width>1180</width>
       <height>310</height>
      </rect>
@@ -130,8 +130,8 @@
      <rect>
       <x>1240</x>
       <y>30</y>
-      <width>430</width>
-      <height>320</height>
+      <width>250</width>
+      <height>300</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -144,8 +144,8 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>50</y>
-       <width>430</width>
+       <y>30</y>
+       <width>250</width>
        <height>270</height>
       </rect>
      </property>
@@ -300,9 +300,9 @@
     <property name="geometry">
      <rect>
       <x>1240</x>
-      <y>370</y>
-      <width>430</width>
-      <height>290</height>
+      <y>350</y>
+      <width>250</width>
+      <height>270</height>
      </rect>
     </property>
     <property name="title">
@@ -312,8 +312,8 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>50</y>
-       <width>430</width>
+       <y>30</y>
+       <width>250</width>
        <height>240</height>
       </rect>
      </property>
@@ -445,9 +445,9 @@
     <property name="geometry">
      <rect>
       <x>1240</x>
-      <y>680</y>
-      <width>430</width>
-      <height>150</height>
+      <y>640</y>
+      <width>250</width>
+      <height>140</height>
      </rect>
     </property>
     <property name="title">
@@ -458,7 +458,7 @@
       <rect>
        <x>0</x>
        <y>30</y>
-       <width>430</width>
+       <width>250</width>
        <height>70</height>
       </rect>
      </property>
@@ -497,7 +497,7 @@
     <widget class="QPushButton" name="button_applyFilter">
      <property name="geometry">
       <rect>
-       <x>220</x>
+       <x>50</x>
        <y>110</y>
        <width>200</width>
        <height>30</height>
@@ -514,7 +514,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1686</width>
+     <width>1500</width>
      <height>33</height>
     </rect>
    </property>

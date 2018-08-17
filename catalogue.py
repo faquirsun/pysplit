@@ -161,9 +161,7 @@ class Catalogue(ABC):
 					if not os.path.exists('{}/data/{}'.format(self.path, stat.upper())):
 						os.makedirs('{}/data/{}'.format(self.path, stat.upper()))
 
-					print("bleep")
-					name = '{}/data/{}/event.{}.{}.{}'.format(self.path, stat.upper(), sourceid, stat.upper(), comp.lower())
-					print(name)
+					name = '{}/data/{}/event.{}.{}.{}'.format(self.path, stat.upper(), arrival.sourceid, stat.upper(), comp.lower())
 
 					# Write the trimmed data to a SAC file
 					tr.write(name, format="SAC")

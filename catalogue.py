@@ -170,6 +170,8 @@ class Catalogue(ABC):
 					st = read(name)
 					tr = st.traces[0]
 
+					print("before")
+
 					tr.stats.sac.stla   = slat
 					tr.stats.sac.stlo   = slon
 					tr.stats.sac.stel   = sdep
@@ -185,6 +187,8 @@ class Catalogue(ABC):
 					tr.stats.sac.evdp   = evdep
 					tr.stats.sac.dist   = dist / 1000.
 					tr.stats.sac.az     = az
+
+					print("after")
 
 					tr.write(name, format="SAC")
 					del name

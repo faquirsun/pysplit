@@ -191,6 +191,7 @@ class Catalogue(ABC):
 
 					for l in files:
 						os.remove(l)
+						print("blorp")
 					del files
 				except:
 					print("Error here")

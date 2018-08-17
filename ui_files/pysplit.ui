@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2420</width>
-    <height>1491</height>
+    <width>1750</width>
+    <height>1090</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,8 +18,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>2420</width>
-    <height>1491</height>
+    <width>0</width>
+    <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -46,8 +46,8 @@
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>741</width>
-      <height>691</height>
+      <width>620</width>
+      <height>560</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -67,8 +67,8 @@
       <rect>
        <x>0</x>
        <y>40</y>
-       <width>739</width>
-       <height>130</height>
+       <width>610</width>
+       <height>90</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0" columnstretch="7,11" rowminimumheight="0,0" columnminimumwidth="0,0">
@@ -118,9 +118,9 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>170</y>
-       <width>740</width>
-       <height>522</height>
+       <y>150</y>
+       <width>620</width>
+       <height>410</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -131,15 +131,15 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>740</width>
-       <height>520</height>
+       <width>0</width>
+       <height>0</height>
       </size>
      </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="status_page">
       <layout class="QHBoxLayout" name="horizontalLayout">
@@ -152,7 +152,7 @@
           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
          </property>
          <property name="verticalSpacing">
-          <number>30</number>
+          <number>11</number>
          </property>
          <item row="0" column="0">
           <widget class="QLabel" name="label">
@@ -327,8 +327,8 @@
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>720</width>
-         <height>548</height>
+         <width>600</width>
+         <height>400</height>
         </rect>
        </property>
        <layout class="QFormLayout" name="teleseismic_form">
@@ -345,7 +345,7 @@
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
         <property name="verticalSpacing">
-         <number>27</number>
+         <number>11</number>
         </property>
         <item row="0" column="0">
          <widget class="QLabel" name="label_startDate">
@@ -448,9 +448,9 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>720</y>
+      <y>580</y>
       <width>211</width>
-      <height>681</height>
+      <height>430</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -471,7 +471,7 @@
        <x>0</x>
        <y>40</y>
        <width>211</width>
-       <height>641</height>
+       <height>390</height>
       </rect>
      </property>
     </widget>
@@ -479,10 +479,10 @@
    <widget class="QGroupBox" name="catalogue_plot">
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>650</x>
       <y>20</y>
-      <width>1621</width>
-      <height>1381</height>
+      <width>1090</width>
+      <height>990</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -499,8 +499,8 @@
       <rect>
        <x>0</x>
        <y>30</y>
-       <width>1191</width>
-       <height>1350</height>
+       <width>760</width>
+       <height>960</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -511,18 +511,18 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>1191</width>
-       <height>1350</height>
+       <width>0</width>
+       <height>0</height>
       </size>
      </property>
     </widget>
     <widget class="QGroupBox" name="groupBox">
      <property name="geometry">
       <rect>
-       <x>1200</x>
+       <x>780</x>
        <y>40</y>
-       <width>411</width>
-       <height>330</height>
+       <width>300</width>
+       <height>250</height>
       </rect>
      </property>
      <property name="title">
@@ -531,8 +531,8 @@
      <widget class="QCheckBox" name="station_plot_tickbox">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>170</y>
+        <x>10</x>
+        <y>120</y>
         <width>156</width>
         <height>41</height>
        </rect>
@@ -547,8 +547,8 @@
      <widget class="QCheckBox" name="picked_plot_tickbox">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>50</y>
+        <x>10</x>
+        <y>40</y>
         <width>130</width>
         <height>41</height>
        </rect>
@@ -566,8 +566,8 @@
      <widget class="QCheckBox" name="unpicked_plot_tickbox">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>110</y>
+        <x>10</x>
+        <y>80</y>
         <width>156</width>
         <height>41</height>
        </rect>
@@ -583,10 +583,10 @@
     <widget class="QGroupBox" name="groupBox_3">
      <property name="geometry">
       <rect>
-       <x>1200</x>
-       <y>380</y>
-       <width>410</width>
-       <height>490</height>
+       <x>780</x>
+       <y>300</y>
+       <width>300</width>
+       <height>360</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -600,8 +600,8 @@
        <rect>
         <x>0</x>
         <y>50</y>
-        <width>410</width>
-        <height>410</height>
+        <width>300</width>
+        <height>310</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_5" columnstretch="4,5">
@@ -754,10 +754,10 @@
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="geometry">
       <rect>
-       <x>1200</x>
-       <y>880</y>
-       <width>410</width>
-       <height>490</height>
+       <x>780</x>
+       <y>680</y>
+       <width>300</width>
+       <height>300</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -769,8 +769,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>410</width>
-         <height>490</height>
+         <width>300</width>
+         <height>300</height>
         </rect>
        </property>
        <property name="title">
@@ -781,8 +781,8 @@
          <rect>
           <x>0</x>
           <y>50</y>
-          <width>410</width>
-          <height>380</height>
+          <width>300</width>
+          <height>250</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout_3" columnstretch="4,5">
@@ -928,8 +928,8 @@
          <rect>
           <x>0</x>
           <y>50</y>
-          <width>410</width>
-          <height>380</height>
+          <width>300</width>
+          <height>250</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout_4" columnstretch="4,5">
@@ -1083,9 +1083,9 @@
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>720</y>
-      <width>511</width>
-      <height>681</height>
+      <y>580</y>
+      <width>380</width>
+      <height>430</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -1105,8 +1105,8 @@
       <rect>
        <x>0</x>
        <y>40</y>
-       <width>511</width>
-       <height>641</height>
+       <width>380</width>
+       <height>390</height>
       </rect>
      </property>
     </widget>
@@ -1117,7 +1117,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>2420</width>
+     <width>1750</width>
      <height>33</height>
     </rect>
    </property>

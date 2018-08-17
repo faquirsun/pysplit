@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1730</width>
-    <height>1120</height>
+    <width>1686</width>
+    <height>1089</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -71,7 +71,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>380</y>
+      <y>360</y>
       <width>1180</width>
       <height>310</height>
      </rect>
@@ -100,7 +100,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>730</y>
+      <y>690</y>
       <width>1180</width>
       <height>310</height>
      </rect>
@@ -130,8 +130,8 @@
      <rect>
       <x>1240</x>
       <y>30</y>
-      <width>470</width>
-      <height>410</height>
+      <width>430</width>
+      <height>320</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -145,8 +145,8 @@
       <rect>
        <x>0</x>
        <y>50</y>
-       <width>470</width>
-       <height>330</height>
+       <width>430</width>
+       <height>270</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_5" columnstretch="4,5">
@@ -300,9 +300,9 @@
     <property name="geometry">
      <rect>
       <x>1240</x>
-      <y>460</y>
-      <width>470</width>
-      <height>410</height>
+      <y>370</y>
+      <width>430</width>
+      <height>290</height>
      </rect>
     </property>
     <property name="title">
@@ -313,8 +313,8 @@
       <rect>
        <x>0</x>
        <y>50</y>
-       <width>470</width>
-       <height>300</height>
+       <width>430</width>
+       <height>240</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_3" columnstretch="4,5">
@@ -445,9 +445,9 @@
     <property name="geometry">
      <rect>
       <x>1240</x>
-      <y>880</y>
-      <width>470</width>
-      <height>110</height>
+      <y>680</y>
+      <width>430</width>
+      <height>100</height>
      </rect>
     </property>
     <property name="title">
@@ -458,8 +458,8 @@
       <rect>
        <x>0</x>
        <y>30</y>
-       <width>470</width>
-       <height>80</height>
+       <width>430</width>
+       <height>70</height>
       </rect>
      </property>
      <layout class="QFormLayout" name="formLayout">
@@ -514,7 +514,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1730</width>
+     <width>1686</width>
      <height>33</height>
     </rect>
    </property>

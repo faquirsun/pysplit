@@ -66,7 +66,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>40</y>
+       <y>30</y>
        <width>610</width>
        <height>90</height>
       </rect>
@@ -120,7 +120,7 @@
        <x>0</x>
        <y>150</y>
        <width>610</width>
-       <height>410</height>
+       <height>360</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -146,10 +146,16 @@
        <item>
         <layout class="QFormLayout" name="status_form">
          <property name="sizeConstraint">
-          <enum>QLayout::SetMaximumSize</enum>
+          <enum>QLayout::SetDefaultConstraint</enum>
          </property>
          <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+          <enum>QFormLayout::ExpandingFieldsGrow</enum>
+         </property>
+         <property name="labelAlignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="formAlignment">
+          <set>Qt::AlignHCenter|Qt::AlignTop</set>
          </property>
          <property name="verticalSpacing">
           <number>11</number>
@@ -325,10 +331,10 @@
       <widget class="QWidget" name="formLayoutWidget">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>10</y>
-         <width>610</width>
-         <height>350</height>
+         <x>20</x>
+         <y>20</y>
+         <width>570</width>
+         <height>320</height>
         </rect>
        </property>
        <layout class="QFormLayout" name="teleseismic_form">
@@ -426,7 +432,7 @@
            <string notr="true">font-weight: bold;</string>
           </property>
           <property name="text">
-           <string>Min. radius around centre:</string>
+           <string>Min. radius:</string>
           </property>
          </widget>
         </item>
@@ -439,7 +445,7 @@
            <string notr="true">font-weight: bold;</string>
           </property>
           <property name="text">
-           <string>Max. radius around centre:</string>
+           <string>Max. radius:</string>
           </property>
          </widget>
         </item>
@@ -950,7 +956,7 @@
           <x>0</x>
           <y>30</y>
           <width>260</width>
-          <height>230</height>
+          <height>264</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout_4" columnstretch="4,5">

@@ -406,6 +406,7 @@ class LocalCatalogue(Catalogue):
 	def plot_stations(self, ax):
 		lons = self.receiver_df.lon.values
 		lats = self.receiver_df.lat.values
+		print(receiver_df)
 		x, y = self.m(lons, lats)
 		tolerance = 10
 		for i in range(len(x)):

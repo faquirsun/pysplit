@@ -174,36 +174,29 @@ class Catalogue(ABC):
 					st = read(name)
 					tr = st.traces[0]
 
-					print("before")
-					print(tr)
-
 					tr.stats.sac.stla   = slat
-					#tr.stats.sac.stlo   = slon
-					#tr.stats.sac.stel   = sdep
+					tr.stats.sac.stlo   = slon
+					tr.stats.sac.stel   = sdep
 					#tr.stats.sac.cmpaz  = str(cmpaz[comp])
 					#tr.stats.sac.cmpinc = str(cmpinc[comp])
-					#tr.stats.sac.kcmpnm = 'HH' + comp
-					#tr.stats.t0         = t0
-					#tr.stats.kt5        = 3
-					#tr.stats.kt0        = 3
-					#tr.stats.sac.o      = o
-					#tr.stats.sac.evla   = evlat
-					#tr.stats.sac.evlo   = evlon
-					#tr.stats.sac.evdp   = evdep
-					#tr.stats.sac.dist   = dist / 1000.
-					#tr.stats.sac.az     = az
-
-					print("after")
+					tr.stats.sac.kcmpnm = 'HH' + comp
+					tr.stats.t0         = t0
+					tr.stats.kt5        = 3
+					tr.stats.kt0        = 3
+					tr.stats.sac.o      = o
+					tr.stats.sac.evla   = evlat
+					tr.stats.sac.evlo   = evlon
+					tr.stats.sac.evdp   = evdep
+					tr.stats.sac.dist   = dist / 1000.
+					tr.stats.sac.az     = az
 
 					tr.write(name, format="SAC")
 					del name
 
 					for l in files:
 						os.remove(l)
-						print("blorp")
 					del files
-				except:
-					print("Error here")
+				except IndexError:
 					for l in files:
 						os.remove(l)
 					del files

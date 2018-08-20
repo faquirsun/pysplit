@@ -175,22 +175,23 @@ class Catalogue(ABC):
 					tr = st.traces[0]
 
 					print("before")
+					print(tr)
 
 					tr.stats.sac.stla   = slat
-					tr.stats.sac.stlo   = slon
-					tr.stats.sac.stel   = sdep
-					tr.stats.sac.cmpaz  = str(cmpaz[comp])
-					tr.stats.sac.cmpinc = str(cmpinc[comp])
-					tr.stats.sac.kcmpnm = 'HH' + comp
-					tr.stats.t0         = t0
-					tr.stats.kt5        = 3
-					tr.stats.kt0        = 3
-					tr.stats.sac.o      = o
-					tr.stats.sac.evla   = evlat
-					tr.stats.sac.evlo   = evlon
-					tr.stats.sac.evdp   = evdep
-					tr.stats.sac.dist   = dist / 1000.
-					tr.stats.sac.az     = az
+					#tr.stats.sac.stlo   = slon
+					#tr.stats.sac.stel   = sdep
+					#tr.stats.sac.cmpaz  = str(cmpaz[comp])
+					#tr.stats.sac.cmpinc = str(cmpinc[comp])
+					#tr.stats.sac.kcmpnm = 'HH' + comp
+					#tr.stats.t0         = t0
+					#tr.stats.kt5        = 3
+					#tr.stats.kt0        = 3
+					#tr.stats.sac.o      = o
+					#tr.stats.sac.evla   = evlat
+					#tr.stats.sac.evlo   = evlon
+					#tr.stats.sac.evdp   = evdep
+					#tr.stats.sac.dist   = dist / 1000.
+					#tr.stats.sac.az     = az
 
 					print("after")
 
@@ -406,7 +407,6 @@ class LocalCatalogue(Catalogue):
 	def plot_stations(self, ax):
 		lons = self.receiver_df.lon.values
 		lats = self.receiver_df.lat.values
-		print(self.receiver_df)
 		x, y = self.m(lons, lats)
 		tolerance = 10
 		for i in range(len(x)):

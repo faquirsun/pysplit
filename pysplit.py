@@ -580,11 +580,13 @@ class NewCatalogueDialogue(qt.QDialog):
 		self.initUI()
 
 	def initUI(self):
-		uic.loadUi('ui_files/new_catalogue_dialogue2.ui', self)
+		uic.loadUi('ui_files/new_catalogue_dialogue.ui', self)
 
 		self.catDirButton.clicked.connect(self.browseCatalogue)
 		self.arcDirButton.clicked.connect(self.browseArchive)
 		self.receiverFileButton.clicked.connect(self.browseReceivers)
+
+		self.
 
 		self.setWindowTitle('PySplit - New catalogue')
 		self.show()

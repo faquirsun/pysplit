@@ -586,8 +586,6 @@ class NewCatalogueDialogue(qt.QDialog):
 		self.arcDirButton.clicked.connect(self.browseArchive)
 		self.receiverFileButton.clicked.connect(self.browseReceivers)
 
-		self.
-
 		self.setWindowTitle('PySplit - New catalogue')
 		self.show()
 

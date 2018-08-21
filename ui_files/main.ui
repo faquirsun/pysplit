@@ -462,101 +462,28 @@
       <property name="title">
        <string>Catalogue map</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_22" rowstretch="5,5,5,0" columnstretch="15,3,0">
-       <item row="0" column="2">
-        <widget class="QGroupBox" name="groupBox_8">
-         <property name="title">
-          <string>Plot options</string>
+      <layout class="QGridLayout" name="gridLayout_22" rowstretch="5,0,0,0" columnstretch="15,0,0">
+       <item row="3" column="2">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string/>
          </property>
-         <layout class="QGridLayout" name="gridLayout_25">
-          <item row="0" column="0" rowspan="2">
-           <widget class="QCheckBox" name="picked_plot_tickbox">
-            <property name="autoFillBackground">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Picked</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>Min. lat</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="input_minLat"/>
-          </item>
-          <item row="2" column="0" rowspan="2" colspan="2">
-           <widget class="QCheckBox" name="unpicked_plot_tickbox">
-            <property name="text">
-             <string>Unpicked</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLabel" name="label_12">
-            <property name="text">
-             <string>Min. lon</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0" rowspan="2">
-           <widget class="QCheckBox" name="station_plot_tickbox">
-            <property name="text">
-             <string>Stations</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="input_minLon"/>
-          </item>
-          <item row="5" column="1">
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>Max. lat</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <widget class="QLineEdit" name="input_maxLat"/>
-          </item>
-          <item row="7" column="1">
-           <widget class="QLabel" name="label_48">
-            <property name="text">
-             <string>Max. lon</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <widget class="QLineEdit" name="input_maxLon"/>
-          </item>
-          <item row="9" column="1">
-           <widget class="QPushButton" name="button_plotMap">
-            <property name="text">
-             <string>Plot map</string>
-            </property>
-           </widget>
-          </item>
-          <item row="10" column="1">
-           <widget class="QPushButton" name="button_resetMap">
-            <property name="text">
-             <string>Reset map</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+        </widget>
+       </item>
+       <item row="0" column="0" rowspan="4" colspan="2">
+        <widget class="MplWidget" name="mpl" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
         </widget>
        </item>
        <item row="2" column="2">
@@ -1004,27 +931,100 @@
          </layout>
         </widget>
        </item>
-       <item row="3" column="2">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string/>
+       <item row="0" column="2">
+        <widget class="QGroupBox" name="groupBox_8">
+         <property name="title">
+          <string>Plot options</string>
          </property>
-        </widget>
-       </item>
-       <item row="0" column="0" rowspan="4" colspan="2">
-        <widget class="MplWidget" name="mpl" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
+         <layout class="QGridLayout" name="gridLayout_25">
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="input_minLat"/>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Min. lat</string>
+            </property>
+           </widget>
+          </item>
+          <item row="15" column="1">
+           <widget class="QPushButton" name="button_resetMap">
+            <property name="text">
+             <string>Reset map</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Max. lat</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="1">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>Min. lon</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="picked_plot_tickbox">
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Picked</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="1">
+           <widget class="QLineEdit" name="input_minLon"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="unpicked_plot_tickbox">
+            <property name="text">
+             <string>Unpicked</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="14" column="1">
+           <widget class="QPushButton" name="button_plotMap">
+            <property name="text">
+             <string>Plot map</string>
+            </property>
+           </widget>
+          </item>
+          <item row="13" column="1">
+           <widget class="QLineEdit" name="input_maxLon"/>
+          </item>
+          <item row="7" column="1">
+           <widget class="QLineEdit" name="input_maxLat"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="station_plot_tickbox">
+            <property name="text">
+             <string>Stations</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="1">
+           <widget class="QLabel" name="label_48">
+            <property name="text">
+             <string>Max. lon</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>

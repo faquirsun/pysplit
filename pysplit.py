@@ -284,10 +284,10 @@ class PySplit(qt.QMainWindow):
 		# If replotting, grab the new parameters
 		if replot:
 			self.catalogue.plot_geographic(self.mpl.canvas.ax,
-										   lon0=float(self.input_minLon.getText()),
-										   lon1=float(self.input_maxLon.getText()),
-										   lat0=float(self.input_minLat.getText()),
-										   lat1=float(self.input_maxLat.getText()))
+										   lon0=float(self.input_minLon.text()),
+										   lon1=float(self.input_maxLon.text()),
+										   lat0=float(self.input_minLat.text()),
+										   lat1=float(self.input_maxLat.text()))
 
 			if self.station_plot_tickbox.isChecked():
 				self.catalogue.plot_stations(self.mpl.canvas.ax)

@@ -1157,6 +1157,9 @@
    </property>
   </action>
   <action name="actionPick_mode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Pick mode</string>
    </property>
@@ -1165,6 +1168,9 @@
    </property>
   </action>
   <action name="actionAnalyse_mode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Analyse mode</string>
    </property>

@@ -462,7 +462,7 @@
       <property name="title">
        <string>Catalogue map</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_22" rowstretch="5,0,0,0" columnstretch="15,0,0">
+      <layout class="QGridLayout" name="gridLayout_22" rowstretch="5,5,5,0" columnstretch="15,0,0">
        <item row="1" column="2">
         <widget class="QGroupBox" name="groupBox_9">
          <property name="styleSheet">

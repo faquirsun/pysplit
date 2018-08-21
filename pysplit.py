@@ -48,7 +48,7 @@ class PySplit(qt.QMainWindow):
 	def initUI(self):
 
 		# Load the ui file
-		uic.loadUi('ui_files/pysplit.ui', self)
+		uic.loadUi('ui_files/main.ui', self)
 
 		# Connect to actions and interactive widgets
 		self.connect()
@@ -85,7 +85,7 @@ class PySplit(qt.QMainWindow):
 		self.station_list.doubleClicked.connect(self.stationSelect)
 
 		# Event list connection
-		self.event_list.doubleClicked.connect(self.eventSelect)
+		self.events_list.doubleClicked.connect(self.eventSelect)
 
 		# Catalogue generation button connection
 		self.tele_load_button.clicked.connect(self.generate_teleseismic_catalogue)
@@ -248,7 +248,7 @@ class PySplit(qt.QMainWindow):
 
 		# Enable the station and event selection lists
 		self.station_list.setEnabled(True)
-		self.event_list.setEnabled(True)
+		self.events_list.setEnabled(True)
 
 	def getLocalInput(self):
 		self.localInputDialogue = LocalInputDialogue()
@@ -326,17 +326,17 @@ class PySplit(qt.QMainWindow):
 		events = glob.glob('{}/*.z'.format(station_path))
 
 		# Populate the event list
-		model = QtGui.QStandardItemModel(self.event_list)
+		model = QtGui.QStandardItemModel(self.events_list)
 		for event in events:
 			head, tail = os.path.split(event)
 			item = QtGui.QStandardItem("Event {}".format(tail.split(".")[1]))
 			model.appendRow(item)
-		self.event_list.setModel(model)
-		self.event_list.setEditTriggers(qt.QAbstractItemView.NoEditTriggers)
+		self.events_list.setModel(model)
+		self.events_list.setEditTriggers(qt.QAbstractItemView.NoEditTriggers)
 
 	def eventSelect(self, index):
 		# Parse event selected
-		self.event = self.event_list.model().data(index).split(" ")[1]
+		self.event = self.events_list.model().data(index).split(" ")[1]
 
 		# Load event information and print to display
 		self._updateEventInformation(self.event)
@@ -415,7 +415,7 @@ class PySplit(qt.QMainWindow):
 
 		# Enable the station and event selection lists
 		self.station_list.setEnabled(True)
-		self.event_list.setEnabled(True)
+		self.events_list.setEnabled(True)
 
 		# Plot the map of the catalogue
 		self.plotCatalogueMap()

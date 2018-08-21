@@ -16,6 +16,12 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="maximumSize">
+   <size>
+    <width>794</width>
+    <height>370</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
@@ -159,6 +165,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tele_radio</tabstop>
+  <tabstop>local_radio</tabstop>
+  <tabstop>catBox</tabstop>
+  <tabstop>catDirButton</tabstop>
+  <tabstop>catName</tabstop>
+  <tabstop>arcBox</tabstop>
+  <tabstop>arcDirButton</tabstop>
+  <tabstop>arcFormBox</tabstop>
+  <tabstop>recBox</tabstop>
+  <tabstop>receiverFileButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

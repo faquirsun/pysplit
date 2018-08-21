@@ -102,6 +102,7 @@ class PySplit(qt.QMainWindow):
 		self.station_plot_tickbox.stateChanged.connect(self.stationStateChanged)
 
 		self.button_plotMap.clicked.connect(lambda: self.plotCatalogueMap(replot=True))
+		self.button_resetMap.clicked.connect(self.plotCatalogueMap)
 
 	def keyPressEvent(self, event):
 		if event.key() == Qt.Key_Control:

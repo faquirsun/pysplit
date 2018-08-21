@@ -101,6 +101,8 @@ class PySplit(qt.QMainWindow):
 		self.unpicked_plot_tickbox.stateChanged.connect(self.unpickedStateChanged)
 		self.station_plot_tickbox.stateChanged.connect(self.stationStateChanged)
 
+		self.button_plotMap.clicked.connect(self.plotCatalogueMap(replot=True))
+
 	def keyPressEvent(self, event):
 		if event.key() == Qt.Key_Control:
 			print("Ctrl toggled on")

@@ -230,7 +230,7 @@ class PySplit(qt.QMainWindow):
 			self.generate_catalogue()
 
 			# Plot the map of the catalogue
-			self.plotter()
+			self.plotCatalogueMap()
 
 		# Set the catalogue name label
 		self.label_catNameDisp.setText(self.catalogue_name)
@@ -271,15 +271,43 @@ class PySplit(qt.QMainWindow):
 		self.data_source = self.local_input_file
 
 
-	def plotter(self):
+	def plotCatalogueMap(self, replot=False):
+		# Transmit a message to the status bar
 		self.statusbar.showMessage("Plotting catalogue map...")
+
+		# Show the matplotlib widget and clear it
 		self.mpl.show()
 		self.mpl.canvas.ax.clear()
-		self.catalogue.plot_geographic(self.mpl.canvas.ax)
-		#if self.station_plot_tickbox.isChecked():
-			#self.catalogue.plot_stations(self.mpl.canvas.ax)
-		self.catalogue.plot_stations(self.mpl.canvas.ax)
+
+		# If replotting, grab the new parameters
+		if replot:
+			self.catalogue.plot_geographic(self.mpl.canvas.ax,
+										   lon0=float(self.input_minLon.getText()),
+										   lon1=float(self.input_maxLon.getText()),
+										   lat0=float(self.input_minLat.getText()),
+										   lat1=float(self.input_maxLat.getText()))
+
+			if self.station_plot_tickbox.isChecked():
+				self.catalogue.plot_stations(self.mpl.canvas.ax)
+
+		else:
+			# Plot the events
+			self.catalogue.plot_geographic(self.mpl.canvas.ax)
+
+			# Plot the stations
+			if self.station_plot_tickbox.isChecked():
+				self.catalogue.plot_stations(self.mpl.canvas.ax)
+
+			# Grab the latitude and longitude of the map and send to input options
+			self.input_minLon.setText(self.catalogue.lon0)
+			self.input_maxLon.setText(self.catalogue.lon1)
+			self.input_minLat.setText(self.catalogue.lat0)
+			self.input_maxLat.setText(self.catalogue.lat1)
+
+		# Draw the canvas
 		self.mpl.canvas.draw()
+
+		# Transmit a message to the status bar
 		self.statusbar.showMessage("Catalogue load complete.")
 
 	def stationSelect(self, index):
@@ -387,7 +415,7 @@ class PySplit(qt.QMainWindow):
 		self.event_list.setEnabled(True)
 
 		# Plot the map of the catalogue
-		self.plotter()
+		self.plotCatalogueMap()
 
 	def generate_teleseismic_catalogue(self):
 		pass
@@ -458,7 +486,7 @@ class PySplit(qt.QMainWindow):
 			self.status_page.show()
 
 			# Plot the map of the catalogue
-			self.plotter()
+			self.plotCatalogueMap()
 
 	def _generate_catalogue_metafile(self):
 		# Read in the template file

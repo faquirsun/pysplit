@@ -366,21 +366,28 @@ class LocalCatalogue(Catalogue):
 	def window_range(self):
 		return 60.
 
-	def plot_geographic(self, ax, resolution='c'):
+	def plot_geographic(self, ax, lon0=None, lon1=None, lat0=None, lat1=None, resolution='c'):
 
 		# Find appropriate geographical region
 		lons = self.source_df.evlon.values
 		lats = self.source_df.evlat.values
 
-		londiff = (lons.max() - lons.min()) * 0.1
-		latdiff = (lats.max() - lats.min()) * 0.1
-		lon0 = lons.min() - londiff
-		lon1 = lons.max() + londiff
-		lat0 = lats.min() - latdiff
-		lat1 = lats.max() + latdiff
+		if lon0 == None: 
+			londiff = (lons.max() - lons.min()) * 0.1
+			latdiff = (lats.max() - lats.min()) * 0.1
+			self.lon0 = lons.min() - londiff
+			self.lon1 = lons.max() + londiff
+			self.lat0 = lats.min() - latdiff
+			self.lat1 = lats.max() + latdiff
+
+		else:
+			self.lon0 = lon0
+			self.lon1 = lon1
+			self.lat0 = lat0
+			self.lat1 = lat1
 
 		# Create a Basemap of the calculated region and draw any coastlines
-		self.m = Basemap(llcrnrlon=lon0, llcrnrlat=lat0, urcrnrlon=lon1, urcrnrlat=lat1,\
+		self.m = Basemap(llcrnrlon=self.lon0, llcrnrlat=self.lat0, urcrnrlon=self.lon1, urcrnrlat=self.lat1,\
             resolution=resolution, projection='merc', ax=ax)
 		self.m.drawcoastlines()
 

@@ -558,7 +558,7 @@
      <widget class="QCheckBox" name="station_plot_tickbox">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>20</x>
         <y>90</y>
         <width>156</width>
         <height>30</height>
@@ -574,7 +574,7 @@
      <widget class="QCheckBox" name="picked_plot_tickbox">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>20</x>
         <y>30</y>
         <width>130</width>
         <height>30</height>
@@ -593,7 +593,7 @@
      <widget class="QCheckBox" name="unpicked_plot_tickbox">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>20</x>
         <y>60</y>
         <width>156</width>
         <height>30</height>
@@ -606,7 +606,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="button_resetMap">
       <property name="geometry">
        <rect>
         <x>140</x>
@@ -619,7 +619,7 @@
        <string>Reset map</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit">
+     <widget class="QLineEdit" name="input_minLat">
       <property name="geometry">
        <rect>
         <x>140</x>
@@ -642,7 +642,7 @@
        <string>Min. lat</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_2">
+     <widget class="QLineEdit" name="input_minLon">
       <property name="geometry">
        <rect>
         <x>140</x>
@@ -665,7 +665,7 @@
        <string>Min. lon</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_3">
+     <widget class="QLineEdit" name="input_maxLat">
       <property name="geometry">
        <rect>
         <x>140</x>
@@ -688,7 +688,7 @@
        <string>Max. lat</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_4">
+     <widget class="QLineEdit" name="input_maxLon">
       <property name="geometry">
        <rect>
         <x>140</x>
@@ -711,7 +711,7 @@
        <string>Max. lon</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_2">
+     <widget class="QPushButton" name="button_plotMap">
       <property name="geometry">
        <rect>
         <x>140</x>
@@ -744,9 +744,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>50</y>
+        <y>30</y>
         <width>250</width>
-        <height>270</height>
+        <height>290</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_5" columnstretch="4,5">
@@ -1062,7 +1062,7 @@
          <x>0</x>
          <y>0</y>
          <width>250</width>
-         <height>490</height>
+         <height>510</height>
         </rect>
        </property>
        <property name="title">
@@ -1074,7 +1074,7 @@
           <x>0</x>
           <y>30</y>
           <width>250</width>
-          <height>264</height>
+          <height>220</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout_4" columnstretch="4,5">
@@ -1249,9 +1249,9 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>30</y>
+       <y>20</y>
        <width>210</width>
-       <height>420</height>
+       <height>430</height>
       </rect>
      </property>
     </widget>

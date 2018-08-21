@@ -301,10 +301,10 @@ class PySplit(qt.QMainWindow):
 				self.catalogue.plot_stations(self.mpl.canvas.ax)
 
 			# Grab the latitude and longitude of the map and send to input options
-			self.input_minLon.setText(str(self.catalogue.lon0))
-			self.input_maxLon.setText(str(self.catalogue.lon1))
-			self.input_minLat.setText(str(self.catalogue.lat0))
-			self.input_maxLat.setText(str(self.catalogue.lat1))
+			self.input_minLon.setText(str(f"{self.catalogue.lon0:.5f}"))
+			self.input_maxLon.setText(str(f"{self.catalogue.lon1:.5f}"))
+			self.input_minLat.setText(str(f"{self.catalogue.lat0:.5f}"))
+			self.input_maxLat.setText(str(f"{self.catalogue.lat1:.5f}"))
 
 		# Draw the canvas
 		self.mpl.canvas.draw()

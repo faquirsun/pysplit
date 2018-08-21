@@ -333,8 +333,8 @@
         <rect>
          <x>20</x>
          <y>20</y>
-         <width>420</width>
-         <height>320</height>
+         <width>491</width>
+         <height>420</height>
         </rect>
        </property>
        <layout class="QFormLayout" name="teleseismic_form">
@@ -604,6 +604,111 @@
       </property>
       <property name="checked">
        <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>220</y>
+        <width>100</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Reset map</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>70</y>
+        <width>100</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>50</y>
+        <width>100</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Min. lat</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>110</y>
+        <width>100</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>90</y>
+        <width>100</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Min. lon</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_3">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>150</y>
+        <width>100</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_8">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>130</y>
+        <width>100</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Max. lat</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_4">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>190</y>
+        <width>100</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_22">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>170</y>
+        <width>100</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Max. lon</string>
       </property>
      </widget>
     </widget>
@@ -956,7 +1061,7 @@
           <x>0</x>
           <y>30</y>
           <width>250</width>
-          <height>230</height>
+          <height>264</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout_4" columnstretch="4,5">

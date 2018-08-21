@@ -496,9 +496,9 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>30</y>
+       <y>20</y>
        <width>210</width>
-       <height>420</height>
+       <height>430</height>
       </rect>
      </property>
     </widget>
@@ -549,7 +549,7 @@
        <x>910</x>
        <y>40</y>
        <width>250</width>
-       <height>250</height>
+       <height>260</height>
       </rect>
      </property>
      <property name="title">
@@ -610,7 +610,7 @@
       <property name="geometry">
        <rect>
         <x>140</x>
-        <y>220</y>
+        <y>230</y>
         <width>100</width>
         <height>20</height>
        </rect>

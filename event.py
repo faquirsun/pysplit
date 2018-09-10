@@ -87,20 +87,49 @@ class Event(object):
 		return tr
 
 	def filter_obspy(self, type, minfreq, maxfreq, n_poles=2, zero_phase=True):
+		# Make a copy of the data (so don't have to read a new one if re-filtering)
 		tmp_stream = self.stream.copy()
 
+		# Detrend the data
+		tmp_stream = (tmp_stream.detrend("linear")).detrend("demean")
+
+		# Add a cosine taper from the 5th - 95th percentile
+		tmp_stream = tmp_stream.taper(max_percentage=0.05)
+
+		# Filter the data
 		tmp_stream.filter(type=type, freqmin=minfreq, freqmax=maxfreq, corners=n_poles, zerophase=zero_phase)
 
-		# Select the 3 components
+		# Overwrite the 3 components
 		self.Z_comp = tmp_stream.select(channel="*Z")[0]
 		self.N_comp = tmp_stream.select(channel="*N")[0]
 		self.E_comp = tmp_stream.select(channel="*E")[0]
 
-	def plot_traces(self, Z_ax, N_ax, E_ax):
+	def plot_traces(self, Z_ax, N_ax, E_ax, x_lims=None, y_scale=None):
 
+		if x_lims == None and y_scale == None:
+			# Calculate x limits and set them
+			xlims = (self.Z_comp.times(type="relative")[0], self.Z_comp.times(type="relative")[-1])
+			Z_ax.set_xlim(xlims)
+			N_ax.set_xlim(xlims)
+			E_ax.set_xlim(xlims)
+
+			# Need to find absolute max of all three traces then normalise them all wrt to that
+
+		if x_lims == None and not y_scale == None:
+			xlims = lims[0]
+			ylims = lims[1]
+
+		if not x_lims == None and y_scale == None:
+			pass
+
+		# Plot the traces
 		Z_ax.plot(self.Z_comp.times(type="relative"), self.Z_comp.data)
 		N_ax.plot(self.N_comp.times(type="relative"), self.N_comp.data)
 		E_ax.plot(self.E_comp.times(type="relative"), self.E_comp.data)
+
+
+
+	
 
 	def _add_stat(self, stat, value):
 		if stat == "window_beg":

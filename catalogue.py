@@ -395,6 +395,9 @@ class LocalCatalogue(Catalogue):
 		ax.set_xlabel("Longitude, degrees", fontsize=10)
 		ax.set_ylabel("Latitude, degrees", fontsize=10)
 
+		# Try rescaling the image now
+		ax.set_aspect('auto')
+
 		x, y = self.m(lons, lats)
 		tolerance = 10
 		for i in range(len(x)):

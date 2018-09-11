@@ -217,8 +217,6 @@ class Catalogue(ABC):
 					tr.write(name, format="MSEED")
 					del name
 
-					print("reached here5")
-
 					for l in files:
 						os.remove(l)
 					del files
@@ -229,11 +227,11 @@ class Catalogue(ABC):
 					continue
 
 			if not file_exists:
-				print("The data for this arrival is not in the archive - it has been removed from the DataFrame")
+				print("The data for this arrival is not in the archive - it has been removed from the DataFrame.")
 				self.arrival_df.drop(i, inplace=True)
 
 			else:
-				print("Data retrieved")
+				print("Data retrieved.")
 				self.arrival_df.loc[i, 'waveform?'] = True
 
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>2097</width>
-    <height>1482</height>
+    <height>1585</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -644,7 +644,7 @@
          <property name="title">
           <string>Plot options</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_25" rowstretch="0,0,0,0,0,0,0,0,0,0,0">
+         <layout class="QGridLayout" name="gridLayout_25" rowstretch="0,0,0,0,0,0,0,0,0,0">
           <item row="0" column="0">
            <widget class="QCheckBox" name="picked_plot_tickbox">
             <property name="autoFillBackground">
@@ -759,7 +759,7 @@
        <enum>QFrame::NoFrame</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="status_page">
        <layout class="QGridLayout" name="gridLayout_15">
@@ -866,6 +866,13 @@
         </item>
         <item row="4" column="0">
          <widget class="QLabel" name="label_4">
+          <property name="font">
+           <font>
+            <family>Ubuntu</family>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="layoutDirection">
            <enum>Qt::LeftToRight</enum>
           </property>
@@ -1048,7 +1055,7 @@
      <x>0</x>
      <y>0</y>
      <width>2097</width>
-     <height>33</height>
+     <height>39</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

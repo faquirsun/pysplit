@@ -1165,6 +1165,31 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>load_events_button</tabstop>
+  <tabstop>load_stats_button</tabstop>
+  <tabstop>load_arrivals_button</tabstop>
+  <tabstop>load_waveforms_button</tabstop>
+  <tabstop>station_list</tabstop>
+  <tabstop>events_list</tabstop>
+  <tabstop>picked_plot_tickbox</tabstop>
+  <tabstop>unpicked_plot_tickbox</tabstop>
+  <tabstop>station_plot_tickbox</tabstop>
+  <tabstop>input_minLat</tabstop>
+  <tabstop>input_maxLat</tabstop>
+  <tabstop>input_minLon</tabstop>
+  <tabstop>input_maxLon</tabstop>
+  <tabstop>button_resetMap</tabstop>
+  <tabstop>button_plotMap</tabstop>
+  <tabstop>minRad_input</tabstop>
+  <tabstop>endDate_input</tabstop>
+  <tabstop>centreLat_input</tabstop>
+  <tabstop>startDate_input</tabstop>
+  <tabstop>minMag_input</tabstop>
+  <tabstop>maxRad_input</tabstop>
+  <tabstop>centreLon_input</tabstop>
+  <tabstop>tele_load_button</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

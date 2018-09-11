@@ -162,7 +162,6 @@ class Catalogue(ABC):
 				try:
 					file = files[0]
 				except IndexError:
-					print("File doesn't exist")
 					file_exists = False
 					continue
 

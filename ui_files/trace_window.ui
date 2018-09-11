@@ -546,7 +546,7 @@
      <x>0</x>
      <y>0</y>
      <width>2592</width>
-     <height>33</height>
+     <height>39</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -578,7 +578,11 @@
  <tabstops>
   <tabstop>input_minFreq</tabstop>
   <tabstop>input_maxFreq</tabstop>
+  <tabstop>button_removeFilter</tabstop>
   <tabstop>button_applyFilter</tabstop>
+  <tabstop>button_nextTrace</tabstop>
+  <tabstop>button_lastTrace</tabstop>
+  <tabstop>button_resetPlot</tabstop>
  </tabstops>
  <resources/>
  <connections>

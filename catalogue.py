@@ -106,6 +106,11 @@ class Catalogue(ABC):
 		window_range = self.window_range()
 
 		for i, arrival in self.arrival_df.iterrows():
+
+			# If the waveforms has already been retrieved, skip it.
+			if arrival['waveform?']:
+				continue
+
 			# Based on the source and receiver ID's, retrieve the relevant information
 			otime, evlat, evlon, evdep = self._get_source(self.source_df, arrival.sourceid)
 			stat, slat, slon, sdep     = self._get_receiver(self.receiver_df, arrival.receiverid)
@@ -174,12 +179,12 @@ class Catalogue(ABC):
 
 					name = '{}/data/{}/event.{}.{}.{}'.format(self.path, stat.upper(), arrival.sourceid, stat.upper(), comp.lower())
 
-					# Write the trimmed data to a SAC file
-					tr.write(name, format="MSEED")
+					# # Write the trimmed data to a SAC file
+					# tr.write(name, format="MSEED")
 
-					# Reload SAC file and update all the headers
-					st = read(name)
-					tr = st.traces[0]
+					# # Reload SAC file and update all the headers
+					# st = read(name)
+					# tr = st.traces[0]
 
 					# Add station information
 					tr.stats.stla   = slat
@@ -206,9 +211,7 @@ class Catalogue(ABC):
 					tr.stats.t0         = t0
 					tr.stats.kt5        = 3
 					tr.stats.kt0        = 3
-					tr.stats.o      = o
-
-					print(tr)
+					tr.stats.o      	= o
 
 					# Write the file out to MSEED
 					tr.write(name, format="MSEED")

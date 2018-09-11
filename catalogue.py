@@ -117,12 +117,22 @@ class Catalogue(ABC):
 			window_beg = otime + float(arrival.traveltime) - window_range
 			window_end = otime + float(arrival.traveltime) + window_range
 
-			# Reference times for SAC file
+			# Reference times for MSEED file
 			o = otime - window_beg
 			t0 = window_range
 
+			# Data existence tracker
+			file_exists = True
+
 			# Download and trim each file from the archive
 			for comp in ['Z', 'N', 'E']:
+
+				# Skip if the file doesn't exist
+				if file_exists:
+					pass
+				else:
+					continue
+
 				evyear = str(window_beg.year)
 				evjday = str(window_beg.julday)
 				nxjday = str((window_beg + 86400).julday)
@@ -148,6 +158,7 @@ class Catalogue(ABC):
 					file = files[0]
 				except IndexError:
 					print("File doesn't exist")
+					file_exists = False
 					continue
 
 				st = read('{}/tmp/*_{}_{}2.m'.format(self.path, stat.upper(), comp))
@@ -163,30 +174,42 @@ class Catalogue(ABC):
 
 					name = '{}/data/{}/event.{}.{}.{}'.format(self.path, stat.upper(), arrival.sourceid, stat.upper(), comp.lower())
 
-					# Write the trimmed data to a SAC file
-					tr.write(name, format="SAC")
+					# # Write the trimmed data to a SAC file
+					# tr.write(name, format="MSEED")
 
-					# Reload SAC file and update all the headers
-					st = read(name)
-					tr = st.traces[0]
+					# # Reload SAC file and update all the headers
+					# st = read(name)
+					# tr = st.traces[0]
 
-					tr.stats.sac.stla   = slat
-					tr.stats.sac.stlo   = slon
-					tr.stats.sac.stel   = sdep
-					tr.stats.sac.cmpaz  = str(self.cmpaz[comp])
-					tr.stats.sac.cmpinc = str(self.cmpinc[comp])
-					tr.stats.sac.kcmpnm = 'HH' + comp
+					# Add station information
+					tr.stats.stla   = slat
+					tr.stats.stlo   = slon
+					tr.stats.stel   = sdep
+
+					# Add event information
+					tr.stats.evla   = evlat
+					tr.stats.evlo   = evlon
+					tr.stats.evdp   = evdep
+
+					# Add distance and azimuth information
+					tr.stats.dist   = dist / 1000.
+					tr.stats.az     = az
+
+					# Add compass definition information
+					tr.stats.cmpaz  = str(self.cmpaz[comp])
+					tr.stats.cmpinc = str(self.cmpinc[comp])
+
+					# Name the component
+					tr.stats.kcmpnm = 'HH' + comp
+
+					# Add timing information
 					tr.stats.t0         = t0
 					tr.stats.kt5        = 3
 					tr.stats.kt0        = 3
 					tr.stats.sac.o      = o
-					tr.stats.sac.evla   = evlat
-					tr.stats.sac.evlo   = evlon
-					tr.stats.sac.evdp   = evdep
-					tr.stats.sac.dist   = dist / 1000.
-					tr.stats.sac.az     = az
 
-					tr.write(name, format="SAC")
+					# Write the file out to MSEED
+					tr.write(name, format="MSEED")
 					del name
 
 					for l in files:
@@ -197,6 +220,15 @@ class Catalogue(ABC):
 						os.remove(l)
 					del files
 					continue
+
+			if not file_exists:
+				print("The data for this arrival is not in the archive - it has been removed from the DataFrame")
+				self.arrival_df.drop(i, inplace=True)
+
+			else:
+				print("Data retrieved")
+				self.arrival_df.loc[i, 'waveform?'] = True
+
 
 	def load_sources(self):
 		# Load sources

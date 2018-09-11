@@ -206,7 +206,9 @@ class Catalogue(ABC):
 					tr.stats.t0         = t0
 					tr.stats.kt5        = 3
 					tr.stats.kt0        = 3
-					tr.stats.sac.o      = o
+					tr.stats.o      = o
+
+					print(tr)
 
 					# Write the file out to MSEED
 					tr.write(name, format="MSEED")

@@ -174,38 +174,30 @@ class Catalogue(ABC):
 
 					name = '{}/data/{}/event.{}.{}.{}'.format(self.path, stat.upper(), arrival.sourceid, stat.upper(), comp.lower())
 
-					# # Write the trimmed data to a SAC file
-					# tr.write(name, format="MSEED")
+					# Write the trimmed data to a SAC file
+					tr.write(name, format="MSEED")
 
-					# # Reload SAC file and update all the headers
-					# st = read(name)
-					# tr = st.traces[0]
+					# Reload SAC file and update all the headers
+					st = read(name)
+					tr = st.traces[0]
 
 					# Add station information
 					tr.stats.stla   = slat
 					tr.stats.stlo   = slon
 					tr.stats.stel   = sdep
 
-					print("reached here1")
-
 					# Add event information
 					tr.stats.evla   = evlat
 					tr.stats.evlo   = evlon
 					tr.stats.evdp   = evdep
 
-					print("reached here2")
-
 					# Add distance and azimuth information
 					tr.stats.dist   = dist / 1000.
 					tr.stats.az     = az
 
-					print("reached here3")
-
 					# Add compass definition information
 					tr.stats.cmpaz  = str(self.cmpaz[comp])
 					tr.stats.cmpinc = str(self.cmpinc[comp])
-
-					print("reached here4")
 
 					# Name the component
 					tr.stats.kcmpnm = 'HH' + comp

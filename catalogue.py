@@ -129,7 +129,6 @@ class Catalogue(ABC):
 
 				# Skip if the file doesn't exist
 				if file_exists:
-					print("File exists")
 					pass
 				else:
 					continue
@@ -187,18 +186,26 @@ class Catalogue(ABC):
 					tr.stats.stlo   = slon
 					tr.stats.stel   = sdep
 
+					print("reached here1")
+
 					# Add event information
 					tr.stats.evla   = evlat
 					tr.stats.evlo   = evlon
 					tr.stats.evdp   = evdep
 
+					print("reached here2")
+
 					# Add distance and azimuth information
 					tr.stats.dist   = dist / 1000.
 					tr.stats.az     = az
 
+					print("reached here3")
+
 					# Add compass definition information
 					tr.stats.cmpaz  = str(self.cmpaz[comp])
 					tr.stats.cmpinc = str(self.cmpinc[comp])
+
+					print("reached here4")
 
 					# Name the component
 					tr.stats.kcmpnm = 'HH' + comp
@@ -212,6 +219,8 @@ class Catalogue(ABC):
 					# Write the file out to MSEED
 					tr.write(name, format="MSEED")
 					del name
+
+					print("reached here5")
 
 					for l in files:
 						os.remove(l)

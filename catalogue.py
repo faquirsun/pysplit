@@ -129,6 +129,7 @@ class Catalogue(ABC):
 
 				# Skip if the file doesn't exist
 				if file_exists:
+					print("File exists")
 					pass
 				else:
 					continue

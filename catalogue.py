@@ -225,13 +225,14 @@ class Catalogue(ABC):
 					del files
 					continue
 
-			if not file_exists:
-				print("The data for this arrival is not in the archive - it has been removed from the DataFrame.")
-				self.arrival_df.drop(i, inplace=True)
-
-			else:
+			if file_exists:
 				print("Data retrieved.")
 				self.arrival_df.loc[i, 'waveform?'] = True
+
+			else:
+				print("The data for this arrival is not in the archive - it has been removed from the DataFrame.")
+				self.arrival_df.drop(i, inplace=True)
+				self.arrival_df.to_csv(self.arrival_file, index=False)
 
 
 	def load_sources(self):

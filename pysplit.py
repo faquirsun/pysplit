@@ -825,6 +825,7 @@ class PickingWindow(qt.QMainWindow):
 		elif self.evts:
 			# Load the events
 			station_path = "{}/{}/data/{}".format(self.catalogue_path, self.catalogue_name, self.station.upper())
+			print(station_path)
 			events = glob.glob('{}/*.z'.format(station_path))
 			print(events)
 			self.events = []

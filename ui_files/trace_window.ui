@@ -585,7 +585,7 @@
             <string>Apply filter</string>
            </property>
            <property name="shortcut">
-            <string>Return</string>
+            <string>A</string>
            </property>
           </widget>
          </item>
@@ -682,5 +682,22 @@
   <tabstop>button_resetPlot</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>2438</x>
+     <y>568</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1295</x>
+     <y>779</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

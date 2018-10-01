@@ -111,19 +111,21 @@ class PySplit(qt.QMainWindow):
 		self.button_resetMap.clicked.connect(self.plotCatalogueMap)
 
 	def keyPressEvent(self, event):
+		# Toggle Ctrl Modifier on
 		if event.key() == Qt.Key_Control:
-			print("Ctrl toggled on")
 			self.ctrl_toggle = True
+
+		# Toggle Shift Modifier on
 		if event.key() == Qt.Key_Shift:
-			print("Shift toggled on")
 			self.shift_toggle = True
 
 	def keyReleaseEvent(self, event):
+		# Toggle Ctrl Modifier off
 		if event.key() == Qt.Key_Control:
-			print("Ctrl toggled off")
 			self.ctrl_toggle = False
+
+		# Toggle Shift Modifier off
 		if event.key() == Qt.Key_Shift:
-			print("Shift toggled off")
 			self.shift_toggle = False
 
 	def unpickedStateChanged(self, int):
@@ -136,15 +138,19 @@ class PySplit(qt.QMainWindow):
 
 	def stationStateChanged(self, int):
 		if self.station_plot_tickbox.isChecked():
-			self.catalogue.station_points.set_visible(True)
+			pass
+			#self.catalogue.station_points.set_visible(True)
 		else:
-			self.catalogue.station_points.set_visible(False)
+			pass
+			#self.catalogue.station_points.set_visible(False)
 
 	def pickStateChanged(self, int):
 		if self.picked_plot_tickbox.isChecked():
-			self.catalogue.pick_points.set_visible(True)
+			pass
+			#self.catalogue.pick_points.set_visible(True)
 		else:
-			self.catalogue.pick_points.set_visible(False)
+			pass
+			#self.catalogue.pick_points.set_visible(False)
 
 	def _onPick(self, event):
 	    artist = event.artist
@@ -395,8 +401,19 @@ class PySplit(qt.QMainWindow):
 		# Open file dialogue and choose catalogue directory
 		self.catalogue_path = qt.QFileDialog.getExistingDirectory(self, 'Choose catalogue directory')
 
+		# Test validity of the catalogue path
+		if (os.path.exists("{}/data".format(self.catalogue_path))) and (os.path.exists("{}/metafiles".format(self.catalogue_path))):
+			pass
+		else:
+			qt.QMessageBox.about(self, "Error!", "The directory you have chosen is invalid, please try again.")
+			return
+
 		# Parse the catalogue metafile
-		self._parse_catalogue_metafile()
+		try:
+			self._parse_catalogue_metafile()
+		except FileNotFoundError:
+			qt.QMessageBox.about(self, "Error!", "Unable to find file containing the metadata for this catalogue. Please double-check it exists.")
+			return
 
 		# Set the catalogue name label
 		self.label_catNameDisp.setText(self.catalogue_name)
@@ -782,13 +799,13 @@ class PickingWindow(qt.QMainWindow):
 		self.ctrl_toggle  = False
 		self.shift_toggle = False
 
-		# If picking all events at a given station
-		if station == None and not event == None:
-			self.evts = True
-
 		# If picking all stations for a given event
-		elif event == None and not station == None:
+		if station == None and event != None:
 			self.stats = True
+
+		# If picking all events at a given station
+		elif event == None and station != None:
+			self.evts = True
 
 		self.initUI()
 
@@ -816,9 +833,13 @@ class PickingWindow(qt.QMainWindow):
 
 			self.counter = 0
 
-			self.event = self.events[self.counter]
+			try:
+				self.event = self.events[self.counter]
 
-			self._updateEventInformation(self.event)
+				self._updateEventInformation(self.event)
+			except IndexError:
+				qt.QMessageBox.about(self, "Error!", "There are no events with recorded arrivals at this station.")
+				return
 
 		# If picking all stations for a given event
 		elif self.stats:
@@ -832,11 +853,19 @@ class PickingWindow(qt.QMainWindow):
 
 			self.counter = 0
 
-			self.station = self.stations[self.counter]
+			try:
+				self.station = self.stations[self.counter]
 
-			self._updateStationInformation(self.station)
+				self._updateStationInformation(self.station)
+			except IndexError:
+				qt.QMessageBox.about(self, "Error!", "There are no stations with recorded arrivals for this event.")
+				return
 
-		self.plotEvent(self.event, self.station, self.filt)
+		if self.default_filter != None:
+			self.input_lowFreq.setText(str(self.default_filter["low_freq"]))
+			self.input_highFreq.setText(str(self.default_filter["high_freq"]))
+
+		self.plotEvent(self.event, self.station)
 
 		self.connect()
 
@@ -893,39 +922,19 @@ class PickingWindow(qt.QMainWindow):
 	def keyPressEvent(self, event):
 		# Toggle Ctrl Modifier on
 		if event.key() == Qt.Key_Control:
-			print("Ctrl toggled on")
 			self.ctrl_toggle = True
 
 		# Toggle Shift Modifier on
 		if event.key() == Qt.Key_Shift:
-			print("Shift toggled on")
 			self.shift_toggle = True
 
 	def keyReleaseEvent(self, event):
 		# Toggle Ctrl Modifier off
 		if event.key() == Qt.Key_Control:
-			print("Ctrl toggled off")
 			self.ctrl_toggle = False
 
 		# Toggle Shift Modifier off
 		if event.key() == Qt.Key_Shift:
-			print("Shift toggled off")
-			self.shift_toggle = False
-
-	def keyPressEvent(self, event):
-		if event.key() == Qt.Key_Control:
-			print("Ctrl toggled on")
-			self.ctrl_toggle = True
-		if event.key() == Qt.Key_Shift:
-			print("Shift toggled on")
-			self.shift_toggle = True
-
-	def keyReleaseEvent(self, event):
-		if event.key() == Qt.Key_Control:
-			print("Ctrl toggled off")
-			self.ctrl_toggle = False
-		if event.key() == Qt.Key_Shift:
-			print("Shift toggled off")
 			self.shift_toggle = False
 
 	def _onMove(self, event):
@@ -1197,6 +1206,7 @@ class PickingWindow(qt.QMainWindow):
 	def removeFilter(self):
 		self.plotdisconnect()
 		self.filt = None
+		self.evt.remove_filter()
 		self.plotEvent(self.event, self.station, replot=True)
 
 	def nextTrace(self):

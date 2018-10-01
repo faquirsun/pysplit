@@ -86,7 +86,12 @@ class Event(object):
 		tr = obspy.read('{}/f.sac'.format(temp_dir))[0]
 		return tr
 
-	def filter_obspy(self, type, minfreq, maxfreq, n_poles=2, zero_phase=True):
+	def remove_filter(self):
+		self.Z_comp = self.stream.select(channel="*Z")[0]
+		self.N_comp = self.stream.select(channel="*N")[0]
+		self.E_comp = self.stream.select(channel="*E")[0]
+
+	def filter_obspy(self, filt_type, minfreq, maxfreq, n_poles=2, zero_phase=True):
 		# Make a copy of the data (so don't have to read a new one if re-filtering)
 		tmp_stream = self.stream.copy()
 
@@ -97,7 +102,7 @@ class Event(object):
 		tmp_stream = tmp_stream.taper(max_percentage=0.05)
 
 		# Filter the data
-		tmp_stream.filter(type=type, freqmin=minfreq, freqmax=maxfreq, corners=n_poles, zerophase=zero_phase)
+		tmp_stream.filter(type=filt_type, freqmin=minfreq, freqmax=maxfreq, corners=n_poles, zerophase=zero_phase)
 
 		# Overwrite the 3 components
 		self.Z_comp = tmp_stream.select(channel="*Z")[0]

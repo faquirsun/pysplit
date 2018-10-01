@@ -826,6 +826,7 @@ class PickingWindow(qt.QMainWindow):
 			# Load the events
 			station_path = "{}/{}/data/{}".format(self.catalogue_path, self.catalogue_name, self.station.upper())
 			events = glob.glob('{}/*.z'.format(station_path))
+			print(events)
 			self.events = []
 			for event in events:
 				head, tail  = os.path.split(event)

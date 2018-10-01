@@ -882,6 +882,7 @@ class PickingWindow(qt.QMainWindow):
 
 		# Connect to plot option buttons
 		self.cidnexttrace = self.button_nextTrace.clicked.connect(self.nextTrace)
+		self.cidlasttrace = self.button_lastTrace.clicked.connect(self.previousTrace)
 		self.cidresetplot = self.button_resetPlot.clicked.connect(self.resetPlot)
 
 	def saveAndExit(self):

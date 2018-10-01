@@ -824,7 +824,7 @@ class PickingWindow(qt.QMainWindow):
 		# If picking all events at a given station
 		elif self.evts:
 			# Load the events
-			station_path = "{}/{}/data/{}".format(self.catalogue_path, self.catalogue_name, self.station.upper())
+			station_path = "{}/{}/data/{}".format(self.catalogue_path, self.station.upper())
 			print(station_path)
 			events = glob.glob('{}/*.z'.format(station_path))
 			print(events)
@@ -846,7 +846,7 @@ class PickingWindow(qt.QMainWindow):
 		# If picking all stations for a given event
 		elif self.stats:
 			# Load stations
-			event_path = "{}/{}/data/*/event.{}.*.z".format(self.catalogue_path, self.catalogue_name, self.event)
+			event_path = "{}/{}/data/*/event.{}.*.z".format(self.catalogue_path, self.event)
 			stations = glob.glob(event_path)
 			self.stations = []
 			for station in stations:

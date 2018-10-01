@@ -1242,7 +1242,7 @@ class PickingWindow(qt.QMainWindow):
 
 	def previousTrace(self):
 		# Reverse counter
-		self.counter -= 1
+		self.counter += -1
 
 		if self.evts:
 			# Check not trying to go below 0th position

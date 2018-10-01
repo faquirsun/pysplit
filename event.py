@@ -104,32 +104,44 @@ class Event(object):
 		self.N_comp = tmp_stream.select(channel="*N")[0]
 		self.E_comp = tmp_stream.select(channel="*E")[0]
 
-	def plot_traces(self, Z_ax, N_ax, E_ax, x_lims=None, y_scale=None):
+	def plot_traces(self, Z_ax, N_ax, E_ax, lims):
 
-		if x_lims == None and y_scale == None:
+		if lims == None:
 			# Calculate x limits and set them
 			xlims = (self.Z_comp.times(type="relative")[0], self.Z_comp.times(type="relative")[-1])
 			Z_ax.set_xlim(xlims)
 			N_ax.set_xlim(xlims)
 			E_ax.set_xlim(xlims)
 
+			# Set y limits to +/- 1
+			Z_ax.set_ylim((-1, 1))
+			N_ax.set_ylim((-1, 1))
+			E_ax.set_ylim((-1, 1))
+
 			# Need to find absolute max of all three traces then normalise them all wrt to that
+			z_max = max(abs(self.Z_comp.data))
+			n_max = max(abs(self.N_comp.data))
+			e_max = max(abs(self.E_comp.data))
 
-		if x_lims == None and not y_scale == None:
+			self.norm_factor = max(z_max, n_max, e_max)
+
+		elif lims != None:
+			# Set x limits
 			xlims = lims[0]
-			ylims = lims[1]
+			Z_ax.set_xlim(xlims)
+			N_ax.set_xlim(xlims)
+			E_ax.set_xlim(xlims)
 
-		if not x_lims == None and y_scale == None:
-			pass
+			# Set y limits
+			ylims = lims[1]
+			Z_ax.set_ylim(ylims)
+			N_ax.set_ylim(ylims)
+			E_ax.set_ylim(ylims)
 
 		# Plot the traces
-		Z_ax.plot(self.Z_comp.times(type="relative"), self.Z_comp.data)
-		N_ax.plot(self.N_comp.times(type="relative"), self.N_comp.data)
-		E_ax.plot(self.E_comp.times(type="relative"), self.E_comp.data)
-
-
-
-	
+		Z_ax.plot(self.Z_comp.times(type="relative"), self.Z_comp.data / self.norm_factor)
+		N_ax.plot(self.N_comp.times(type="relative"), self.N_comp.data / self.norm_factor)
+		E_ax.plot(self.E_comp.times(type="relative"), self.E_comp.data / self.norm_factor)
 
 	def _add_stat(self, stat, value):
 		if stat == "window_beg":

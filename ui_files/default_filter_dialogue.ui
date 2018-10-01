@@ -6,70 +6,145 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>606</width>
-    <height>195</height>
+    <width>612</width>
+    <height>358</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>140</y>
-     <width>350</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-   </property>
-  </widget>
-  <widget class="QWidget" name="formLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>30</y>
-     <width>570</width>
-     <height>85</height>
-    </rect>
-   </property>
-   <layout class="QFormLayout" name="formLayout">
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_lowFreq">
-      <property name="text">
-       <string>Lowpass frequency</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QLineEdit" name="input_lowFreq">
-      <property name="placeholderText">
-       <string>e.g. 2 Hz</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_highFreq">
-      <property name="text">
-       <string>Highpass frequency</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLineEdit" name="input_highFreq">
-      <property name="placeholderText">
-       <string>e.g. 8 Hz</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <layout class="QFormLayout" name="formLayout">
+     <property name="labelAlignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <item row="2" column="0">
+      <widget class="QLabel" name="numberOfPolesLabel">
+       <property name="text">
+        <string>Number of poles: </string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="indent">
+        <number>-1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="input_noPoles">
+       <item>
+        <property name="text">
+         <string>2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>3</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>4</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="zerophaseLabel">
+       <property name="text">
+        <string>Zerophase?</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QCheckBox" name="input_zerophase"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_lowFreq">
+       <property name="text">
+        <string>Lowpass frequency: </string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="input_lowFreq">
+       <property name="placeholderText">
+        <string>e.g. 2 Hz</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_highFreq">
+       <property name="text">
+        <string>Highpass frequency: </string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLineEdit" name="input_highFreq">
+       <property name="placeholderText">
+        <string>e.g. 8 Hz</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="filterTypeLabel">
+       <property name="text">
+        <string>Filter type: </string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="input_filtType">
+       <item>
+        <property name="text">
+         <string>Bandpass</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Lowpass</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Highpass</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
+ <tabstops>
+  <tabstop>input_filtType</tabstop>
+  <tabstop>input_noPoles</tabstop>
+  <tabstop>input_zerophase</tabstop>
+  <tabstop>input_lowFreq</tabstop>
+  <tabstop>input_highFreq</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

@@ -179,25 +179,25 @@ class Catalogue(ABC):
 					name = '{}/data/{}/event.{}.{}.{}'.format(self.path, stat.upper(), arrival.sourceid, stat.upper(), comp.lower())
 
 					# # Write the trimmed data to a SAC file
-					# tr.write(name, format="MSEED")
+					# tr.write(name, format="SAC")
 
 					# # Reload SAC file and update all the headers
 					# st = read(name)
 					# tr = st.traces[0]
 
 					# Add station information
-					tr.stats.stla   = slat
-					tr.stats.stlo   = slon
-					tr.stats.stel   = sdep
+					tr.stats.stla = slat
+					tr.stats.stlo = slon
+					tr.stats.stel = sdep
 
 					# Add event information
-					tr.stats.evla   = evlat
-					tr.stats.evlo   = evlon
-					tr.stats.evdp   = evdep
+					tr.stats.evla = evlat
+					tr.stats.evlo = evlon
+					tr.stats.evdp = evdep
 
 					# Add distance and azimuth information
-					tr.stats.dist   = dist / 1000.
-					tr.stats.az     = az
+					tr.stats.dist = dist / 1000.
+					tr.stats.az   = az
 
 					# Add compass definition information
 					tr.stats.cmpaz  = str(self.cmpaz[comp])
@@ -207,19 +207,22 @@ class Catalogue(ABC):
 					tr.stats.kcmpnm = 'HH' + comp
 
 					# Add timing information
-					tr.stats.t0         = t0
-					tr.stats.kt5        = 3
-					tr.stats.kt0        = 3
-					tr.stats.o      	= o
+					tr.stats.t0  = t0
+					tr.stats.kt5 = 3
+					tr.stats.kt0 = 3
+					tr.stats.o   = o
 
 					# Write the file out to MSEED
 					tr.write(name, format="MSEED")
-					del name
 
+					# Clean up variables and remove temp files
+					del name
 					for l in files:
 						os.remove(l)
 					del files
+
 				except IndexError:
+					# Clean up variables and remove temp files
 					for l in files:
 						os.remove(l)
 					del files
@@ -233,6 +236,8 @@ class Catalogue(ABC):
 				print("The data for this arrival is not in the archive - it has been removed from the DataFrame.")
 				self.arrival_df.drop(i, inplace=True)
 				self.arrival_df.to_csv(self.arrival_file, index=False)
+
+		self.arrival_df.to_csv(self.arrival_file, index=False)
 
 
 	def load_sources(self):

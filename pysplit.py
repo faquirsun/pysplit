@@ -178,10 +178,18 @@ class PySplit(qt.QMainWindow):
 		if self.defaultFilterDialogue.exec_():
 			# Read the default filter parameters
 			try:
-				self.low_freq  = float(self.defaultFilterDialogue.input_lowFreq.text())
-				self.high_freq = float(self.defaultFilterDialogue.input_highFreq.text())
+				filt_type = self.defaultFilterDialogue.input_filtType.currentText()
+				no_poles  = int(self.defaultFilterDialogue.input_noPoles.currentText())
+				zerophase = self.defaultFilterDialogue.input_zerophase.isChecked()
+				low_freq  = float(self.defaultFilterDialogue.input_lowFreq.text())
+				high_freq = float(self.defaultFilterDialogue.input_highFreq.text())
 
-				self.filt = [self.low_freq, self.high_freq]
+				self.filt = {'filt_type': filt_type,
+							 'no_poles': no_poles,
+							 'zerophase': zerophase,
+							 'low_freq': low_freq,
+							 'high_freq': high_freq
+							}
 			except:
 				qt.QMessageBox.about(self, "Error!", "Try again.")
 		else:
@@ -589,7 +597,6 @@ class PySplit(qt.QMainWindow):
 			self.minrad = params[14]
 			self.maxrad = params[15]
 
-
 	def _onMapClick(self, event):
 		if not self.shift_toggle:
 			return
@@ -762,7 +769,10 @@ class PickingWindow(qt.QMainWindow):
 		self.catalogue_name = catalogue_name
 		self.event   = event
 		self.station = station
-		self.filt    = filt
+
+		# Set default filter
+		self.default_filter = filt
+		self.filt           = filt
 
 		# Initialise trackers for whether or not multiple events/stations are being picked on
 		self.evts  = False
@@ -834,6 +844,9 @@ class PickingWindow(qt.QMainWindow):
 		self.show()
 
 	def connect(self):
+		# File menu connections
+		self.actionSave_Exit.triggered.connect(self.saveAndExit)
+
 		# Connect to filter buttons
 		self.cidafilter = self.button_applyFilter.clicked.connect(self.applyFilter)
 		self.cidrfilter = self.button_removeFilter.clicked.connect(self.removeFilter)
@@ -841,6 +854,9 @@ class PickingWindow(qt.QMainWindow):
 		# Connect to plot option buttons
 		self.cidnexttrace = self.button_nextTrace.clicked.connect(self.nextTrace)
 		self.cidresetplot = self.button_resetPlot.clicked.connect(self.resetPlot)
+
+	def saveAndExit(self):
+		pass
 
 	def plotconnect(self):
 		# Connect each canvas to track motion - this will create a 
@@ -853,10 +869,10 @@ class PickingWindow(qt.QMainWindow):
 		self.cidncompclick = self.n_comp_plot.canvas.mpl_connect('button_press_event', self._onClick)
 		self.cidecompclick = self.e_comp_plot.canvas.mpl_connect('button_press_event', self._onClick)
 
-		# Connect to scrolls
-		self.cidzcompscroll = self.z_comp_plot.canvas.mpl_connect('scroll_event', self._onScroll)
-		self.cidncompscroll = self.n_comp_plot.canvas.mpl_connect('scroll_event', self._onScroll)
-		self.cidecompscroll = self.e_comp_plot.canvas.mpl_connect('scroll_event', self._onScroll)
+		# Connect to releases
+		self.cidzcomprelease = self.z_comp_plot.canvas.mpl_connect('button_release_event', self._onRelease)
+		self.cidncomprelease = self.n_comp_plot.canvas.mpl_connect('button_release_event', self._onRelease)
+		self.cidecomprelease = self.e_comp_plot.canvas.mpl_connect('button_release_event', self._onRelease)
 
 	def plotdisconnect(self):
 		# Disconnect each canvas to track motion - this will create a 
@@ -869,10 +885,10 @@ class PickingWindow(qt.QMainWindow):
 		self.n_comp_plot.canvas.mpl_disconnect(self.cidncompclick)
 		self.e_comp_plot.canvas.mpl_disconnect(self.cidecompclick)
 
-		# Disconnect to scrolls
-		self.z_comp_plot.canvas.mpl_disconnect(self.cidzcompscroll)
-		self.n_comp_plot.canvas.mpl_disconnect(self.cidncompscroll)
-		self.e_comp_plot.canvas.mpl_disconnect(self.cidecompscroll)
+		# Disconnect to releases
+		self.z_comp_plot.canvas.mpl_disconnect(self.cidzcomprelease)
+		self.n_comp_plot.canvas.mpl_disconnect(self.cidncomprelease)
+		self.e_comp_plot.canvas.mpl_disconnect(self.cidecomprelease)
 
 	def keyPressEvent(self, event):
 		# Toggle Ctrl Modifier on
@@ -896,42 +912,6 @@ class PickingWindow(qt.QMainWindow):
 			print("Shift toggled off")
 			self.shift_toggle = False
 
-	def _onScroll(self, event):
-
-		z_canvas = self.z_comp_plot.canvas
-		n_canvas = self.n_comp_plot.canvas
-		e_canvas = self.e_comp_plot.canvas
-
-		# Zoom out
-		if event.button == 'down':
-			scale_factor = self.base_scale
-
-		# Zoom in
-		else:
-			scale_factor = 1 / self.base_scale
-
-		# Check for modifiers:
-		#		
-		#		 Ctrl + scroll: Zoom x range
-		#		Shift + scroll: Scale y values
-
-		# Get the current x and y limits
-		x_lim = z_canvas.ax.get_xlim()
-		y_lim = z_canvas.ax.get_ylim()
-
-		# Get the x and y ranges
-		x_range = (z_x_lim[1] - z_x_lim[0]) * .5 
-		
-		z_y_range = (z_y_lim[1] - z_y_lim[0]) * .5
-
-
-
-    #new_width = (curr_xlim[1]-curr_ylim[0])*factor
-    #new_height= (curr_xlim[1]-curr_ylim[0])*factor
-
-    #relx = (curr_xlim[1]-event.xdata)/(curr_xlim[1]-curr_xlim[0])
-    #rely = (curr_ylim[1]-event.ydata)/(curr_ylim[1]-curr_ylim[0])
-
 	def keyPressEvent(self, event):
 		if event.key() == Qt.Key_Control:
 			print("Ctrl toggled on")
@@ -949,28 +929,62 @@ class PickingWindow(qt.QMainWindow):
 			self.shift_toggle = False
 
 	def _onMove(self, event):
+		# Temp variables for accessing canvases
 		z_canvas = self.z_comp_plot.canvas
 		n_canvas = self.n_comp_plot.canvas
 		e_canvas = self.e_comp_plot.canvas
 
 		if event.inaxes is z_canvas.ax or n_canvas.ax or e_canvas.ax:
-			# Grab the x position of the pointer
-			x = event.xdata
+			if self.shift_toggle:
+				if not self._zoom_click:
+					return
+				if self._trace_drag_lock is not self:
+					return
 
-			# Set the x value of the cursor to the current position
-			self.zcursor.set_data([x, x], self.zydat)
-			self.ncursor.set_data([x, x], self.nydat)
-			self.ecursor.set_data([x, x], self.eydat)
+				xpress, ypress = self.trace_click
+
+				xmove, ymove = event.xdata, event.ydata
+
+				dx = xmove - xpress
+				dy = ymove - ypress
+
+			else:
+				# Grab the x position of the pointer
+				x = event.xdata
+
+				# Set the x value of the cursor to the current position
+				self.zcursor.set_data([x, x], self.zydat)
+				self.ncursor.set_data([x, x], self.nydat)
+				self.ecursor.set_data([x, x], self.eydat)
 
 			# restore the background region
 			z_canvas.restore_region(self.z_background)
 			n_canvas.restore_region(self.n_background)
 			e_canvas.restore_region(self.e_background)
 
-			# redraw just the current cursor
-			z_canvas.ax.draw_artist(self.zcursor)
-			n_canvas.ax.draw_artist(self.ncursor)
-			e_canvas.ax.draw_artist(self.ecursor)
+			if self.shift_toggle:
+				# Set rectangle values
+				z_trace_rectangle = Rectangle((xpress, ypress), dx, dy,
+										  edgecolor='red', fill=False)
+				n_trace_rectangle = Rectangle((xpress, ypress), dx, dy,
+										  edgecolor='red', fill=False)
+				e_trace_rectangle = Rectangle((xpress, ypress), dx, dy,
+										  edgecolor='red', fill=False)
+				# Add the rectangle patch to each canvas
+				z_canvas.ax.add_patch(z_trace_rectangle)
+				n_canvas.ax.add_patch(n_trace_rectangle)
+				e_canvas.ax.add_patch(e_trace_rectangle)
+
+				# Redraw just the rectangle
+				z_canvas.ax.draw_artist(z_trace_rectangle)
+				n_canvas.ax.draw_artist(n_trace_rectangle)
+				e_canvas.ax.draw_artist(e_trace_rectangle)
+
+			else:
+				# Redraw just the current cursor
+				z_canvas.ax.draw_artist(self.zcursor)
+				n_canvas.ax.draw_artist(self.ncursor)
+				e_canvas.ax.draw_artist(self.ecursor)
 
 			if self.w_beg_line:
 				# Redraw the window line
@@ -996,143 +1010,194 @@ class PickingWindow(qt.QMainWindow):
 			e_canvas.blit(e_canvas.ax.bbox)
 
 	def _onClick(self, event):
-		z_canvas = self.z_comp_plot.canvas
-		n_canvas = self.n_comp_plot.canvas
-		e_canvas = self.e_comp_plot.canvas
+		# Check for shift modifier - this enables the draggable zoom
+		if self.shift_toggle:
+			if self._trace_drag_lock is not None:
+				return
 
-		# Left-clicking handles the window start time
-		if event.button == 1 and not self.shift_toggle:
-			# Set the window start line to be redrawn on move
-			self.w_beg_line = True
+			self._zoom_click = True
 
-			# Add the window beginning to the event stats
-			self.evt._add_stat("window_beg", event.xdata)
+			xpress, ypress = event.xdata, event.ydata
+			self._trace_drag_lock = self
 
-			# Make a vertical line artist
-			self.z_window_beg = z_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
-			self.n_window_beg = n_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
-			self.e_window_beg = e_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+			# Grab the boundary values
+			self.trace_click = xpress, ypress
 
-			# Restore the background region
-			z_canvas.restore_region(self.z_background)
-			n_canvas.restore_region(self.n_background)
-			e_canvas.restore_region(self.e_background)
+		else:
+			z_canvas = self.z_comp_plot.canvas
+			n_canvas = self.n_comp_plot.canvas
+			e_canvas = self.e_comp_plot.canvas
 
-			# Redraw the window line
-			z_canvas.ax.draw_artist(self.z_window_beg)
-			n_canvas.ax.draw_artist(self.n_window_beg)
-			e_canvas.ax.draw_artist(self.e_window_beg)
+			# Left-clicking handles the window start time
+			if event.button == 1 and not self.ctrl_toggle:
+				# Set the window start line to be redrawn on move
+				self.w_beg_line = True
 
-			if self.pick_line:
-				# Redraw the pick line
-				z_canvas.ax.draw_artist(self.z_pick)
-				n_canvas.ax.draw_artist(self.n_pick)
-				e_canvas.ax.draw_artist(self.e_pick)
+				# Add the window beginning to the event stats
+				self.evt._add_stat("window_beg", event.xdata)
 
-			if self.w_end_line:
-				# Redraw the window line
-				z_canvas.ax.draw_artist(self.z_window_end)
-				n_canvas.ax.draw_artist(self.n_window_end)
-				e_canvas.ax.draw_artist(self.e_window_end)	
+				# Make a vertical line artist
+				self.z_window_beg = z_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+				self.n_window_beg = n_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+				self.e_window_beg = e_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
 
-			# blit the redrawn area
-			z_canvas.blit(z_canvas.ax.bbox)
-			n_canvas.blit(n_canvas.ax.bbox)
-			e_canvas.blit(e_canvas.ax.bbox)
+				# Restore the background region
+				z_canvas.restore_region(self.z_background)
+				n_canvas.restore_region(self.n_background)
+				e_canvas.restore_region(self.e_background)
 
-		# Middle-clicking handles the arrival pick time
-		if event.button == 2 or (event.button == 1 and self.shift_toggle):
-			# Set the pick line to be redrawn on move
-			self.pick_line = True
-
-			# Add the pick to the event stats
-			self.evt._add_stat("pick", event.xdata)
-
-			# Make a vertical line artist
-			self.z_pick = z_canvas.ax.axvline(event.xdata, linewidth=1, color="red", animated=True)
-			self.n_pick = n_canvas.ax.axvline(event.xdata, linewidth=1, color="red", animated=True)
-			self.e_pick = e_canvas.ax.axvline(event.xdata, linewidth=1, color="red", animated=True)
-
-			# Restore the background region
-			z_canvas.restore_region(self.z_background)
-			n_canvas.restore_region(self.n_background)
-			e_canvas.restore_region(self.e_background)
-
-			if self.w_beg_line:
 				# Redraw the window line
 				z_canvas.ax.draw_artist(self.z_window_beg)
 				n_canvas.ax.draw_artist(self.n_window_beg)
 				e_canvas.ax.draw_artist(self.e_window_beg)
 
-			# Redraw the pick line
-			z_canvas.ax.draw_artist(self.z_pick)
-			n_canvas.ax.draw_artist(self.n_pick)
-			e_canvas.ax.draw_artist(self.e_pick)
+				if self.pick_line:
+					# Redraw the pick line
+					z_canvas.ax.draw_artist(self.z_pick)
+					n_canvas.ax.draw_artist(self.n_pick)
+					e_canvas.ax.draw_artist(self.e_pick)
 
-			if self.w_end_line:
+				if self.w_end_line:
+					# Redraw the window line
+					z_canvas.ax.draw_artist(self.z_window_end)
+					n_canvas.ax.draw_artist(self.n_window_end)
+					e_canvas.ax.draw_artist(self.e_window_end)	
+
+				# blit the redrawn area
+				z_canvas.blit(z_canvas.ax.bbox)
+				n_canvas.blit(n_canvas.ax.bbox)
+				e_canvas.blit(e_canvas.ax.bbox)
+
+			# Middle-clicking handles the arrival pick time
+			if event.button == 2 or (event.button == 1 and self.ctrl_toggle):
+				# Set the pick line to be redrawn on move
+				self.pick_line = True
+
+				# Add the pick to the event stats
+				self.evt._add_stat("pick", event.xdata)
+
+				# Make a vertical line artist
+				self.z_pick = z_canvas.ax.axvline(event.xdata, linewidth=1, color="red", animated=True)
+				self.n_pick = n_canvas.ax.axvline(event.xdata, linewidth=1, color="red", animated=True)
+				self.e_pick = e_canvas.ax.axvline(event.xdata, linewidth=1, color="red", animated=True)
+
+				# Restore the background region
+				z_canvas.restore_region(self.z_background)
+				n_canvas.restore_region(self.n_background)
+				e_canvas.restore_region(self.e_background)
+
+				if self.w_beg_line:
+					# Redraw the window line
+					z_canvas.ax.draw_artist(self.z_window_beg)
+					n_canvas.ax.draw_artist(self.n_window_beg)
+					e_canvas.ax.draw_artist(self.e_window_beg)
+
+				# Redraw the pick line
+				z_canvas.ax.draw_artist(self.z_pick)
+				n_canvas.ax.draw_artist(self.n_pick)
+				e_canvas.ax.draw_artist(self.e_pick)
+
+				if self.w_end_line:
+					# Redraw the window line
+					z_canvas.ax.draw_artist(self.z_window_end)
+					n_canvas.ax.draw_artist(self.n_window_end)
+					e_canvas.ax.draw_artist(self.e_window_end)
+
+				# blit the redrawn area
+				z_canvas.blit(z_canvas.ax.bbox)
+				n_canvas.blit(n_canvas.ax.bbox)
+				e_canvas.blit(e_canvas.ax.bbox)
+
+			# Right-clicking handles the window end time
+			if event.button == 3:
+				# Set the window end line to be redrawn on move
+				self.w_end_line = True
+
+				# Add the window ending to the event stats
+				self.evt._add_stat("window_end", event.xdata)
+
+				# Make a vertical line artist
+				self.z_window_end = z_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+				self.n_window_end = n_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+				self.e_window_end = e_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+
+				# Restore the background region
+				z_canvas.restore_region(self.z_background)
+				n_canvas.restore_region(self.n_background)
+				e_canvas.restore_region(self.e_background)
+
+				if self.w_beg_line:
+					# Redraw the window line
+					z_canvas.ax.draw_artist(self.z_window_beg)
+					n_canvas.ax.draw_artist(self.n_window_beg)
+					e_canvas.ax.draw_artist(self.e_window_beg)
+
+				if self.pick_line:
+					# Redraw the pick line
+					z_canvas.ax.draw_artist(self.z_pick)
+					n_canvas.ax.draw_artist(self.n_pick)
+					e_canvas.ax.draw_artist(self.e_pick)
+
 				# Redraw the window line
 				z_canvas.ax.draw_artist(self.z_window_end)
 				n_canvas.ax.draw_artist(self.n_window_end)
 				e_canvas.ax.draw_artist(self.e_window_end)
 
-			# blit the redrawn area
-			z_canvas.blit(z_canvas.ax.bbox)
-			n_canvas.blit(n_canvas.ax.bbox)
-			e_canvas.blit(e_canvas.ax.bbox)
+				# blit the redrawn area
+				z_canvas.blit(z_canvas.ax.bbox)
+				n_canvas.blit(n_canvas.ax.bbox)
+				e_canvas.blit(e_canvas.ax.bbox)
 
-		# Right-clicking handles the window end time
-		if event.button == 3:
-			# Set the window end line to be redrawn on move
-			self.w_end_line = True
+	def _onRelease(self, event):
+		if self.shift_toggle:
+		
+			if self._trace_drag_lock is not self:
+				return
 
-			# Add the window ending to the event stats
-			self.evt._add_stat("window_end", event.xdata)
+			# Grab the x and y data positions of the click point
+			xpress, ypress = self.trace_click
 
-			# Make a vertical line artist
-			self.z_window_end = z_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
-			self.n_window_end = n_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
-			self.e_window_end = e_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+			# Reset trace click and lock variables
+			self._zoom_click      = False
+			self.trace_click      = None
+			self._trace_drag_lock = None
 
-			# Restore the background region
-			z_canvas.restore_region(self.z_background)
-			n_canvas.restore_region(self.n_background)
-			e_canvas.restore_region(self.e_background)
+			# Grab the x and y data positions of the release point
+			xrelease, yrelease = event.xdata, event.ydata
 
-			if self.w_beg_line:
-				# Redraw the window line
-				z_canvas.ax.draw_artist(self.z_window_beg)
-				n_canvas.ax.draw_artist(self.n_window_beg)
-				e_canvas.ax.draw_artist(self.e_window_beg)
+			# Set limits
+			xlims = (min(xpress, xrelease), max(xpress, xrelease))
+			ylims = (min(ypress, yrelease), max(ypress, yrelease))
+			self.lims = [xlims, ylims]
 
-			if self.pick_line:
-				# Redraw the pick line
-				z_canvas.ax.draw_artist(self.z_pick)
-				n_canvas.ax.draw_artist(self.n_pick)
-				e_canvas.ax.draw_artist(self.e_pick)
-
-			# Redraw the window line
-			z_canvas.ax.draw_artist(self.z_window_end)
-			n_canvas.ax.draw_artist(self.n_window_end)
-			e_canvas.ax.draw_artist(self.e_window_end)
-
-			# blit the redrawn area
-			z_canvas.blit(z_canvas.ax.bbox)
-			n_canvas.blit(n_canvas.ax.bbox)
-			e_canvas.blit(e_canvas.ax.bbox)
+			self.plotEvent(self.event, self.station, replot=True)
 
 	def applyFilter(self):
-		min_freq = float(self.input_minFreq.text())
-		max_freq = float(self.input_maxFreq.text())
+		# Read the default filter parameters
+		try:
+			filt_type = self.input_filtType.currentText()
+			no_poles  = int(self.input_noPoles.currentText())
+			zerophase = self.input_zerophase.isChecked()
+			low_freq  = float(self.input_lowFreq.text())
+			high_freq = float(self.input_highFreq.text())
 
-		filt = [min_freq, max_freq]
+			self.filt = {'filt_type': filt_type,
+						 'no_poles': no_poles,
+						 'zerophase': zerophase,
+						 'low_freq': low_freq,
+						 'high_freq': high_freq
+						}
+		except ValueError:
+			qt.QMessageBox.about(self, "Warning!", "You appear to have tried to use an incomplete/incorrect filter. Fill in all of the options and try again.")
+			return
 
 		self.plotdisconnect()
-		self.plotEvent(self.event, self.station, filt)
+		self.plotEvent(self.event, self.station, replot=True)
 
 	def removeFilter(self):
-		# ---- ADD LIMITS BACK IN, JUST REMOVE FILTER ----
 		self.plotdisconnect()
-		self.plotEvent(self.event, self.station)
+		self.filt = None
+		self.plotEvent(self.event, self.station, replot=True)
 
 	def nextTrace(self):
 		# Advance counter
@@ -1163,7 +1228,7 @@ class PickingWindow(qt.QMainWindow):
 			self._updateStationInformation(self.station)
 
 		self.plotdisconnect()
-		self.plotEvent(self.event, self.station, self.filt)
+		self.plotEvent(self.event, self.station)
 
 	def previousTrace(self):
 		# Reverse counter
@@ -1194,37 +1259,49 @@ class PickingWindow(qt.QMainWindow):
 			self._updateStationInformation(self.station)
 
 		self.plotdisconnect()
-		self.plotEvent(self.event, self.station, self.filt)
+		self.plotEvent(self.event, self.station)
 
 	def resetPlot(self):
 		self.plotdisconnect()
+		self.lims = None
+		self.filt = self.default_filter
 		self.plotEvent(self.event, self.station)
 
-	def plotEvent(self, event, station, filt=None, lims=None):
+	def plotEvent(self, event, station, replot=False):
 
 		# Clear the canvases
 		self.z_comp_plot.canvas.ax.clear()
 		self.n_comp_plot.canvas.ax.clear()
 		self.e_comp_plot.canvas.ax.clear()
 
-		# Make the window and pick lines not show on move
-		self.w_beg_line = False
-		self.pick_line  = False
-		self.w_end_line = False
-
+		# Create background variables
 		self.z_background = None
 		self.n_background = None
 		self.e_background = None
 
-		# Create an instance of the Event class
-		self.evt = evt.Event("{}/data/{}/event.{}.{}.*".format(self.catalogue_path, station.upper(), event, station.upper()))
+		# Create the lock and click variables
+		self._trace_drag_lock = None
+		self.trace_click      = None
 
-		if not filt == None:
-			self.evt.filter_obspy("bandpass", filt[0], filt[1])
+		if not replot:
+			# Add limits variable
+			self.lims = None
 
-			# Set filter input text at current values
+			# Set filter to default filter
+			self.filt = self.default_filter
 
-		self.evt.plot_traces(self.z_comp_plot.canvas.ax, self.n_comp_plot.canvas.ax, self.e_comp_plot.canvas.ax)
+			# Make the window and pick lines not show on move
+			self.w_beg_line = False
+			self.pick_line  = False
+			self.w_end_line = False
+
+			# Create an instance of the Event class
+			self.evt = evt.Event("{}/data/{}/event.{}.{}.*".format(self.catalogue_path, station.upper(), event, station.upper()))
+
+		if not self.filt == None:
+			self.evt.filter_obspy(self.filt["filt_type"], self.filt["low_freq"], self.filt["high_freq"], n_poles=self.filt["no_poles"], zero_phase=self.filt["zerophase"])
+
+		self.evt.plot_traces(self.z_comp_plot.canvas.ax, self.n_comp_plot.canvas.ax, self.e_comp_plot.canvas.ax, lims=self.lims)
 
 		# Connect to each trace to grab the background once Qt has done resizing
 		self.z_comp_plot.canvas.mpl_connect('draw_event', self._zDrawEvent)

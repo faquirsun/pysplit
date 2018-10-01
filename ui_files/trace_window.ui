@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>2592</width>
-    <height>1555</height>
+    <height>1560</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -459,45 +459,137 @@
        <string>Filter settings</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_10">
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="input_minFreq"/>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_minFreq">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
+       <item row="1" column="0" colspan="2">
+        <layout class="QFormLayout" name="formLayout">
+         <property name="labelAlignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
-         <property name="text">
-          <string>Min. frequency</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_maxFreq">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
-         </property>
-         <property name="text">
-          <string>Max. frequency</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="input_maxFreq"/>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <widget class="QPushButton" name="button_applyFilter">
-         <property name="text">
-          <string>Apply filter</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <widget class="QPushButton" name="button_removeFilter">
-         <property name="text">
-          <string>Remove filter</string>
-         </property>
-        </widget>
+         <item row="1" column="0">
+          <widget class="QLabel" name="filterTypeLabel">
+           <property name="text">
+            <string>Filter type: </string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="input_filtType">
+           <item>
+            <property name="text">
+             <string>Bandpass</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Lowpass</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Highpass</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="numberOfPolesLabel">
+           <property name="text">
+            <string>Number of poles: </string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="indent">
+            <number>-1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="input_noPoles">
+           <item>
+            <property name="text">
+             <string>2</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>3</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>4</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="zerophaseLabel">
+           <property name="text">
+            <string>Zerophase?</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QCheckBox" name="input_zerophase"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_lowFreq">
+           <property name="text">
+            <string>Lowpass frequency: </string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="input_lowFreq">
+           <property name="placeholderText">
+            <string>e.g. 2 Hz</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_highFreq">
+           <property name="text">
+            <string>Highpass frequency: </string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="input_highFreq">
+           <property name="placeholderText">
+            <string>e.g. 8 Hz</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0" colspan="2">
+          <widget class="QPushButton" name="button_removeFilter">
+           <property name="text">
+            <string>Remove filter</string>
+           </property>
+           <property name="shortcut">
+            <string>R</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0" colspan="2">
+          <widget class="QPushButton" name="button_applyFilter">
+           <property name="text">
+            <string>Apply filter</string>
+           </property>
+           <property name="shortcut">
+            <string>Return</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -546,13 +638,14 @@
      <x>0</x>
      <y>0</y>
      <width>2592</width>
-     <height>39</height>
+     <height>34</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionSave_Exit"/>
     <addaction name="actionExit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -566,6 +659,14 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
+  <action name="actionSave_Exit">
+   <property name="text">
+    <string>Save and Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -576,31 +677,10 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>input_minFreq</tabstop>
-  <tabstop>input_maxFreq</tabstop>
-  <tabstop>button_removeFilter</tabstop>
-  <tabstop>button_applyFilter</tabstop>
   <tabstop>button_nextTrace</tabstop>
   <tabstop>button_lastTrace</tabstop>
   <tabstop>button_resetPlot</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>actionExit</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1209</x>
-     <y>927</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

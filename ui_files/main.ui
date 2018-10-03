@@ -333,7 +333,7 @@
        <item row="2" column="2">
         <widget class="QStackedWidget" name="stackedWidget_3">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="station_info_page">
           <layout class="QGridLayout" name="gridLayout_27">
@@ -759,7 +759,7 @@
        <enum>QFrame::NoFrame</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="status_page">
        <layout class="QGridLayout" name="gridLayout_15">

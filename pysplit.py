@@ -463,7 +463,7 @@ class PySplit(qt.QMainWindow):
 		self.plotCatalogueMap()
 
 	def generateTeleseismicCatalogue(self):
-		pass
+		self.generate_catlogue()
 
 	def load_events(self):
 		sources = self.catalogue.load_sources()
@@ -513,7 +513,7 @@ class PySplit(qt.QMainWindow):
 		# Get catalogue type
 		if self.catalogue_type == "local":
 			self.catalogue.generate_catalogue(self.local_input_file)
-			#self.catalogue.get_arrivals(self.local_input_file)
+
 		if self.catalogue_type == "teleseismic":
 			self.catalogue.generate_catalogue(starttime=self.startDate_input.date().toString(Qt.ISODate), 
 											  endtime=self.endDate_input.date().toString(Qt.ISODate),
@@ -1308,6 +1308,7 @@ class PickingWindow(qt.QMainWindow):
 		self.e_background = None
 
 		# Create the lock and click variables
+		self._zoom_click      = False
 		self._trace_drag_lock = None
 		self.trace_click      = None
 

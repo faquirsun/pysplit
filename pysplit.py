@@ -426,10 +426,8 @@ class PySplit(qt.QMainWindow):
 			self.catalogue = cat.LocalCatalogue("{}/{}".format(self.catalogue_path, self.catalogue_name), self.archive_path, self.receiver_file)
 
 			# Show the status page catalogues
-			self.teleseismic_input_page.hide()
-			self.status_page.show()
-			self.catalogue_info_page.hide()
-			self.station_info_page.show()
+			self.catalogue_forms.setCurrentIndex(1)
+			self.stat_v_cat_info.setCurrentIndex(0)
 
 		if self.catalogue_type == "teleseismic":
 			# Create an instance of Teleseismic Catalogue
@@ -437,10 +435,8 @@ class PySplit(qt.QMainWindow):
 			self.catalogue = cat.TeleseismicCatalogue("{}/{}".format(self.catalogue_path, self.catalogue_name), self.archive_path, self.receiver_file)
 
 			# Show the catalogue info page
-			self.status_page.hide()
-			self.teleseismic_input_page.show()
-			self.station_info_page.hide()
-			self.catalogue_info_page.show()
+			self.catalogue_forms.setCurrentIndex(0)
+			self.stat_v_cat_info.setCurrentIndex(1)
 
 		# Load the catalogue
 		self.statusbar.showMessage("Loading catalogue...")
@@ -527,8 +523,7 @@ class PySplit(qt.QMainWindow):
 			# and is read in when an existing catalogue is loaded
 			self._generate_catalogue_metafile()
 
-			self.teleseismic_input_page.hide()
-			self.status_page.show()
+			self.catalogue_forms.setCurrentIndex(0)
 
 			# Plot the map of the catalogue
 			self.plotCatalogueMap()

@@ -463,7 +463,7 @@ class PySplit(qt.QMainWindow):
 		self.plotCatalogueMap()
 
 	def generateTeleseismicCatalogue(self):
-		self.generate_catlogue()
+		self.generate_catalogue()
 
 	def load_events(self):
 		sources = self.catalogue.load_sources()

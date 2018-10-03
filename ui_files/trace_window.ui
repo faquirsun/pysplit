@@ -38,116 +38,7 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QGridLayout" name="gridLayout" columnstretch="16,4">
-    <item row="0" column="0" rowspan="4">
-     <layout class="QGridLayout" name="gridLayout_2">
-      <property name="leftMargin">
-       <number>30</number>
-      </property>
-      <property name="topMargin">
-       <number>30</number>
-      </property>
-      <property name="rightMargin">
-       <number>30</number>
-      </property>
-      <property name="bottomMargin">
-       <number>30</number>
-      </property>
-      <item row="1" column="0">
-       <widget class="QGroupBox" name="n_comp_box">
-        <property name="title">
-         <string>N component</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_6">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>5</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>5</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="MplWidget" name="n_comp_plot" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QGroupBox" name="z_comp_box">
-        <property name="title">
-         <string>Z component</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_4">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>5</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>5</number>
-         </property>
-         <item row="0" column="1">
-          <widget class="MplWidget" name="z_comp_plot" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QGroupBox" name="e_comp_box">
-        <property name="title">
-         <string>E component</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_7">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>5</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>5</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="MplWidget" name="e_comp_plot" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
-    </item>
+   <layout class="QGridLayout" name="gridLayout" rowstretch="1,1,1,0,0" columnstretch="16,4">
     <item row="0" column="1">
      <widget class="QGroupBox" name="eventInfo">
       <property name="styleSheet">
@@ -311,6 +202,115 @@
        </item>
       </layout>
      </widget>
+    </item>
+    <item row="0" column="0" rowspan="5">
+     <layout class="QGridLayout" name="gridLayout_2">
+      <property name="leftMargin">
+       <number>30</number>
+      </property>
+      <property name="topMargin">
+       <number>30</number>
+      </property>
+      <property name="rightMargin">
+       <number>30</number>
+      </property>
+      <property name="bottomMargin">
+       <number>30</number>
+      </property>
+      <item row="1" column="0">
+       <widget class="QGroupBox" name="n_comp_box">
+        <property name="title">
+         <string>N component</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_6">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>5</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="MplWidget" name="n_comp_plot" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QGroupBox" name="z_comp_box">
+        <property name="title">
+         <string>Z component</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>5</number>
+         </property>
+         <item row="0" column="1">
+          <widget class="MplWidget" name="z_comp_plot" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QGroupBox" name="e_comp_box">
+        <property name="title">
+         <string>E component</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_7">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>5</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="MplWidget" name="e_comp_plot" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item row="1" column="1">
      <widget class="QGroupBox" name="stationInfo">
@@ -594,7 +594,7 @@
       </layout>
      </widget>
     </item>
-    <item row="3" column="1">
+    <item row="4" column="1">
      <widget class="QGroupBox" name="groupBox">
       <property name="title">
        <string>Plot settings</string>
@@ -610,7 +610,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <widget class="QPushButton" name="button_resetPlot">
          <property name="text">
           <string>Reset plot</string>
@@ -624,6 +624,64 @@
          </property>
          <property name="shortcut">
           <string>Ctrl+Space</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QPushButton" name="button_toggleLims">
+         <property name="text">
+          <string>Toggle limits</string>
+         </property>
+         <property name="shortcut">
+          <string>Ctrl+Z</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="title">
+       <string>Phase pick settings</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="2">
+        <widget class="QRadioButton" name="c_radio">
+         <property name="text">
+          <string>Custom</string>
+         </property>
+         <property name="shortcut">
+          <string>Ctrl+C</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QRadioButton" name="s_radio">
+         <property name="text">
+          <string>S</string>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>60</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="shortcut">
+          <string>S</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QRadioButton" name="p_radio">
+         <property name="text">
+          <string>P</string>
+         </property>
+         <property name="shortcut">
+          <string>P</string>
          </property>
         </widget>
        </item>
@@ -648,7 +706,15 @@
     <addaction name="actionSave_Exit"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="actionDefault_filter"/>
+    <addaction name="actionCustom_phase"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuSettings"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionExit">
@@ -667,6 +733,22 @@
     <string>Ctrl+S</string>
    </property>
   </action>
+  <action name="actionDefault_filter">
+   <property name="text">
+    <string>Default filter</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionCustom_phase">
+   <property name="text">
+    <string>Custom phase</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -677,8 +759,19 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>input_filtType</tabstop>
+  <tabstop>input_noPoles</tabstop>
+  <tabstop>input_zerophase</tabstop>
+  <tabstop>input_lowFreq</tabstop>
+  <tabstop>input_highFreq</tabstop>
+  <tabstop>button_removeFilter</tabstop>
+  <tabstop>button_applyFilter</tabstop>
+  <tabstop>s_radio</tabstop>
+  <tabstop>p_radio</tabstop>
+  <tabstop>c_radio</tabstop>
   <tabstop>button_nextTrace</tabstop>
   <tabstop>button_lastTrace</tabstop>
+  <tabstop>button_toggleLims</tabstop>
   <tabstop>button_resetPlot</tabstop>
  </tabstops>
  <resources/>
@@ -690,8 +783,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>2438</x>
-     <y>568</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>1295</x>

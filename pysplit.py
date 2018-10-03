@@ -883,6 +883,7 @@ class PickingWindow(qt.QMainWindow):
 		# Connect to plot option buttons
 		self.cidnexttrace = self.button_nextTrace.clicked.connect(self.nextTrace)
 		self.cidlasttrace = self.button_lastTrace.clicked.connect(self.previousTrace)
+		self.cidlastzoom  = self.button_toggleLims.clicked.connect(self.toggleLims)
 		self.cidresetplot = self.button_resetPlot.clicked.connect(self.resetPlot)
 
 	def saveAndExit(self):
@@ -1038,18 +1039,22 @@ class PickingWindow(qt.QMainWindow):
 			n_canvas = self.n_comp_plot.canvas
 			e_canvas = self.e_comp_plot.canvas
 
+			dt = self.evt.Z_comp.stats.delta
+
+			adjusted_xdata = round(event.xdata / dt) * dt
+
 			# Left-clicking handles the window start time
 			if event.button == 1 and not self.ctrl_toggle:
 				# Set the window start line to be redrawn on move
 				self.w_beg_line = True
 
 				# Add the window beginning to the event stats
-				self.evt._add_stat("window_beg", event.xdata)
+				self.evt._add_stat("window_beg", adjusted_xdata)
 
 				# Make a vertical line artist
-				self.z_window_beg = z_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
-				self.n_window_beg = n_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
-				self.e_window_beg = e_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+				self.z_window_beg = z_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
+				self.n_window_beg = n_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
+				self.e_window_beg = e_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
 
 				# Restore the background region
 				z_canvas.restore_region(self.z_background)
@@ -1084,12 +1089,12 @@ class PickingWindow(qt.QMainWindow):
 				self.pick_line = True
 
 				# Add the pick to the event stats
-				self.evt._add_stat("pick", event.xdata)
+				self.evt._add_stat("pick", adjusted_xdata, pick_type=self.pick_type)
 
 				# Make a vertical line artist
-				self.z_pick = z_canvas.ax.axvline(event.xdata, linewidth=1, color="red", animated=True)
-				self.n_pick = n_canvas.ax.axvline(event.xdata, linewidth=1, color="red", animated=True)
-				self.e_pick = e_canvas.ax.axvline(event.xdata, linewidth=1, color="red", animated=True)
+				self.z_pick = z_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="red", animated=True)
+				self.n_pick = n_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="red", animated=True)
+				self.e_pick = e_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="red", animated=True)
 
 				# Restore the background region
 				z_canvas.restore_region(self.z_background)
@@ -1124,12 +1129,12 @@ class PickingWindow(qt.QMainWindow):
 				self.w_end_line = True
 
 				# Add the window ending to the event stats
-				self.evt._add_stat("window_end", event.xdata)
+				self.evt._add_stat("window_end", adjusted_xdata)
 
 				# Make a vertical line artist
-				self.z_window_end = z_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
-				self.n_window_end = n_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
-				self.e_window_end = e_canvas.ax.axvline(event.xdata, linewidth=1, color="green", animated=True)
+				self.z_window_end = z_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
+				self.n_window_end = n_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
+				self.e_window_end = e_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
 
 				# Restore the background region
 				z_canvas.restore_region(self.z_background)
@@ -1178,6 +1183,7 @@ class PickingWindow(qt.QMainWindow):
 			# Set limits
 			xlims = (min(xpress, xrelease), max(xpress, xrelease))
 			ylims = (min(ypress, yrelease), max(ypress, yrelease))
+			self.previous_lims = self.lims
 			self.lims = [xlims, ylims]
 
 			self.plotEvent(self.event, self.station, replot=True)
@@ -1208,6 +1214,13 @@ class PickingWindow(qt.QMainWindow):
 		self.plotdisconnect()
 		self.filt = None
 		self.evt.remove_filter()
+		self.plotEvent(self.event, self.station, replot=True)
+
+	def toggleLims(self):
+		# Overwrite limits
+		self.lims, self.previous_lims = self.previous_lims, self.lims
+
+		# Replot the traces
 		self.plotEvent(self.event, self.station, replot=True)
 
 	def nextTrace(self):
@@ -1280,10 +1293,14 @@ class PickingWindow(qt.QMainWindow):
 
 	def plotEvent(self, event, station, replot=False):
 
+		z_canvas = self.z_comp_plot.canvas
+		n_canvas = self.n_comp_plot.canvas
+		e_canvas = self.e_comp_plot.canvas
+
 		# Clear the canvases
-		self.z_comp_plot.canvas.ax.clear()
-		self.n_comp_plot.canvas.ax.clear()
-		self.e_comp_plot.canvas.ax.clear()
+		z_canvas.ax.clear()
+		n_canvas.ax.clear()
+		e_canvas.ax.clear()
 
 		# Create background variables
 		self.z_background = None
@@ -1296,6 +1313,7 @@ class PickingWindow(qt.QMainWindow):
 
 		if not replot:
 			# Add limits variable
+			self.previous_lims = None
 			self.lims = None
 
 			# Set filter to default filter
@@ -1309,27 +1327,32 @@ class PickingWindow(qt.QMainWindow):
 			# Create an instance of the Event class
 			self.evt = evt.Event("{}/data/{}/event.{}.{}.*".format(self.catalogue_path, station.upper(), event, station.upper()))
 
+		# Check if a filter has been specified, and apply it if so
 		if not self.filt == None:
 			self.evt.filter_obspy(self.filt["filt_type"], self.filt["low_freq"], self.filt["high_freq"], n_poles=self.filt["no_poles"], zero_phase=self.filt["zerophase"])
 
-		self.evt.plot_traces(self.z_comp_plot.canvas.ax, self.n_comp_plot.canvas.ax, self.e_comp_plot.canvas.ax, lims=self.lims)
+		# Plot the traces
+		self.evt.plot_traces(z_canvas.ax, n_canvas.ax, e_canvas.ax, lims=self.lims)
+
+		# Plot any existing measurements
+		#z_canvas.ax.axvline()
 
 		# Connect to each trace to grab the background once Qt has done resizing
-		self.z_comp_plot.canvas.mpl_connect('draw_event', self._zDrawEvent)
-		self.n_comp_plot.canvas.mpl_connect('draw_event', self._nDrawEvent)
-		self.e_comp_plot.canvas.mpl_connect('draw_event', self._eDrawEvent)
+		z_canvas.mpl_connect('draw_event', self._zDrawEvent)
+		n_canvas.mpl_connect('draw_event', self._nDrawEvent)
+		e_canvas.mpl_connect('draw_event', self._eDrawEvent)
 
 		# Draw when Qt has done all resizing
-		self.z_comp_plot.canvas.draw_idle()
-		self.n_comp_plot.canvas.draw_idle()
-		self.e_comp_plot.canvas.draw_idle()
+		z_canvas.draw_idle()
+		n_canvas.draw_idle()
+		e_canvas.draw_idle()
 
 		# Initialise the cursor to track mouse position on the axes
-		self.zcursor = self.z_comp_plot.canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
+		self.zcursor = z_canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
 		_, self.zydat = self.zcursor.get_data()
-		self.ncursor = self.n_comp_plot.canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
+		self.ncursor = n_canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
 		_, self.nydat = self.ncursor.get_data()
-		self.ecursor = self.e_comp_plot.canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
+		self.ecursor = e_canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
 		_, self.eydat = self.ecursor.get_data()
 
 		self.plotconnect()

@@ -148,18 +148,13 @@ class Event(object):
 		N_ax.plot(self.N_comp.times(type="relative"), self.N_comp.data / self.norm_factor)
 		E_ax.plot(self.E_comp.times(type="relative"), self.E_comp.data / self.norm_factor)
 
-	def _add_stat(self, stat, value):
-		if stat == "window_beg":
-			self.Z_comp.stats.window.window_beg = value
-			self.N_comp.stats.window.window_beg = value
-			self.E_comp.stats.window.window_beg = value
+	def _add_stat(self, stat, value, pick_type=None):
+		if stat == "window_beg" or stat == "window_end":
+			self.Z_comp.stats.window[stat] = value
+			self.N_comp.stats.window[stat] = value
+			self.E_comp.stats.window[stat] = value
 
-		if stat == "window_end":
-			self.Z_comp.stats.window.window_end = value
-			self.N_comp.stats.window.window_beg = value
-			self.E_comp.stats.window.window_beg = value
-
-		if stat == "pick":
-			self.Z_comp.stats.pick = value
-			self.N_comp.stats.pick = value
-			self.E_comp.stats.pick = value
+		elif stat == "pick":
+			self.Z_comp.stats.picks["{}_manual".format(pick_type)] = value
+			self.N_comp.stats.picks["{}_manual".format(pick_type)] = value
+			self.E_comp.stats.picks["{}_manual".format(pick_type)] = value

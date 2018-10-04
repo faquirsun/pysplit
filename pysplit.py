@@ -426,7 +426,7 @@ class PySplit(qt.QMainWindow):
 			self.catalogue = cat.LocalCatalogue("{}/{}".format(self.catalogue_path, self.catalogue_name), self.archive_path, self.receiver_file)
 
 			# Show the status page catalogues
-			self.catalogue_forms.setCurrentIndex(1)
+			self.catalogue_forms.setCurrentIndex(0)
 			self.stat_v_cat_info.setCurrentIndex(0)
 
 		if self.catalogue_type == "teleseismic":
@@ -435,7 +435,7 @@ class PySplit(qt.QMainWindow):
 			self.catalogue = cat.TeleseismicCatalogue("{}/{}".format(self.catalogue_path, self.catalogue_name), self.archive_path, self.receiver_file)
 
 			# Show the catalogue info page
-			self.catalogue_forms.setCurrentIndex(0)
+			self.catalogue_forms.setCurrentIndex(1)
 			self.stat_v_cat_info.setCurrentIndex(1)
 
 		# Load the catalogue

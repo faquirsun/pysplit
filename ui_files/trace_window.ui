@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>2592</width>
-    <height>1560</height>
+    <height>1631</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -646,7 +646,7 @@
        <string>Phase pick settings</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_5">
-       <item row="0" column="2">
+       <item row="0" column="3">
         <widget class="QRadioButton" name="c_radio">
          <property name="text">
           <string>Custom</string>
@@ -656,7 +656,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
+       <item row="0" column="1">
         <widget class="QRadioButton" name="s_radio">
          <property name="text">
           <string>S</string>
@@ -671,17 +671,20 @@
           <string>S</string>
          </property>
          <property name="checked">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
+       <item row="0" column="0">
         <widget class="QRadioButton" name="p_radio">
          <property name="text">
           <string>P</string>
          </property>
          <property name="shortcut">
           <string>P</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -767,7 +770,6 @@
   <tabstop>button_removeFilter</tabstop>
   <tabstop>button_applyFilter</tabstop>
   <tabstop>s_radio</tabstop>
-  <tabstop>p_radio</tabstop>
   <tabstop>c_radio</tabstop>
   <tabstop>button_nextTrace</tabstop>
   <tabstop>button_lastTrace</tabstop>

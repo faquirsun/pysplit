@@ -195,9 +195,10 @@ class Catalogue(ABC):
 					tr.stats.evlo = evlon
 					tr.stats.evdp = evdep
 
-					# Add distance and azimuth information
+					# Add distance, azimuth and back-azimuth information
 					tr.stats.dist = dist / 1000.
 					tr.stats.az   = az
+					tr.stats.back_azimuth = baz
 
 					# Add compass definition information
 					tr.stats.cmpaz  = str(self.cmpaz[comp])

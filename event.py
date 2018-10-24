@@ -32,10 +32,15 @@ class Event(object):
 		self.N_comp = self.stream.select(channel="*N")[0]
 		self.E_comp = self.stream.select(channel="*E")[0]
 
-		# Add window dictionary to 
+		# Add window dictionary to each component
 		self.Z_comp.stats.window = {'window_beg': None, 'window_end': None}
 		self.N_comp.stats.window = {'window_beg': None, 'window_end': None}
 		self.E_comp.stats.window = {'window_beg': None, 'window_end': None}
+
+		# Add empty picks dictionary to each component
+		self.Z_comp.stats.picks = {}
+		self.N_comp.stats.picks = {}
+		self.E_comp.stats.picks = {}
 
 		self.delta = self.Z_comp.stats.delta
 
@@ -155,6 +160,7 @@ class Event(object):
 			self.E_comp.stats.window[stat] = value
 
 		elif stat == "pick":
-			self.Z_comp.stats.picks["{}_manual".format(pick_type)] = value
-			self.N_comp.stats.picks["{}_manual".format(pick_type)] = value
-			self.E_comp.stats.picks["{}_manual".format(pick_type)] = value
+			pick = "{}_manual".format(pick_type)
+			self.Z_comp.stats.picks[pick] = value
+			self.N_comp.stats.picks[pick] = value
+			self.E_comp.stats.picks[pick] = value

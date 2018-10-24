@@ -768,6 +768,19 @@ class DefaultFilterDialogue(qt.QDialog):
 		self.setWindowTitle('PySplit - Set default filter')
 		self.show()
 
+class CustomPickDialogue(qt.QDialog):
+
+	def __init__(self):
+		super(CustomPickDialogue, self).__init__()
+
+		self.initUI()
+
+	def initUI(self):
+		uic.loadUi('ui_files/custom_phase_dialogue.ui', self)
+
+		self.setWindowTitle('PySplit - Set custom phase pick')
+		self.show()
+
 class PickingWindow(qt.QMainWindow):
 
 	base_scale = 2
@@ -786,6 +799,9 @@ class PickingWindow(qt.QMainWindow):
 		self.default_filter = filt
 		self.filt           = filt
 
+		# Set default pick type
+		self.pick_type = "P"
+
 		# Initialise trackers for whether or not multiple events/stations are being picked on
 		self.evts  = False
 		self.stats = False
@@ -797,10 +813,12 @@ class PickingWindow(qt.QMainWindow):
 		# If picking all stations for a given event
 		if station == None and event != None:
 			self.stats = True
+			self._updateEventInformation(self.event)
 
 		# If picking all events at a given station
 		elif event == None and station != None:
 			self.evts = True
+			self._updateStationInformation(self.station)
 
 		self.initUI()
 
@@ -871,6 +889,12 @@ class PickingWindow(qt.QMainWindow):
 		# File menu connections
 		self.actionSave_Exit.triggered.connect(self.saveAndExit)
 
+		# Settings menu connections
+		self.actionDefault_filter.triggered.connect(self.defaultFilter)
+		self.actionP_pick.triggered.connect(self.pPick)
+		self.actionS_pick.triggered.connect(self.sPick)
+		self.actionCustom_pick.triggered.connect(self.customPick)
+
 		# Connect to filter buttons
 		self.cidafilter = self.button_applyFilter.clicked.connect(self.applyFilter)
 		self.cidrfilter = self.button_removeFilter.clicked.connect(self.removeFilter)
@@ -933,6 +957,53 @@ class PickingWindow(qt.QMainWindow):
 		# Toggle Shift Modifier off
 		if event.key() == Qt.Key_Shift:
 			self.shift_toggle = False
+
+	def pPick(self):
+		self.pick_type == "P"
+
+	def sPick(self):
+		self.pick_type == "S"
+
+	def customPick(self):
+		# Only run if the radio button is being toggled on.
+		if not self.c_radio.isChecked():
+			return 
+
+		self.customPickDialogue = CustomPickDialogue()
+
+		if self.customPickDialogue.exec_():
+			# Read the custom pick type
+			try:
+				self.pick_type = self.customPickDialogue.input_pickType.currentText()
+				self.label_customPhase.setText(self.pick_type)
+			except ValueError:
+				qt.QMessageBox.about(self, "Error!", "You need to specify a phase to pick!")
+		else:
+			return
+
+	def defaultFilter(self):
+		self.defaultFilterDialogue = DefaultFilterDialogue()
+
+		if self.defaultFilterDialogue.exec_():
+			# Read the default filter parameters
+			try:
+				filt_type = self.defaultFilterDialogue.input_filtType.currentText()
+				no_poles  = int(self.defaultFilterDialogue.input_noPoles.currentText())
+				zerophase = self.defaultFilterDialogue.input_zerophase.isChecked()
+				low_freq  = float(self.defaultFilterDialogue.input_lowFreq.text())
+				high_freq = float(self.defaultFilterDialogue.input_highFreq.text())
+
+				self.filt = {'filt_type': filt_type,
+							 'no_poles': no_poles,
+							 'zerophase': zerophase,
+							 'low_freq': low_freq,
+							 'high_freq': high_freq
+							}
+			except ValueError:
+				qt.QMessageBox.about(self, "Error!", "You appear to have tried to use an incomplete/incorrect filter. Fill in all of the options and try again.")
+		else:
+			return
+
 
 	def _onMove(self, event):
 		# Temp variables for accessing canvases

@@ -688,6 +688,13 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="4">
+        <widget class="QLabel" name="label_customPhase">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -713,8 +720,16 @@
     <property name="title">
      <string>Settings</string>
     </property>
+    <widget class="QMenu" name="menuPhase_pick">
+     <property name="title">
+      <string>Phase pick</string>
+     </property>
+     <addaction name="actionP_pick"/>
+     <addaction name="actionS_pick"/>
+     <addaction name="actionCustom_pick"/>
+    </widget>
     <addaction name="actionDefault_filter"/>
-    <addaction name="actionCustom_phase"/>
+    <addaction name="menuPhase_pick"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSettings"/>
@@ -744,12 +759,19 @@
     <string>Ctrl+F</string>
    </property>
   </action>
-  <action name="actionCustom_phase">
+  <action name="actionP_pick">
+   <property name="text">
+    <string>P pick</string>
+   </property>
+  </action>
+  <action name="actionS_pick">
+   <property name="text">
+    <string>S pick</string>
+   </property>
+  </action>
+  <action name="actionCustom_pick">
    <property name="text">
     <string>Custom phase</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+P</string>
    </property>
   </action>
  </widget>
@@ -790,7 +812,55 @@
     </hint>
     <hint type="destinationlabel">
      <x>1295</x>
-     <y>779</y>
+     <y>815</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>c_radio</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>actionCustom_pick</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>2478</x>
+     <y>1246</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>s_radio</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>actionS_pick</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>2319</x>
+     <y>1246</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>p_radio</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>actionP_pick</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>2159</x>
+     <y>1246</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
     </hint>
    </hints>
   </connection>

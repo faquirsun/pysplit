@@ -486,7 +486,12 @@ class TeleseismicCatalogue(Catalogue):
 
 				self.source_df.loc[i] = [otime, evlat, evlon, evdep, evmag, i]
 
-			except:
+			except TypeError:
+				print("No recorded depth for event:")
+				print("     Origin time: {}".format(otime))
+				print("        Latitude: {}".format(evlat))
+				print("       Longitude: {}".format(evlon))
+				print("Removed from catalogue.")
 				event = "-"
 				otime = "-"
 				evlat = "-"
@@ -509,9 +514,10 @@ class TeleseismicCatalogue(Catalogue):
 		# Initialise the velocity model
 		model = TauPyModel(model="ak135")
 
+
 		# Evaluate the arrivals
 		for i, receiver in self.receiver_df.iterrows():
-			print("i", i)
+			print("i", i, receiver)
 			# Filter for events occurring during station deployment
 			tmp_df = self.source_df[self.source_df['otime'].between(receiver.st_dep, receiver.et_dep)]
 
@@ -522,10 +528,29 @@ class TeleseismicCatalogue(Catalogue):
 												   distance_in_degree=tmp_dist,
 												   phase_list=phases,
 												   receiver_depth_in_km=receiver.dep)
+
+				# Check if any of the requested phase arrivals exist
 				if not phase_arr:
+					print("No arrivals found for the following phases:")
+					for i in range(len(phases)):
+						print("     {}".format(phases[i]))
 					continue
+
 				else:
-					tmp = pd.DataFrame([int(source.sourceid), int(receiver.receiverid), phase_arr[0].time], index=self.arrival_cols).T
+					# Create dictionary for phase traveltimes
+					phase_dict = {}
+					for i in range(len(phase_arr)):
+						key  = phase_arr[i].purist_name
+						time = phase_arr[i].time
+						
+						print("Adding {} arrival to dictionary:".format(key))
+						if key in diction:
+							diction[key].append(phase_arr[i].time)
+						else:
+							diction[key] = []
+							diction[key].append(time) 
+
+					tmp = pd.DataFrame([int(source.sourceid), int(receiver.receiverid), phase_dict, False], index=self.arrival_cols).T
 					self.arrival_df = self.arrival_df.append(tmp, ignore_index=True)
 
 		self.arrival_df.to_csv(self.arrival_file, index=False)

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2097</width>
+    <width>2385</width>
     <height>1585</height>
    </rect>
   </property>
@@ -640,102 +640,116 @@
         </widget>
        </item>
        <item row="0" column="2">
-        <widget class="QGroupBox" name="groupBox_8">
-         <property name="title">
-          <string>Plot options</string>
+        <widget class="QStackedWidget" name="plot_options">
+         <property name="currentIndex">
+          <number>1</number>
          </property>
-         <layout class="QGridLayout" name="gridLayout_25" rowstretch="0,0,0,0,0,0,0,0,0,0">
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="picked_plot_tickbox">
-            <property name="autoFillBackground">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Picked</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QLineEdit" name="input_minLon"/>
-          </item>
-          <item row="7" column="1">
-           <widget class="QLineEdit" name="input_maxLon"/>
-          </item>
-          <item row="9" column="1">
-           <widget class="QPushButton" name="button_plotMap">
-            <property name="text">
-             <string>Plot map</string>
-            </property>
-            <property name="shortcut">
-             <string>Return</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>Max. lat</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="station_plot_tickbox">
-            <property name="text">
-             <string>Stations</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="input_maxLat"/>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="input_minLat"/>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>Min. lat</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="label_48">
-            <property name="text">
-             <string>Max. lon</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label_12">
-            <property name="text">
-             <string>Min. lon</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <widget class="QPushButton" name="button_resetMap">
-            <property name="text">
-             <string>Reset map</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QCheckBox" name="unpicked_plot_tickbox">
-            <property name="text">
-             <string>Unpicked</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QWidget" name="local_plot_options">
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="0">
+            <widget class="QGroupBox" name="groupBox_8">
+             <property name="title">
+              <string>Plot options</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_25" rowstretch="0,0,0,0,0,0,0,0,0,0">
+              <item row="0" column="0">
+               <widget class="QCheckBox" name="picked_plot_tickbox">
+                <property name="autoFillBackground">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Picked</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QLineEdit" name="input_minLon"/>
+              </item>
+              <item row="7" column="1">
+               <widget class="QLineEdit" name="input_maxLon"/>
+              </item>
+              <item row="9" column="1">
+               <widget class="QPushButton" name="button_plotMap">
+                <property name="text">
+                 <string>Plot map</string>
+                </property>
+                <property name="shortcut">
+                 <string>Return</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_13">
+                <property name="text">
+                 <string>Max. lat</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QCheckBox" name="station_plot_tickbox">
+                <property name="text">
+                 <string>Stations</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="input_maxLat"/>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="input_minLat"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Min. lat</string>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="0">
+               <widget class="QLabel" name="label_48">
+                <property name="text">
+                 <string>Max. lon</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_12">
+                <property name="text">
+                 <string>Min. lon</string>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="1">
+               <widget class="QPushButton" name="button_resetMap">
+                <property name="text">
+                 <string>Reset map</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QCheckBox" name="unpicked_plot_tickbox">
+                <property name="text">
+                 <string>Unpicked</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tele_plot_options">
+          <layout class="QGridLayout" name="gridLayout_2"/>
+         </widget>
         </widget>
        </item>
       </layout>
@@ -759,7 +773,7 @@
        <enum>QFrame::NoFrame</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="status_page">
        <layout class="QGridLayout" name="gridLayout_15">
@@ -1054,7 +1068,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>2097</width>
+     <width>2385</width>
      <height>34</height>
     </rect>
    </property>
@@ -1166,6 +1180,14 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>startDate_input</tabstop>
+  <tabstop>endDate_input</tabstop>
+  <tabstop>minMag_input</tabstop>
+  <tabstop>centreLon_input</tabstop>
+  <tabstop>centreLat_input</tabstop>
+  <tabstop>minRad_input</tabstop>
+  <tabstop>maxRad_input</tabstop>
+  <tabstop>tele_load_button</tabstop>
   <tabstop>load_events_button</tabstop>
   <tabstop>load_stats_button</tabstop>
   <tabstop>load_arrivals_button</tabstop>
@@ -1181,14 +1203,6 @@
   <tabstop>input_maxLon</tabstop>
   <tabstop>button_resetMap</tabstop>
   <tabstop>button_plotMap</tabstop>
-  <tabstop>minRad_input</tabstop>
-  <tabstop>endDate_input</tabstop>
-  <tabstop>centreLat_input</tabstop>
-  <tabstop>startDate_input</tabstop>
-  <tabstop>minMag_input</tabstop>
-  <tabstop>maxRad_input</tabstop>
-  <tabstop>centreLon_input</tabstop>
-  <tabstop>tele_load_button</tabstop>
  </tabstops>
  <resources/>
  <connections>

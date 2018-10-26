@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>2592</width>
-    <height>1631</height>
+    <height>1733</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -600,7 +600,7 @@
        <string>Plot settings</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0">
+       <item row="1" column="0">
         <widget class="QPushButton" name="button_nextTrace">
          <property name="text">
           <string>Next trace</string>
@@ -610,14 +610,14 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="5" column="0">
         <widget class="QPushButton" name="button_resetPlot">
          <property name="text">
           <string>Reset plot</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QPushButton" name="button_lastTrace">
          <property name="text">
           <string>Previous trace</string>
@@ -627,13 +627,33 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="4" column="0">
         <widget class="QPushButton" name="button_toggleLims">
          <property name="text">
           <string>Toggle limits</string>
          </property>
          <property name="shortcut">
           <string>Ctrl+Z</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>Reject trace</string>
+         </property>
+         <property name="shortcut">
+          <string>Q</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QPushButton" name="pushButton_2">
+         <property name="text">
+          <string>View spectogram</string>
+         </property>
+         <property name="shortcut">
+          <string>Shift+S</string>
          </property>
         </widget>
        </item>

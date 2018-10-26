@@ -227,10 +227,9 @@ class PySplit(qt.QMainWindow):
 			self.data_source = "IRIS"
 			self.label_catTypeDisp.setText("Teleseismic")
 
-			self.status_page.hide()
-			self.teleseismic_input_page.show()
-			self.station_info_page.hide()
-			self.catalogue_info_page.show()
+			self.catalogue_forms.setCurrentIndex(1)
+			self.stat_v_cat_info.setCurrentIndex(1)
+			self.plot_options.setCurrentIndex(1)
 
 			# Create an instance of the Teleseismic Catalogue class
 			self.catalogue = cat.TeleseismicCatalogue("{}/{}".format(self.catalogue_path, self.catalogue_name), self.archive_path, self.receiver_file)
@@ -239,10 +238,9 @@ class PySplit(qt.QMainWindow):
 			# Set catalogue type label
 			self.label_catTypeDisp.setText("Local")
 
-			self.teleseismic_input_page.hide()
-			self.status_page.show()
-			self.catalogue_info_page.hide()
-			self.station_info_page.show()
+			self.catalogue_forms.setCurrentIndex(0)
+			self.stat_v_cat_info.setCurrentIndex(0)
+			self.plot_options.setCurrentIndex(0)
 
 			# Open input file dialogue
 			self.getLocalInput()
@@ -329,10 +327,11 @@ class PySplit(qt.QMainWindow):
 				self.catalogue.plot_stations(self.mpl.canvas.ax)
 
 			# Grab the latitude and longitude of the map and send to input options
-			self.input_minLon.setText(str(f"{self.catalogue.lon0:.5f}"))
-			self.input_maxLon.setText(str(f"{self.catalogue.lon1:.5f}"))
-			self.input_minLat.setText(str(f"{self.catalogue.lat0:.5f}"))
-			self.input_maxLat.setText(str(f"{self.catalogue.lat1:.5f}"))
+			if self.catalogue_type == "local":
+				self.input_minLon.setText(str(f"{self.catalogue.lon0:.5f}"))
+				self.input_maxLon.setText(str(f"{self.catalogue.lon1:.5f}"))
+				self.input_minLat.setText(str(f"{self.catalogue.lat0:.5f}"))
+				self.input_maxLat.setText(str(f"{self.catalogue.lat1:.5f}"))
 
 		# Connect to the map to grab background once Qt has done resizing
 		self.mpl.canvas.mpl_connect('draw_event', self._mapDrawEvent)
@@ -393,7 +392,7 @@ class PySplit(qt.QMainWindow):
 		self.label_eventLon.setText(f"{event_info.evlon.values[0]:.4f}")
 		self.label_eventLat.setText(f"{event_info.evlat.values[0]:.4f}")
 		self.label_eventDepth.setText(f"{event_info.evdep.values[0]:.4f}")
-		self.label_eventMag.setText(event_info.evmag.values[0])
+		self.label_eventMag.setText(f"{event_info.evmag.values[0]:.2f}")
 		self.label_eventID.setText(str(event_info.sourceid.values[0]))
 
 
@@ -428,6 +427,7 @@ class PySplit(qt.QMainWindow):
 			# Show the status page catalogues
 			self.catalogue_forms.setCurrentIndex(0)
 			self.stat_v_cat_info.setCurrentIndex(0)
+			self.plot_options.setCurrentIndex(0)
 
 		if self.catalogue_type == "teleseismic":
 			# Create an instance of Teleseismic Catalogue
@@ -437,6 +437,7 @@ class PySplit(qt.QMainWindow):
 			# Show the catalogue info page
 			self.catalogue_forms.setCurrentIndex(1)
 			self.stat_v_cat_info.setCurrentIndex(1)
+			self.plot_options.setCurrentIndex(1)
 
 		# Load the catalogue
 		self.statusbar.showMessage("Loading catalogue...")

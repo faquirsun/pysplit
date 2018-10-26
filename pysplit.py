@@ -58,10 +58,7 @@ class PySplit(qt.QMainWindow):
 
 		# Hide the map widget initially
 		self.mpl.hide()
-		self.teleseismic_input_page.hide()
-		self.status_page.hide()
-		self.catalogue_info_page.hide()
-		self.station_info_page.hide()
+		self.catalogue_forms.setCurrentIndex(2)
 
 		# Set initial filter to None
 		self.filt = None
@@ -228,7 +225,6 @@ class PySplit(qt.QMainWindow):
 			self.label_catTypeDisp.setText("Teleseismic")
 
 			self.catalogue_forms.setCurrentIndex(1)
-			self.stat_v_cat_info.setCurrentIndex(1)
 			self.plot_options.setCurrentIndex(1)
 
 			# Create an instance of the Teleseismic Catalogue class
@@ -239,7 +235,6 @@ class PySplit(qt.QMainWindow):
 			self.label_catTypeDisp.setText("Local")
 
 			self.catalogue_forms.setCurrentIndex(0)
-			self.stat_v_cat_info.setCurrentIndex(0)
 			self.plot_options.setCurrentIndex(0)
 
 			# Open input file dialogue
@@ -426,7 +421,6 @@ class PySplit(qt.QMainWindow):
 
 			# Show the status page catalogues
 			self.catalogue_forms.setCurrentIndex(0)
-			self.stat_v_cat_info.setCurrentIndex(0)
 			self.plot_options.setCurrentIndex(0)
 
 		if self.catalogue_type == "teleseismic":
@@ -436,7 +430,6 @@ class PySplit(qt.QMainWindow):
 
 			# Show the catalogue info page
 			self.catalogue_forms.setCurrentIndex(0)
-			self.stat_v_cat_info.setCurrentIndex(1)
 			self.plot_options.setCurrentIndex(1)
 
 		# Load the catalogue

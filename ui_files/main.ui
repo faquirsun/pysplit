@@ -172,7 +172,7 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_22" rowstretch="5,5,5,0" columnstretch="15,0,0">
        <item row="1" column="2">
-        <widget class="QGroupBox" name="groupBox_9">
+        <widget class="QGroupBox" name="event_info">
          <property name="styleSheet">
           <string notr="true"/>
          </property>
@@ -323,143 +323,122 @@
          </layout>
         </widget>
        </item>
-       <item row="3" column="2">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string/>
+       <item row="0" column="0" rowspan="4" colspan="2">
+        <widget class="MplWidget" name="mpl" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
-        <widget class="QStackedWidget" name="stat_v_cat_info">
+       <item row="0" column="2">
+        <widget class="QStackedWidget" name="plot_options">
          <property name="currentIndex">
           <number>1</number>
          </property>
-         <widget class="QWidget" name="station_info_page">
-          <layout class="QGridLayout" name="gridLayout_27">
+         <widget class="QWidget" name="local_plot_options">
+          <layout class="QGridLayout" name="gridLayout">
            <item row="0" column="0">
-            <widget class="QGroupBox" name="groupBox_10">
+            <widget class="QGroupBox" name="plot_options_box">
              <property name="title">
-              <string>Station information</string>
+              <string>Plot options</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout_28">
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_56">
-                <property name="styleSheet">
-                 <string notr="true">font-weight: bold;</string>
-                </property>
-                <property name="text">
-                 <string>Elevation (km): </string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
+             <layout class="QGridLayout" name="gridLayout_25" rowstretch="0,0,0,0,0,0,0,0,0,0">
               <item row="0" column="0">
-               <widget class="QLabel" name="label_14">
-                <property name="styleSheet">
-                 <string notr="true">font-weight: bold;</string>
+               <widget class="QCheckBox" name="picked_plot_tickbox">
+                <property name="autoFillBackground">
+                 <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>Name: </string>
+                 <string>Picked</string>
                 </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLabel" name="label_statElev">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_57">
-                <property name="styleSheet">
-                 <string notr="true">font-weight: bold;</string>
-                </property>
-                <property name="text">
-                 <string>Deployed: </string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QLabel" name="label_statLat">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_58">
-                <property name="styleSheet">
-                 <string notr="true">font-weight: bold;</string>
-                </property>
-                <property name="text">
-                 <string>Latitude: </string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLabel" name="label_statLon">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_59">
-                <property name="styleSheet">
-                 <string notr="true">font-weight: bold;</string>
-                </property>
-                <property name="text">
-                 <string>Longitude: </string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLabel" name="label_statName">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="1">
-               <widget class="QLabel" name="label_statDep">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0">
-               <widget class="QLabel" name="label_60">
-                <property name="styleSheet">
-                 <string notr="true">font-weight: bold;</string>
-                </property>
-                <property name="text">
-                 <string>Retrieved: </string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
               <item row="5" column="1">
-               <widget class="QLabel" name="label_statRet">
+               <widget class="QLineEdit" name="input_minLon"/>
+              </item>
+              <item row="7" column="1">
+               <widget class="QLineEdit" name="input_maxLon"/>
+              </item>
+              <item row="9" column="1">
+               <widget class="QPushButton" name="button_plotMap">
                 <property name="text">
-                 <string/>
+                 <string>Plot map</string>
+                </property>
+                <property name="shortcut">
+                 <string>Return</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_13">
+                <property name="text">
+                 <string>Max. lat</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QCheckBox" name="station_plot_tickbox">
+                <property name="text">
+                 <string>Stations</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="input_maxLat"/>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="input_minLat"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Min. lat</string>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="0">
+               <widget class="QLabel" name="label_48">
+                <property name="text">
+                 <string>Max. lon</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_12">
+                <property name="text">
+                 <string>Min. lon</string>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="1">
+               <widget class="QPushButton" name="button_resetMap">
+                <property name="text">
+                 <string>Reset map</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QCheckBox" name="unpicked_plot_tickbox">
+                <property name="text">
+                 <string>Unpicked</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -468,10 +447,10 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="catalogue_info_page">
-          <layout class="QGridLayout" name="gridLayout_29">
+         <widget class="QWidget" name="catalogue_info">
+          <layout class="QGridLayout" name="gridLayout_2">
            <item row="0" column="0">
-            <widget class="QGroupBox" name="groupBox_11">
+            <widget class="QGroupBox" name="catalogue_info_box">
              <property name="title">
               <string>Catalogue information</string>
              </property>
@@ -623,133 +602,133 @@
          </widget>
         </widget>
        </item>
-       <item row="0" column="0" rowspan="4" colspan="2">
-        <widget class="MplWidget" name="mpl" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+       <item row="2" column="2">
+        <widget class="QGroupBox" name="station_info">
+         <property name="title">
+          <string>Station information</string>
          </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QStackedWidget" name="plot_options">
-         <property name="currentIndex">
-          <number>1</number>
-         </property>
-         <widget class="QWidget" name="local_plot_options">
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="groupBox_8">
-             <property name="title">
-              <string>Plot options</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_25" rowstretch="0,0,0,0,0,0,0,0,0,0">
-              <item row="0" column="0">
-               <widget class="QCheckBox" name="picked_plot_tickbox">
-                <property name="autoFillBackground">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>Picked</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="1">
-               <widget class="QLineEdit" name="input_minLon"/>
-              </item>
-              <item row="7" column="1">
-               <widget class="QLineEdit" name="input_maxLon"/>
-              </item>
-              <item row="9" column="1">
-               <widget class="QPushButton" name="button_plotMap">
-                <property name="text">
-                 <string>Plot map</string>
-                </property>
-                <property name="shortcut">
-                 <string>Return</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_13">
-                <property name="text">
-                 <string>Max. lat</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QCheckBox" name="station_plot_tickbox">
-                <property name="text">
-                 <string>Stations</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="1">
-               <widget class="QLineEdit" name="input_maxLat"/>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLineEdit" name="input_minLat"/>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_9">
-                <property name="text">
-                 <string>Min. lat</string>
-                </property>
-               </widget>
-              </item>
-              <item row="7" column="0">
-               <widget class="QLabel" name="label_48">
-                <property name="text">
-                 <string>Max. lon</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0">
-               <widget class="QLabel" name="label_12">
-                <property name="text">
-                 <string>Min. lon</string>
-                </property>
-               </widget>
-              </item>
-              <item row="8" column="1">
-               <widget class="QPushButton" name="button_resetMap">
-                <property name="text">
-                 <string>Reset map</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QCheckBox" name="unpicked_plot_tickbox">
-                <property name="text">
-                 <string>Unpicked</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="tele_plot_options">
-          <layout class="QGridLayout" name="gridLayout_2"/>
-         </widget>
+         <layout class="QGridLayout" name="gridLayout_28">
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_56">
+            <property name="styleSheet">
+             <string notr="true">font-weight: bold;</string>
+            </property>
+            <property name="text">
+             <string>Elevation (km): </string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_14">
+            <property name="styleSheet">
+             <string notr="true">font-weight: bold;</string>
+            </property>
+            <property name="text">
+             <string>Name: </string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="label_statElev">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_57">
+            <property name="styleSheet">
+             <string notr="true">font-weight: bold;</string>
+            </property>
+            <property name="text">
+             <string>Deployed: </string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="label_statLat">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_58">
+            <property name="styleSheet">
+             <string notr="true">font-weight: bold;</string>
+            </property>
+            <property name="text">
+             <string>Latitude: </string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="label_statLon">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_59">
+            <property name="styleSheet">
+             <string notr="true">font-weight: bold;</string>
+            </property>
+            <property name="text">
+             <string>Longitude: </string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_statName">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="label_statDep">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_60">
+            <property name="styleSheet">
+             <string notr="true">font-weight: bold;</string>
+            </property>
+            <property name="text">
+             <string>Retrieved: </string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="label_statRet">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -773,7 +752,7 @@
        <enum>QFrame::NoFrame</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="status_page">
        <layout class="QGridLayout" name="gridLayout_15">
@@ -1059,6 +1038,7 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="page"/>
      </widget>
     </item>
    </layout>

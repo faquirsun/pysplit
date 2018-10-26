@@ -240,7 +240,6 @@ class Catalogue(ABC):
 
 		self.arrival_df.to_csv(self.arrival_file, index=False)
 
-
 	def load_sources(self):
 		# Load sources
 		try:
@@ -316,11 +315,15 @@ class LocalCatalogue(Catalogue):
 		# Output the catalogue
 		self.source_df.to_csv(self.source_file, index=False)
 
-	def get_arrivals(self, hyp_file):
+	def get_arrivals(self, phases=None, input_file=None):
 		"""
 		Extracts S-phase arrival times from a hyp file and creates a 
 		list of arrivals.
 		"""
+		if input_file == None:
+			print("You've not provided a hyp file.")
+			return
+
 		lines = []
 		S_lines = []
 		with open(hyp_file, 'r') as f:
@@ -510,14 +513,15 @@ class TeleseismicCatalogue(Catalogue):
 		# Output the catalogue
 		self.source_df.to_csv(self.source_file, index=False)
 
-	def get_arrivals(self, phases=["SKS"]):
+	def get_arrivals(self, phases=["SKS"], input_file=None):
 		# Initialise the velocity model
 		model = TauPyModel(model="ak135")
 
-
 		# Evaluate the arrivals
 		for i, receiver in self.receiver_df.iterrows():
-			print("i", i, receiver)
+			print("i", i)
+			print(" ")
+			print(receiver)
 			# Filter for events occurring during station deployment
 			tmp_df = self.source_df[self.source_df['otime'].between(receiver.st_dep, receiver.et_dep)]
 
@@ -544,16 +548,29 @@ class TeleseismicCatalogue(Catalogue):
 						time = phase_arr[i].time
 						
 						print("Adding {} arrival to dictionary:".format(key))
-						if key in diction:
-							diction[key].append(phase_arr[i].time)
+						if key in phase_dict:
+							phase_dict[key].append(phase_arr[i].time)
 						else:
-							diction[key] = []
-							diction[key].append(time) 
+							phase_dict[key] = []
+							phase_dict[key].append(time) 
 
 					tmp = pd.DataFrame([int(source.sourceid), int(receiver.receiverid), phase_dict, False], index=self.arrival_cols).T
 					self.arrival_df = self.arrival_df.append(tmp, ignore_index=True)
 
 		self.arrival_df.to_csv(self.arrival_file, index=False)
+
+		# Now filter the receivers against this list
+		available_receivers = self.arrival_df.drop_duplicates(subset="receiverid", keep="first").receiverid
+		available_receivers_names = []
+
+		for i, receiverid in available_receivers.items():
+			stat, slat, slon, sdep = self._get_receiver(self.receiver_df, receiverid)
+			available_receivers_names.append(stat)
+
+		self.receiver_df = self.receiver_df.loc[self.receiver_df['stat'].isin(available_receivers_names)]
+
+		# Output the new receiver file
+		self.receiver_df.to_csv(self.receiver_file, index=False)
 
 	def window_range(self):
 		return 300.

@@ -255,6 +255,14 @@ class PySplit(qt.QMainWindow):
 		self.label_catNameDisp.setText(self.catalogue_name)
 
 		# Populate the station list
+		self._populateStationList()
+
+		# Enable the station and event selection lists
+		self.station_list.setEnabled(True)
+		self.events_list.setEnabled(True)
+
+	def _populateStationList(self):
+		# Populate the station list
 		model = QtGui.QStandardItemModel(self.station_list)
 		for receiver in self.catalogue.receiver_df.stat.values:
 			item = QtGui.QStandardItem(receiver)
@@ -262,9 +270,18 @@ class PySplit(qt.QMainWindow):
 		self.station_list.setModel(model)
 		self.station_list.setEditTriggers(qt.QAbstractItemView.NoEditTriggers)
 
-		# Enable the station and event selection lists
-		self.station_list.setEnabled(True)
-		self.events_list.setEnabled(True)
+	def _populateCatalogueInformation(self):
+		self.label_startDate2.setText(self.sdate)
+		self.label_endDate2.setText(self.edate)
+		self.label_cenLon.setText(self.clon)
+		self.label_cenLat.setText(self.clat)
+		self.label_minRad2.setText(self.minrad)
+		self.label_maxRad2.setText(self.maxrad)
+		self.label_minMag2.setText(self.minmag)
+
+		# Calculate number of events and update label
+		no_events = str(len(self.catalogue.source_df.index))
+		self.label_noEvents.setText(no_events)
 
 	def getLocalInput(self):
 		self.localInputDialogue = LocalInputDialogue()
@@ -437,13 +454,12 @@ class PySplit(qt.QMainWindow):
 		self.load_events()
 		self.load_stations()
 
+		if self.catalogue_type == "teleseismic":
+			# Display information about the catalogue in the catalogue info box
+			self._populateCatalogueInformation()
+
 		# Populate the station list
-		model = QtGui.QStandardItemModel(self.station_list)
-		for receiver in self.catalogue.receiver_df.stat.values:
-			item = QtGui.QStandardItem(receiver)
-			model.appendRow(item)
-		self.station_list.setModel(model)
-		self.station_list.setEditTriggers(qt.QAbstractItemView.NoEditTriggers)
+		self._populateStationList()
 
 		# Enable the station and event selection lists
 		self.station_list.setEnabled(True)
@@ -464,6 +480,7 @@ class PySplit(qt.QMainWindow):
 			self.load_events_button.setEnabled(False)
 		else:
 			qt.QMessageBox.about(self, "Error!", "Error loading event file.")
+			return
 
 	def load_stations(self):
 		stations = self.catalogue.load_receivers()
@@ -474,6 +491,7 @@ class PySplit(qt.QMainWindow):
 			self.load_stats_button.setEnabled(False)
 		else:
 			qt.QMessageBox.about(self, "Error!", "Error loading station file.")
+			return
 
 	def load_arrivals(self):
 		arrivals = self.catalogue.load_arrivals()
@@ -485,7 +503,24 @@ class PySplit(qt.QMainWindow):
 			self.load_waveforms_button.setEnabled(True)
 		else:
 			qt.QMessageBox.about(self, "Error!", "The arrivals file does not exist - attempting to generate one...")
-			self.catalogue.get_arrivals(self.local_input_file)
+			if self.catalogue_type == "local":
+				self.catalogue.get_arrivals(input_file=self.local_input_file)
+			elif self.catalogue_type == "teleseismic":
+
+				# Open pop-up to get the phases to be collected
+				self.telePhaseDialogue = TelePhaseDialogue()
+
+				if self.telePhaseDialogue.exec_():
+					self.input_phases = self.telePhaseDialogue.phases
+					if not self.input_phases:
+						qt.QMessageBox.about(self, "Error!", "No phases selected - please try again!")
+						return
+				else:
+					return
+
+				self.catalogue.get_arrivals(phases=self.input_phases)
+				self._populateStationList()
+
 			self.load_arrivals()
 
 	def load_waveforms(self):
@@ -493,6 +528,7 @@ class PySplit(qt.QMainWindow):
 			self.catalogue.get_waveforms()
 		except:
 			qt.QMessageBox.about(self, "Error!", "Some error in there somewhere yo")
+			return
 
 		self.label_waveformStat.setText("Waveforms generated.")
 		self.label_waveformStat.setStyleSheet("color: rgb(0, 255, 0)")
@@ -519,6 +555,8 @@ class PySplit(qt.QMainWindow):
 
 			self.catalogue_forms.setCurrentIndex(0)
 
+			self._populateCatalogueInformation()
+
 			# Plot the map of the catalogue
 			self.plotCatalogueMap()
 
@@ -526,6 +564,9 @@ class PySplit(qt.QMainWindow):
 		# Read in the template file
 		filein = open('metafile_template.txt')
 		src = Template(filein.read())
+
+		self.sdate = self.startDate_input.date().toString(Qt.ISODate)
+		self.edate = self.endDate_input.date().toString(Qt.ISODate)
 
 		# Set the general metadata parameters
 		d_cat = {'name': self.catalogue_name,
@@ -536,8 +577,8 @@ class PySplit(qt.QMainWindow):
 			 'apath': self.archive_path,
 			 'aformat': self.archive_format,
 			 'rfile': self.receiver_file,
-			 'sdate': self.startDate_input.date().toString(Qt.ISODate),
-			 'edate': self.endDate_input.date().toString(Qt.ISODate)}
+			 'sdate': self.sdate,
+			 'edate': self.edate}
 
 		# Set the local catalogue parameters
 		if self.catalogue_type == "local":
@@ -548,11 +589,17 @@ class PySplit(qt.QMainWindow):
 
 		# Set the teleseismic catalogue parameters
 		if self.catalogue_type == "teleseismic":
-			d_tel = {'minmag': self.minMag_input.text(),
-					 'clon': self.centreLon_input.text(),
-		 			 'clat': self.centreLat_input.text(),
-					 'minrad': self.minRad_input.text(),
-		 			 'maxrad': self.maxRad_input.text()}
+			self.minmag = self.minMag_input.text()
+			self.clon   = self.centreLon_input.text()
+			self.clat   = self.centreLat_input.text()
+			self.minrad = self.minRad_input.text()
+			self.maxrad = self.maxRad_input.text()
+
+			d_tel = {'minmag': self.minmag,
+					 'clon': self.clon,
+		 			 'clat': self.clat,
+					 'minrad': self.minrad,
+		 			 'maxrad': self.maxrad}
 
 		 	# Merge the two catalogues
 			d = {**d_cat, **d_tel}
@@ -606,6 +653,8 @@ class PySplit(qt.QMainWindow):
 	def _onMapClick(self, event):
 		if not self.shift_toggle:
 			return
+		if self.catalogue_type == "teleseismic":
+			return
 		# See if mouse over map
 		if event.inaxes != self.mpl.canvas.ax:
 			return
@@ -620,6 +669,8 @@ class PySplit(qt.QMainWindow):
 
 	def _onMapMove(self, event):
 		if not self.shift_toggle:
+			return
+		if self.catalogue_type == "teleseismic":
 			return
 
 		if self._map_drag_lock is not self:
@@ -649,6 +700,8 @@ class PySplit(qt.QMainWindow):
 
 	def _onMapRelease(self, event):
 		if not self.shift_toggle:
+			return
+		if self.catalogue_type == "teleseismic":
 			return
 			
 		if self._map_drag_lock is not self:
@@ -725,6 +778,48 @@ class NewCatalogueDialogue(qt.QDialog):
 		self.receiver_file = filename[0]
 
 		self.recBox.setText(self.receiver_file)
+
+class TelePhaseDialogue(qt.QDialog):
+
+	def __init__(self):
+		super(TelePhaseDialogue, self).__init__()
+
+		self.phases = []
+
+		self.initUI()
+
+	def initUI(self):
+		uic.loadUi('ui_files/tele_phase_dialogue.ui', self)
+
+		# Connect to the add phase button
+		self.button_addPhase.clicked.connect(self.addPhase)
+
+		# Populate the station list
+		self.model = QtGui.QStandardItemModel(self.phase_list)
+
+		# Turn off editing triggers
+		self.phase_list.setEditTriggers(qt.QAbstractItemView.NoEditTriggers)
+
+		self.setWindowTitle('PySplit - Teleseismic phase selection')
+		self.show()
+
+	def addPhase(self):
+		# Grab the current phase to be added
+		phase = self.input_phaseType.currentText()
+
+		# Check if phase already in list
+		if phase in self.phases:
+			pass
+		# If not, add it
+		else:
+			self.phases.append(phase)
+
+			# Add it to the ListView object
+			item = QtGui.QStandardItem(phase)
+			self.model.appendRow(item)
+
+			# Update model
+			self.phase_list.setModel(self.model)
 
 class LocalInputDialogue(qt.QDialog):
 

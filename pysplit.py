@@ -502,11 +502,12 @@ class PySplit(qt.QMainWindow):
 			self.load_arrivals_button.setEnabled(False)
 			self.load_waveforms_button.setEnabled(True)
 		else:
-			qt.QMessageBox.about(self, "Error!", "The arrivals file does not exist - attempting to generate one...")
+			self.statusbar.showMessage("The arrivals file does not exist - attempting to generate one...")
 			if self.catalogue_type == "local":
+				# Load the arrivals from the local input file provided
 				self.catalogue.get_arrivals(input_file=self.local_input_file)
-			elif self.catalogue_type == "teleseismic":
 
+			elif self.catalogue_type == "teleseismic":
 				# Open pop-up to get the phases to be collected
 				self.telePhaseDialogue = TelePhaseDialogue()
 
@@ -524,10 +525,15 @@ class PySplit(qt.QMainWindow):
 			self.load_arrivals()
 
 	def load_waveforms(self):
-		try:
+		waveforms = self.catalogue.load_waveforms()
+
+		if waveforms:
+			self.label_waveformStat.setText("Waveforms downloaded.")
+			self.label_waveformStat.setStyleSheet("color: rgb(0, 255, 0)")
+			self.load_waveforms_button.setEnabled(False)
+		else:
 			self.catalogue.get_waveforms()
-		except:
-			qt.QMessageBox.about(self, "Error!", "Some error in there somewhere yo")
+			#qt.QMessageBox.about(self, "Error!", "Some error in there somewhere yo")
 			return
 
 		self.label_waveformStat.setText("Waveforms generated.")

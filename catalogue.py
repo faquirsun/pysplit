@@ -149,6 +149,7 @@ class Catalogue(ABC):
 					nxjday = '0' + nxjday
 
 				# Copy all files for a given day + the next
+				print("Hello")
 				file_to_grab = '{}/{}/{}/*_{}_{}2.m'.format(self.archive, evyear, evjday, stat.upper(), comp)
 				next_to_grab = '{}/{}/{}/*_{}_{}2.m'.format(self.archive, evyear, nxjday, stat.upper(), comp)
 
@@ -266,6 +267,10 @@ class Catalogue(ABC):
 			return True
 		except:
 			return False
+
+	def load_waveforms(self):
+		# Check if the waveforms have been completely downloaded
+		return self.arrival_df["waveform?"].all
 
 	def filter_spatially(self):
 		pass

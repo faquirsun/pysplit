@@ -270,7 +270,9 @@ class Catalogue(ABC):
 			self.arrival_df = pd.read_csv(self.arrival_file, sep=',')
 			# Need to convert all the saved strings to dictionaries
 			for i, arrival in self.arrival_df.iterrows():
-				self.arrival_df["traveltime"].iloc[i] = ast.literal_eval(self.arrival_df["traveltime"].iloc(i))
+				print(i)
+				converted_dict = ast.literal_eval(self.arrival_df["traveltime"].iloc[i])
+				self.arrival_df["traveltime"].iloc[i] = converted_dict
 			return True
 		except:
 			return False

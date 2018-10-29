@@ -270,7 +270,7 @@ class Catalogue(ABC):
 
 	def load_waveforms(self):
 		# Check if the waveforms have been completely downloaded
-		return self.arrival_df["waveform?"].all
+		return self.arrival_df["waveform?"].all()
 
 	def filter_spatially(self):
 		pass

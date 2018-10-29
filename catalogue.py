@@ -153,7 +153,6 @@ class Catalogue(ABC):
 							nxjday = '0' + nxjday
 
 						# Copy all files for a given day + the next
-						print("Hello")
 						file_to_grab = '{}/{}/{}/*_{}_{}2.m'.format(self.archive, evyear, evjday, stat.upper(), comp)
 						next_to_grab = '{}/{}/{}/*_{}_{}2.m'.format(self.archive, evyear, nxjday, stat.upper(), comp)
 
@@ -270,14 +269,9 @@ class Catalogue(ABC):
 			self.arrival_df = pd.read_csv(self.arrival_file, sep=',')
 			# Need to convert all the saved strings to dictionaries
 			self.arrival_df["traveltime"] = self.arrival_df["traveltime"].apply(ast.literal_eval)
-			print(self.arrival_df["traveltime"], type(self.arrival_df["traveltime"][0]))
 			return True
 		except:
 			return False
-
-	def _str2dict(self):
-		df["traveltime"]
-
 
 	def load_waveforms(self):
 		# Check if the waveforms have been completely downloaded

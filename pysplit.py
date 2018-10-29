@@ -1544,7 +1544,7 @@ class PickingWindow(qt.QMainWindow):
 		self.label_eventLon.setText(f"{event_info.evlon.values[0]:.4f}")
 		self.label_eventLat.setText(f"{event_info.evlat.values[0]:.4f}")
 		self.label_eventDepth.setText(f"{event_info.evdep.values[0]:.4f}")
-		self.label_eventMag.setText(event_info.evmag.values[0])
+		self.label_eventMag.setText(f"{event_info.evmag.values[0]:.2f}")
 		self.label_eventID.setText(str(event_info.sourceid.values[0]))
 
 

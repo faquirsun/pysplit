@@ -111,133 +111,136 @@ class Catalogue(ABC):
 			if arrival['waveform?']:
 				continue
 
-			# Based on the source and receiver ID's, retrieve the relevant information
-			otime, evlat, evlon, evdep = self._get_source(self.source_df, arrival.sourceid)
-			stat, slat, slon, sdep     = self._get_receiver(self.receiver_df, arrival.receiverid)
+			for phase, ttimes in arrival["traveltime"].items():
+				for traveltime in ttimes:
 
-			# Calculate the azimuth between the source-receiver pair
-			dist, az, baz = gps2dist_azimuth(evlat, evlon, slat, slon)
+					# Based on the source and receiver ID's, retrieve the relevant information
+					otime, evlat, evlon, evdep = self._get_source(self.source_df, arrival.sourceid)
+					stat, slat, slon, sdep     = self._get_receiver(self.receiver_df, arrival.receiverid)
 
-			# Calculate reference time for window to download
-			window_beg = otime + float(arrival.traveltime) - window_range
-			window_end = otime + float(arrival.traveltime) + window_range
+					# Calculate the azimuth between the source-receiver pair
+					dist, az, baz = gps2dist_azimuth(evlat, evlon, slat, slon)
 
-			# Reference times for MSEED file
-			o = otime - window_beg
-			t0 = window_range
+					# Calculate reference time for window to download
+					window_beg = otime + float(traveltime) - window_range
+					window_end = otime + float(traveltime) + window_range
 
-			# Data existence tracker
-			file_exists = True
+					# Reference times for MSEED file
+					o = otime - window_beg
+					t0 = window_range
 
-			# Download and trim each file from the archive
-			for comp in ['Z', 'N', 'E']:
+					# Data existence tracker
+					file_exists = True
 
-				# Skip if the file doesn't exist
-				if file_exists:
-					pass
-				else:
-					continue
+					# Download and trim each file from the archive
+					for comp in ['Z', 'N', 'E']:
 
-				evyear = str(window_beg.year)
-				evjday = str(window_beg.julday)
-				nxjday = str((window_beg + 86400).julday)
+						# Skip if the file doesn't exist
+						if file_exists:
+							pass
+						else:
+							continue
 
-				# Julian day must be a 3 character string
-				while (len(evjday) != 3):
-					evjday = '0' + evjday
-				while (len(nxjday) != 3):
-					nxjday = '0' + nxjday
+						evyear = str(window_beg.year)
+						evjday = str(window_beg.julday)
+						nxjday = str((window_beg + 86400).julday)
 
-				# Copy all files for a given day + the next
-				print("Hello")
-				file_to_grab = '{}/{}/{}/*_{}_{}2.m'.format(self.archive, evyear, evjday, stat.upper(), comp)
-				next_to_grab = '{}/{}/{}/*_{}_{}2.m'.format(self.archive, evyear, nxjday, stat.upper(), comp)
+						# Julian day must be a 3 character string
+						while (len(evjday) != 3):
+							evjday = '0' + evjday
+						while (len(nxjday) != 3):
+							nxjday = '0' + nxjday
 
-				# Grab files
-				os.system('scp {} {}/tmp/.'.format(file_to_grab, self.path))
-				if (window_beg.julday != window_end.julday):
-					os.system('scp {} {}/tmp/.'.format(next_to_grab, self.path))
+						# Copy all files for a given day + the next
+						print("Hello")
+						file_to_grab = '{}/{}/{}/*_{}_{}2.m'.format(self.archive, evyear, evjday, stat.upper(), comp)
+						next_to_grab = '{}/{}/{}/*_{}_{}2.m'.format(self.archive, evyear, nxjday, stat.upper(), comp)
 
-				files = sorted(glob.glob('{}/tmp/*_{}_{}2.m'.format(self.path, stat.upper(), comp)))
+						# Grab files
+						os.system('scp {} {}/tmp/.'.format(file_to_grab, self.path))
+						if (window_beg.julday != window_end.julday):
+							os.system('scp {} {}/tmp/.'.format(next_to_grab, self.path))
 
-				try:
-					file = files[0]
-				except IndexError:
-					file_exists = False
-					continue
+						files = sorted(glob.glob('{}/tmp/*_{}_{}2.m'.format(self.path, stat.upper(), comp)))
 
-				st = read('{}/tmp/*_{}_{}2.m'.format(self.path, stat.upper(), comp))
+						try:
+							file = files[0]
+						except IndexError:
+							file_exists = False
+							continue
 
-				# Trim and save the file locally
-				try:
-					st.trim(window_beg, window_end)
-					tr = st[0]
+						st = read('{}/tmp/*_{}_{}2.m'.format(self.path, stat.upper(), comp))
 
-					# Generate name of output file
-					if not os.path.exists('{}/data/{}'.format(self.path, stat.upper())):
-						os.makedirs('{}/data/{}'.format(self.path, stat.upper()))
+						# Trim and save the file locally
+						try:
+							st.trim(window_beg, window_end)
+							tr = st[0]
 
-					name = '{}/data/{}/event.{}.{}.{}'.format(self.path, stat.upper(), arrival.sourceid, stat.upper(), comp.lower())
+							# Generate name of output file
+							if not os.path.exists('{}/data/{}'.format(self.path, stat.upper())):
+								os.makedirs('{}/data/{}'.format(self.path, stat.upper()))
 
-					# # Write the trimmed data to a SAC file
-					# tr.write(name, format="SAC")
+							name = '{}/data/{}/event.{}.{}.{}'.format(self.path, stat.upper(), arrival.sourceid, stat.upper(), comp.lower())
 
-					# # Reload SAC file and update all the headers
-					# st = read(name)
-					# tr = st.traces[0]
+							# # Write the trimmed data to a SAC file
+							# tr.write(name, format="SAC")
 
-					# Add station information
-					tr.stats.stla = slat
-					tr.stats.stlo = slon
-					tr.stats.stel = sdep
+							# # Reload SAC file and update all the headers
+							# st = read(name)
+							# tr = st.traces[0]
 
-					# Add event information
-					tr.stats.evla = evlat
-					tr.stats.evlo = evlon
-					tr.stats.evdp = evdep
+							# Add station information
+							tr.stats.stla = slat
+							tr.stats.stlo = slon
+							tr.stats.stel = sdep
 
-					# Add distance, azimuth and back-azimuth information
-					tr.stats.dist = dist / 1000.
-					tr.stats.az   = az
-					tr.stats.back_azimuth = baz
+							# Add event information
+							tr.stats.evla = evlat
+							tr.stats.evlo = evlon
+							tr.stats.evdp = evdep
 
-					# Add compass definition information
-					tr.stats.cmpaz  = str(self.cmpaz[comp])
-					tr.stats.cmpinc = str(self.cmpinc[comp])
+							# Add distance, azimuth and back-azimuth information
+							tr.stats.dist = dist / 1000.
+							tr.stats.az   = az
+							tr.stats.back_azimuth = baz
 
-					# Name the component
-					tr.stats.kcmpnm = 'HH' + comp
+							# Add compass definition information
+							tr.stats.cmpaz  = str(self.cmpaz[comp])
+							tr.stats.cmpinc = str(self.cmpinc[comp])
 
-					# Add timing information
-					tr.stats.t0  = t0
-					tr.stats.kt5 = 3
-					tr.stats.kt0 = 3
-					tr.stats.o   = o
+							# Name the component
+							tr.stats.kcmpnm = 'HH' + comp
 
-					# Write the file out to MSEED
-					tr.write(name, format="MSEED")
+							# Add timing information
+							tr.stats.t0  = t0
+							tr.stats.kt5 = 3
+							tr.stats.kt0 = 3
+							tr.stats.o   = o
 
-					# Clean up variables and remove temp files
-					del name
-					for l in files:
-						os.remove(l)
-					del files
+							# Write the file out to MSEED
+							tr.write(name, format="MSEED")
 
-				except IndexError:
-					# Clean up variables and remove temp files
-					for l in files:
-						os.remove(l)
-					del files
-					continue
+							# Clean up variables and remove temp files
+							del name
+							for l in files:
+								os.remove(l)
+							del files
 
-			if file_exists:
-				print("Data retrieved.")
-				self.arrival_df.loc[i, 'waveform?'] = True
+						except IndexError:
+							# Clean up variables and remove temp files
+							for l in files:
+								os.remove(l)
+							del files
+							continue
 
-			else:
-				print("The data for this arrival is not in the archive - it has been removed from the DataFrame.")
-				self.arrival_df.drop(i, inplace=True)
-				self.arrival_df.to_csv(self.arrival_file, index=False)
+					if file_exists:
+						print("Data retrieved.")
+						self.arrival_df.loc[i, 'waveform?'] = True
+
+					else:
+						print("The data for this arrival is not in the archive - it has been removed from the DataFrame.")
+						self.arrival_df.drop(i, inplace=True)
+						self.arrival_df.to_csv(self.arrival_file, index=False)
 
 		self.arrival_df.to_csv(self.arrival_file, index=False)
 

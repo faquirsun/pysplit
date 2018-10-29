@@ -266,13 +266,14 @@ class Catalogue(ABC):
 
 	def load_arrivals(self):
 		# Load arrivals
-		#try:
-		self.arrival_df = pd.read_csv(self.arrival_file, sep=',')
-		# Need to convert all the saved strings to dictionaries
-		self.arrival_df["traveltime"] = self.arrival_df["traveltime"].apply(ast.literal_eval)
-		return True
-		#except:
-		#return False
+		try:
+			self.arrival_df = pd.read_csv(self.arrival_file, sep=',')
+			# Need to convert all the saved strings to dictionaries
+			self.arrival_df["traveltime"] = self.arrival_df["traveltime"].apply(ast.literal_eval)
+			print(self.arrival_df["traveltime"], type(self.arrival_df["traveltime"][0]))
+			return True
+		except:
+			return False
 
 	def _str2dict(self):
 		df["traveltime"]

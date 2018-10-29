@@ -266,16 +266,17 @@ class Catalogue(ABC):
 
 	def load_arrivals(self):
 		# Load arrivals
-		try:
-			self.arrival_df = pd.read_csv(self.arrival_file, sep=',')
-			# Need to convert all the saved strings to dictionaries
-			for i, arrival in self.arrival_df.iterrows():
-				print(i)
-				converted_dict = ast.literal_eval(self.arrival_df["traveltime"].iloc[i])
-				self.arrival_df["traveltime"].iloc[i] = converted_dict
-			return True
-		except:
-			return False
+		#try:
+		self.arrival_df = pd.read_csv(self.arrival_file, sep=',')
+		# Need to convert all the saved strings to dictionaries
+		for i, arrival in self.arrival_df.iterrows():
+			print(i)
+			converted_dict = ast.literal_eval(self.arrival_df["traveltime"].iloc[i])
+			self.arrival_df["traveltime"].iloc[i] = converted_dict
+
+		return True
+		#except:
+		return False
 
 	def load_waveforms(self):
 		# Check if the waveforms have been completely downloaded

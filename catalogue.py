@@ -21,6 +21,7 @@ from abc import ABC, abstractmethod
 import os
 import sys
 import glob
+import ast
 import pandas as pd
 from obspy.clients.fdsn import Client
 from obspy import UTCDateTime
@@ -267,6 +268,9 @@ class Catalogue(ABC):
 		# Load arrivals
 		try:
 			self.arrival_df = pd.read_csv(self.arrival_file, sep=',')
+			# Need to convert all the saved strings to dictionaries
+			for i, arrival in self.arrival_df.iterrows():
+				self.arrival_df["traveltime"].iloc[i] = ast.literal_eval(self.arrival_df["traveltime"].iloc(i))
 			return True
 		except:
 			return False

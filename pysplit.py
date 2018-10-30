@@ -908,12 +908,10 @@ class PickingWindow(qt.QMainWindow):
 		# If picking all stations for a given event
 		if station == None and event != None:
 			self.stats = True
-			self._updateEventInformation(self.event)
 
 		# If picking all events at a given station
 		elif event == None and station != None:
 			self.evts = True
-			self._updateStationInformation(self.station)
 
 		self.initUI()
 

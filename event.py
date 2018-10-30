@@ -27,10 +27,8 @@ class Event(object):
 		# Read in event files
 		self.stream = read(file_path)
 
-		# Select the 3 components
-		self.Z_comp = self.stream.select(channel="*Z")[0]
-		self.N_comp = self.stream.select(channel="*N")[0]
-		self.E_comp = self.stream.select(channel="*E")[0]
+		# Detrend the data
+		self.detrend_data()
 
 		# Add window dictionary to each component
 		self.Z_comp.stats.window = {'window_beg': None, 'window_end': None}
@@ -96,12 +94,21 @@ class Event(object):
 		self.N_comp = self.stream.select(channel="*N")[0]
 		self.E_comp = self.stream.select(channel="*E")[0]
 
-	def filter_obspy(self, filt_type, minfreq, maxfreq, n_poles=2, zero_phase=True):
-		# Make a copy of the data (so don't have to read a new one if re-filtering)
+	def detrend_data(self):
+		# Make a copy of the data
 		tmp_stream = self.stream.copy()
 
 		# Detrend the data
 		tmp_stream = (tmp_stream.detrend("linear")).detrend("demean")
+
+		# Overwrite the 3 components
+		self.Z_comp = tmp_stream.select(channel="*Z")[0]
+		self.N_comp = tmp_stream.select(channel="*N")[0]
+		self.E_comp = tmp_stream.select(channel="*E")[0]
+
+	def filter_obspy(self, filt_type, minfreq, maxfreq, n_poles=2, zero_phase=True):
+		# Make a copy of the data (so don't have to read a new one if re-filtering)
+		tmp_stream = self.stream.copy()
 
 		# Add a cosine taper from the 5th - 95th percentile
 		tmp_stream = tmp_stream.taper(max_percentage=0.05)

@@ -943,6 +943,7 @@ class PickingWindow(qt.QMainWindow):
 				self.event = self.events[self.counter]
 				print(self.event)
 
+				self._updateStationInformation(self.station)
 				self._updateEventInformation(self.event)
 			except IndexError:
 				qt.QMessageBox.about(self, "Error!", "There are no events with recorded arrivals at this station.")
@@ -964,6 +965,7 @@ class PickingWindow(qt.QMainWindow):
 				self.station = self.stations[self.counter]
 
 				self._updateStationInformation(self.station)
+				self._updateEventInformation(self.event)
 			except IndexError:
 				qt.QMessageBox.about(self, "Error!", "There are no stations with recorded arrivals for this event.")
 				return

@@ -943,6 +943,7 @@ class PickingWindow(qt.QMainWindow):
 
 			try:
 				self.event = self.events[self.counter]
+				print(self.event)
 
 				self._updateEventInformation(self.event)
 			except IndexError:

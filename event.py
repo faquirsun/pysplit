@@ -24,8 +24,16 @@ class Event(object):
 
 	def __init__(self, file_path):
 
+		self.file_path = file_path
+
 		# Read in event files
 		self.stream = read(file_path)
+
+		tmp_stream = self.stream.copy()
+
+		self.Z_comp = tmp_stream.select(channel="*Z")[0]
+		self.N_comp = tmp_stream.select(channel="*N")[0]
+		self.E_comp = tmp_stream.select(channel="*E")[0]
 
 		# Detrend the data
 		self.detrend_data()
@@ -41,6 +49,7 @@ class Event(object):
 		self.E_comp.stats.picks = {}
 
 		self.delta = self.Z_comp.stats.delta
+		self.sps   = self.Z_comp.stats.sampling_rate
 
 	def unsplit(self, phi, dt):
 		# Make copy of the data
@@ -90,9 +99,7 @@ class Event(object):
 		return tr
 
 	def remove_filter(self):
-		self.Z_comp = self.stream.select(channel="*Z")[0]
-		self.N_comp = self.stream.select(channel="*N")[0]
-		self.E_comp = self.stream.select(channel="*E")[0]
+		self.detrend_data()
 
 	def detrend_data(self):
 		# Make a copy of the data
@@ -102,24 +109,32 @@ class Event(object):
 		tmp_stream = (tmp_stream.detrend("linear")).detrend("demean")
 
 		# Overwrite the 3 components
-		self.Z_comp = tmp_stream.select(channel="*Z")[0]
-		self.N_comp = tmp_stream.select(channel="*N")[0]
-		self.E_comp = tmp_stream.select(channel="*E")[0]
+		self.Z_comp.data = tmp_stream.select(channel="*Z")[0].data
+		self.N_comp.data = tmp_stream.select(channel="*N")[0].data
+		self.E_comp.data = tmp_stream.select(channel="*E")[0].data
 
-	def filter_obspy(self, filt_type, minfreq, maxfreq, n_poles=2, zero_phase=True):
+	def filter_obspy(self, filt_type, minfreq=None, maxfreq=None, n_poles=2, zero_phase=True):
 		# Make a copy of the data (so don't have to read a new one if re-filtering)
 		tmp_stream = self.stream.copy()
+
+		# Detrend the data
+		tmp_stream = (tmp_stream.detrend("linear")).detrend("demean")		
 
 		# Add a cosine taper from the 5th - 95th percentile
 		tmp_stream = tmp_stream.taper(max_percentage=0.05)
 
 		# Filter the data
-		tmp_stream.filter(type=filt_type, freqmin=minfreq, freqmax=maxfreq, corners=n_poles, zerophase=zero_phase)
+		if filt_type == "Lowpass":
+			tmp_stream = tmp_stream.filter(type="lowpass", freq=minfreq, corners=n_poles, zerophase=zero_phase)
+		if filt_type == "Bandpass":
+			tmp_stream = tmp_stream.filter(type="bandpass", freqmin=minfreq, freqmax=maxfreq, corners=n_poles, zerophase=zero_phase)
+		if filt_type == "Highpass":
+			tmp_stream = tmp_stream.filter(type="highpass", freq=maxfreq, corners=n_poles, zerophase=zero_phase)
 
 		# Overwrite the 3 components
-		self.Z_comp = tmp_stream.select(channel="*Z")[0]
-		self.N_comp = tmp_stream.select(channel="*N")[0]
-		self.E_comp = tmp_stream.select(channel="*E")[0]
+		self.Z_comp.data = tmp_stream.select(channel="*Z")[0].data
+		self.N_comp.data = tmp_stream.select(channel="*N")[0].data
+		self.E_comp.data = tmp_stream.select(channel="*E")[0].data
 
 	def plot_traces(self, Z_ax, N_ax, E_ax, lims):
 
@@ -171,3 +186,25 @@ class Event(object):
 			self.Z_comp.stats.picks[pick] = value
 			self.N_comp.stats.picks[pick] = value
 			self.E_comp.stats.picks[pick] = value
+
+	def save_event(self, pick_path):
+		# Save the traces to mSEED
+		file_path_stem = self.file_path[:-1]
+		print
+		self.Z_comp.write("{}.z".format(file_path_stem), format="MSEED")
+		self.N_comp.write("{}.n".format(file_path_stem), format="MSEED")
+		self.E_comp.write("{}.e".format(file_path_stem), format="MSEED")
+
+		head, tail = os.path.split(file_path_stem)
+
+		# Create a pick file
+		# for phase, pick in self.Z_comp.stats.picks:
+		# 	filename = "{}/{}{}".format(pick_path, tail, phase)
+
+		# 	with open(filename, "w+") as f:
+		# 		f.write("{} {} {} {} {}".format(ymd, hm, sms, err, polarity))
+
+	@property
+	def starttime(self):
+		return self.Z_comp.stats.starttime
+	

@@ -404,7 +404,10 @@ class PySplit(qt.QMainWindow):
 		self.label_eventLon.setText(f"{event_info.evlon.values[0]:.4f}")
 		self.label_eventLat.setText(f"{event_info.evlat.values[0]:.4f}")
 		self.label_eventDepth.setText(f"{event_info.evdep.values[0]:.4f}")
-		self.label_eventMag.setText(f"{event_info.evmag.values[0]:.2f}")
+		if type(event_info.evmag.values[0]) == float:
+			self.label_eventMag.setText(f"{event_info.evmag.values[0]:.2f}")
+		else:
+			self.label_eventMag.setText(event_info.evmag.values[0])
 		self.label_eventID.setText(str(event_info.sourceid.values[0]))
 
 
@@ -894,8 +897,13 @@ class PickingWindow(qt.QMainWindow):
 		self.default_filter = filt
 		self.filt           = filt
 
-		# Set default pick type
+		# Set default pick type and line color
 		self.pick_type = "P"
+		self.pick_line_color = "red"
+		self.pick_polarity = ""
+
+		# Initialise pick tracker
+		self.pick_lines = {}
 
 		# Initialise trackers for whether or not multiple events/stations are being picked on
 		self.evts  = False
@@ -971,6 +979,10 @@ class PickingWindow(qt.QMainWindow):
 				return
 
 		if self.default_filter != None:
+			self.input_filtType.setCurrentText(self.default_filter["filt_type"])
+			self.input_noPoles.setCurrentText(str(self.default_filter["no_poles"]))
+			if self.default_filter["zerophase"]:
+				self.input_zerophase.setChecked(True)
 			self.input_lowFreq.setText(str(self.default_filter["low_freq"]))
 			self.input_highFreq.setText(str(self.default_filter["high_freq"]))
 
@@ -983,7 +995,7 @@ class PickingWindow(qt.QMainWindow):
 
 	def connect(self):
 		# File menu connections
-		self.actionSave_Exit.triggered.connect(self.saveAndExit)
+		self.actionSave.triggered.connect(self.saveTrace)
 
 		# Settings menu connections
 		self.actionDefault_filter.triggered.connect(self.defaultFilter)
@@ -1001,8 +1013,12 @@ class PickingWindow(qt.QMainWindow):
 		self.cidlastzoom  = self.button_toggleLims.clicked.connect(self.toggleLims)
 		self.cidresetplot = self.button_resetPlot.clicked.connect(self.resetPlot)
 
-	def saveAndExit(self):
-		pass
+	def saveTrace(self):
+		if self.evt != None:
+			print("Saving event...")
+			self.evt.save_event("{}/picks".format(self.catalogue_path))
+		else:
+			return
 
 	def plotconnect(self):
 		# Connect each canvas to track motion - this will create a 
@@ -1045,6 +1061,28 @@ class PickingWindow(qt.QMainWindow):
 		if event.key() == Qt.Key_Shift:
 			self.shift_toggle = True
 
+		# Up polarity indicator
+		if event.key() == Qt.Key_U:
+			if not self.pick_line:
+				return
+			else:
+				# Set pick polarity
+				self.pick_polarity = "U"
+
+				# Update label
+				self.label_pickPolarity.setText(self.pick_polarity)
+
+		# Down polarity indicator
+		if event.key() == Qt.Key_D:
+			if not self.pick_line:
+				return
+			else:
+				# Set pick polarity
+				self.pick_polarity = "D"
+
+				# Update label
+				self.label_pickPolarity.setText(self.pick_polarity)
+
 	def keyReleaseEvent(self, event):
 		# Toggle Ctrl Modifier off
 		if event.key() == Qt.Key_Control:
@@ -1055,15 +1093,17 @@ class PickingWindow(qt.QMainWindow):
 			self.shift_toggle = False
 
 	def pPick(self):
-		self.pick_type == "P"
+		self.pick_type = "P"
+		self.pick_line_color = "red"
 
 	def sPick(self):
-		self.pick_type == "S"
+		self.pick_type = "S"
+		self.pick_line_color = "blue"
 
 	def customPick(self):
 		# Only run if the radio button is being toggled on.
 		if not self.c_radio.isChecked():
-			return 
+			return
 
 		self.customPickDialogue = CustomPickDialogue()
 
@@ -1072,6 +1112,8 @@ class PickingWindow(qt.QMainWindow):
 			try:
 				self.pick_type = self.customPickDialogue.input_pickType.currentText()
 				self.label_customPhase.setText(self.pick_type)
+
+				self.pick_line_color = "orange"
 			except ValueError:
 				qt.QMessageBox.about(self, "Error!", "You need to specify a phase to pick!")
 		else:
@@ -1159,23 +1201,8 @@ class PickingWindow(qt.QMainWindow):
 				n_canvas.ax.draw_artist(self.ncursor)
 				e_canvas.ax.draw_artist(self.ecursor)
 
-			if self.w_beg_line:
-				# Redraw the window line
-				z_canvas.ax.draw_artist(self.z_window_beg)
-				n_canvas.ax.draw_artist(self.n_window_beg)
-				e_canvas.ax.draw_artist(self.e_window_beg)
-
-			if self.pick_line:
-				# Redraw the pick line
-				z_canvas.ax.draw_artist(self.z_pick)
-				n_canvas.ax.draw_artist(self.n_pick)
-				e_canvas.ax.draw_artist(self.e_pick)
-
-			if self.w_end_line:
-				# Redraw the window line
-				z_canvas.ax.draw_artist(self.z_window_end)
-				n_canvas.ax.draw_artist(self.n_window_end)
-				e_canvas.ax.draw_artist(self.e_window_end)				
+			# Plot any lines that are currently being stored
+			self._replotLines()				
 
 			# blit just the redrawn area
 			z_canvas.blit(z_canvas.ax.bbox)
@@ -1212,6 +1239,7 @@ class PickingWindow(qt.QMainWindow):
 
 				# Add the window beginning to the event stats
 				self.evt._add_stat("window_beg", adjusted_xdata)
+				print(self.evt.Z_comp.stats)
 
 				# Make a vertical line artist
 				self.z_window_beg = z_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
@@ -1223,22 +1251,8 @@ class PickingWindow(qt.QMainWindow):
 				n_canvas.restore_region(self.n_background)
 				e_canvas.restore_region(self.e_background)
 
-				# Redraw the window line
-				z_canvas.ax.draw_artist(self.z_window_beg)
-				n_canvas.ax.draw_artist(self.n_window_beg)
-				e_canvas.ax.draw_artist(self.e_window_beg)
-
-				if self.pick_line:
-					# Redraw the pick line
-					z_canvas.ax.draw_artist(self.z_pick)
-					n_canvas.ax.draw_artist(self.n_pick)
-					e_canvas.ax.draw_artist(self.e_pick)
-
-				if self.w_end_line:
-					# Redraw the window line
-					z_canvas.ax.draw_artist(self.z_window_end)
-					n_canvas.ax.draw_artist(self.n_window_end)
-					e_canvas.ax.draw_artist(self.e_window_end)	
+				# Plot any lines that are currently being stored
+				self._replotLines()
 
 				# blit the redrawn area
 				z_canvas.blit(z_canvas.ax.bbox)
@@ -1250,35 +1264,30 @@ class PickingWindow(qt.QMainWindow):
 				# Set the pick line to be redrawn on move
 				self.pick_line = True
 
+				# Make a UTCDateTime for the pick time
+				pick_time = self.evt.starttime + adjusted_xdata
+
 				# Add the pick to the event stats
 				self.evt._add_stat("pick", adjusted_xdata, pick_type=self.pick_type)
 
+				# Set pick time label
+				self.label_pickTime.setText(pick_time.isoformat())
+				self.label_pickPhase.setText(self.pick_type)
+
 				# Make a vertical line artist
-				self.z_pick = z_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="red", animated=True)
-				self.n_pick = n_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="red", animated=True)
-				self.e_pick = e_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="red", animated=True)
+				self.z_pick = z_canvas.ax.axvline(adjusted_xdata, linewidth=1, color=self.pick_line_color, animated=True)
+				self.n_pick = n_canvas.ax.axvline(adjusted_xdata, linewidth=1, color=self.pick_line_color, animated=True)
+				self.e_pick = e_canvas.ax.axvline(adjusted_xdata, linewidth=1, color=self.pick_line_color, animated=True)
+
+				self.pick_lines[self.pick_type] = [self.z_pick, self.n_pick, self.e_pick]
 
 				# Restore the background region
 				z_canvas.restore_region(self.z_background)
 				n_canvas.restore_region(self.n_background)
 				e_canvas.restore_region(self.e_background)
 
-				if self.w_beg_line:
-					# Redraw the window line
-					z_canvas.ax.draw_artist(self.z_window_beg)
-					n_canvas.ax.draw_artist(self.n_window_beg)
-					e_canvas.ax.draw_artist(self.e_window_beg)
-
-				# Redraw the pick line
-				z_canvas.ax.draw_artist(self.z_pick)
-				n_canvas.ax.draw_artist(self.n_pick)
-				e_canvas.ax.draw_artist(self.e_pick)
-
-				if self.w_end_line:
-					# Redraw the window line
-					z_canvas.ax.draw_artist(self.z_window_end)
-					n_canvas.ax.draw_artist(self.n_window_end)
-					e_canvas.ax.draw_artist(self.e_window_end)
+				# Plot any lines that are currently being stored
+				self._replotLines()
 
 				# blit the redrawn area
 				z_canvas.blit(z_canvas.ax.bbox)
@@ -1303,27 +1312,38 @@ class PickingWindow(qt.QMainWindow):
 				n_canvas.restore_region(self.n_background)
 				e_canvas.restore_region(self.e_background)
 
-				if self.w_beg_line:
-					# Redraw the window line
-					z_canvas.ax.draw_artist(self.z_window_beg)
-					n_canvas.ax.draw_artist(self.n_window_beg)
-					e_canvas.ax.draw_artist(self.e_window_beg)
-
-				if self.pick_line:
-					# Redraw the pick line
-					z_canvas.ax.draw_artist(self.z_pick)
-					n_canvas.ax.draw_artist(self.n_pick)
-					e_canvas.ax.draw_artist(self.e_pick)
-
-				# Redraw the window line
-				z_canvas.ax.draw_artist(self.z_window_end)
-				n_canvas.ax.draw_artist(self.n_window_end)
-				e_canvas.ax.draw_artist(self.e_window_end)
+				# Plot any lines that are currently being stored
+				self._replotLines()
 
 				# blit the redrawn area
 				z_canvas.blit(z_canvas.ax.bbox)
 				n_canvas.blit(n_canvas.ax.bbox)
 				e_canvas.blit(e_canvas.ax.bbox)
+
+	def _replotLines(self):
+		# For clarity
+		z_canvas = self.z_comp_plot.canvas
+		n_canvas = self.n_comp_plot.canvas
+		e_canvas = self.e_comp_plot.canvas
+
+		if self.w_beg_line:
+			# Redraw the window line
+			z_canvas.ax.draw_artist(self.z_window_beg)
+			n_canvas.ax.draw_artist(self.n_window_beg)
+			e_canvas.ax.draw_artist(self.e_window_beg)
+
+		if self.pick_line:
+			# Redraw the pick lines
+			for phase, pick_lines in self.pick_lines.items():
+				z_canvas.ax.draw_artist(pick_lines[0])
+				n_canvas.ax.draw_artist(pick_lines[1])
+				e_canvas.ax.draw_artist(pick_lines[2])
+
+		if self.w_end_line:
+			# Redraw the window line
+			z_canvas.ax.draw_artist(self.z_window_end)
+			n_canvas.ax.draw_artist(self.n_window_end)
+			e_canvas.ax.draw_artist(self.e_window_end)
 
 	def _onRelease(self, event):
 		if self.shift_toggle:
@@ -1389,6 +1409,17 @@ class PickingWindow(qt.QMainWindow):
 		# Advance counter
 		self.counter += 1
 
+		# Reset pick trackers
+		self.pick_lines = {}
+		self.pick_polarity = ""
+		self.pick_time = ""
+		self.pick_phase = ""
+
+		# Set all the labels
+		self.label_pickPolarity.setText(self.pick_polarity)
+		self.label_pickTime.setText(self.pick_time)
+		self.label_pickPhase.setText(self.pick_phase)
+
 		if self.evts:
 			# Check not on last event
 			if self.counter == len(self.events):
@@ -1419,6 +1450,17 @@ class PickingWindow(qt.QMainWindow):
 	def previousTrace(self):
 		# Reverse counter
 		self.counter += -1
+
+		# Reset pick tracker
+		self.pick_lines = {}
+		self.pick_polarity = ""
+		self.pick_time = ""
+		self.pick_phase = ""
+
+		# Set all the labels
+		self.label_pickPolarity.setText(self.pick_polarity)
+		self.label_pickTime.setText(self.pick_time)
+		self.label_pickPhase.setText(self.pick_phase)
 
 		if self.evts:
 			# Check not trying to go below 0th position
@@ -1490,9 +1532,12 @@ class PickingWindow(qt.QMainWindow):
 			# Create an instance of the Event class
 			self.evt = evt.Event("{}/data/{}/event.{}.{}.*".format(self.catalogue_path, station.upper(), event, station.upper()))
 
+		else:
+			self._replotLines()
+
 		# Check if a filter has been specified, and apply it if so
 		if not self.filt == None:
-			self.evt.filter_obspy(self.filt["filt_type"], self.filt["low_freq"], self.filt["high_freq"], n_poles=self.filt["no_poles"], zero_phase=self.filt["zerophase"])
+			self.evt.filter_obspy(filt_type=self.filt["filt_type"], minfreq=self.filt["low_freq"], maxfreq=self.filt["high_freq"], n_poles=self.filt["no_poles"], zero_phase=self.filt["zerophase"])
 
 		# Plot the traces
 		self.evt.plot_traces(z_canvas.ax, n_canvas.ax, e_canvas.ax, lims=self.lims)
@@ -1545,7 +1590,10 @@ class PickingWindow(qt.QMainWindow):
 		self.label_eventLon.setText(f"{event_info.evlon.values[0]:.4f}")
 		self.label_eventLat.setText(f"{event_info.evlat.values[0]:.4f}")
 		self.label_eventDepth.setText(f"{event_info.evdep.values[0]:.4f}")
-		self.label_eventMag.setText(f"{event_info.evmag.values[0]:.2f}")
+		if type(event_info.evmag.values[0]) == float:
+			self.label_eventMag.setText(f"{event_info.evmag.values[0]:.2f}")
+		else:
+			self.label_eventMag.setText(event_info.evmag.values[0])
 		self.label_eventID.setText(str(event_info.sourceid.values[0]))
 
 

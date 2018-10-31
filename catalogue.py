@@ -65,6 +65,7 @@ class Catalogue(ABC):
 				os.makedirs("{}/data".format(path))
 				os.makedirs("{}/tmp".format(path))
 				os.makedirs("{}/plots".format(path))
+				os.makedirs("{}/picks".format(path))
 				print("Catalogue located at {}.".format(path))
 		except TypeError:
 			print("TypeError: *path* should a string.")

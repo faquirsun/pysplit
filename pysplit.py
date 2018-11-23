@@ -1444,8 +1444,10 @@ class PickingWindow(qt.QMainWindow):
 
 				# Check if P and S have been picked (and window exists)
 				if "P_manual" in self.evt.picks.keys() and "S_manual" in self.evt.picks.keys() and self.stats:
-					ptravel = self.evt.starttime + self.evt.picks["P_manual"]["rtime"] - self.evt.otime
-					stravel = self.evt.starttime + self.evt.picks["S_manual"]["rtime"] - self.evt.otime
+					ptravel = self.evt.starttime - self.evt.otime
+					ptravel += self.evt.picks["P_manual"]["rtime"]
+					stravel = self.evt.starttime - self.evt.otime
+					stravel += self.evt.picks["S_manual"]["rtime"]
 					self.wadatiWindow.addPick(ptravel, stravel, self.station)
 
 			# Right-clicking handles the window end time

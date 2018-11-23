@@ -1444,6 +1444,7 @@ class PickingWindow(qt.QMainWindow):
 
 				# Check if P and S have been picked (and window exists)
 				if "P_manual" in self.evt.picks.keys() and "S_manual" in self.evt.picks.keys() and self.stats:
+					print(type(self.evt.starttime), type(self.evt.otime))
 					ptravel = self.evt.starttime - self.evt.otime
 					ptravel += self.evt.picks["P_manual"]["rtime"]
 					stravel = self.evt.starttime - self.evt.otime

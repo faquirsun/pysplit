@@ -1085,7 +1085,6 @@ class PickingWindow(qt.QMainWindow):
 				return
 
 			# Open up Wadati plot
-			print(self.stats)
 			self.wadatiWindow = WadatiWindow(self)
 
 		if self.default_filter != None:
@@ -1441,8 +1440,8 @@ class PickingWindow(qt.QMainWindow):
 				n_canvas.blit(n_canvas.ax.bbox)
 				e_canvas.blit(e_canvas.ax.bbox)
 
-				# Check if P and S have been picked
-				if "P_manual" in self.evt.picks.keys() and "S_manual" in self.evt.picks.keys():
+				# Check if P and S have been picked (and window exists)
+				if "P_manual" in self.evt.picks.keys() and "S_manual" in self.evt.picks.keys() and self.stats:
 					ptravel = self.evt.otime + self.evt.picks["P_manual"]["rtime"]
 					stravel = self.evt.otime + self.evt.picks["S_manual"]["rtime"]
 					self.wadatiWindow.addPick(ptravel, stravel, self.station)
@@ -1568,7 +1567,7 @@ class PickingWindow(qt.QMainWindow):
 		self.saveTrace()
 
 		# Reset to P pick
-		self.pPick()
+		self.p_radio.isChecked(True)
 
 		# Reset trace removal tracker
 		self.trace_removed = False
@@ -1619,7 +1618,7 @@ class PickingWindow(qt.QMainWindow):
 		self.saveTrace()
 
 		# Reset to P pick
-		self.pPick()
+		self.p_radio.isChecked(True)
 
 		# Reset trace removal tracker
 		self.trace_removed = False

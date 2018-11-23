@@ -1705,61 +1705,61 @@ class PickingWindow(qt.QMainWindow):
 			self.evt = evt.Event("{}/data/{}/event.{}.{}.*".format(self.catalogue_path, station.upper(), event, station.upper()), self.event_info)
 
 			# Look up any picks
-			try:
-				pick_files = glob.glob("{}/picks/{}/event.{}.{}*".format(self.catalogue_path, station.upper(), event, station.upper()))
-				for pick_file in pick_files:
+			# try:
+			# 	pick_files = glob.glob("{}/picks/{}/event.{}.{}*".format(self.catalogue_path, station.upper(), event, station.upper()))
+			# 	for pick_file in pick_files:
 
-					# Handle window start files
-					if pick_file[-2:] == "wb":
-						# Read in window start time
-						window = pd.read_csv(pick_file, sep=" ", header=None)
-						w_beg_time = window.iloc[0][0]
+			# 		# Handle window start files
+			# 		if pick_file[-2:] == "wb":
+			# 			# Read in window start time
+			# 			window = pd.read_csv(pick_file, sep=" ", header=None)
+			# 			w_beg_time = window.iloc[0][0]
 
-						# Make a vertical line artist
-						z_canvas.ax.axvline(w_beg_time, linewidth=1, color="green")
-						n_canvas.ax.axvline(w_beg_time, linewidth=1, color="green")
-						e_canvas.ax.axvline(w_beg_time, linewidth=1, color="green")
+			# 			# Make a vertical line artist
+			# 			z_canvas.ax.axvline(w_beg_time, linewidth=1, color="green")
+			# 			n_canvas.ax.axvline(w_beg_time, linewidth=1, color="green")
+			# 			e_canvas.ax.axvline(w_beg_time, linewidth=1, color="green")
 
-					# Handle window end files
-					elif pick_file[-2:] == "we":
-						# Read in window end time
-						window = pd.read_csv(pick_file, sep=" ", header=None)
-						w_end_time = window.iloc[0][0]
+			# 		# Handle window end files
+			# 		elif pick_file[-2:] == "we":
+			# 			# Read in window end time
+			# 			window = pd.read_csv(pick_file, sep=" ", header=None)
+			# 			w_end_time = window.iloc[0][0]
 
-						# Make a vertical line artist
-						z_canvas.ax.axvline(w_end_time, linewidth=1, color="green")
-						n_canvas.ax.axvline(w_end_time, linewidth=1, color="green")
-						e_canvas.ax.axvline(w_end_time, linewidth=1, color="green")
+			# 			# Make a vertical line artist
+			# 			z_canvas.ax.axvline(w_end_time, linewidth=1, color="green")
+			# 			n_canvas.ax.axvline(w_end_time, linewidth=1, color="green")
+			# 			e_canvas.ax.axvline(w_end_time, linewidth=1, color="green")
 
-					# Handle picks
-					else:
-						pick_phase = (pick_file.split(".")[-1]).split("_")[0]
+			# 		# Handle picks
+			# 		else:
+			# 			pick_phase = (pick_file.split(".")[-1]).split("_")[0]
 
-						pick = pd.read_csv(pick_file, sep=" ", header=None)
+			# 			pick = pd.read_csv(pick_file, sep=" ", header=None)
 
-						pick_time = UTCDateTime("{}T{}:{}".format(pick.iloc[0][0], pick.iloc[0][1], pick.iloc[0][2])) - self.evt.starttime
+			# 			pick_time = UTCDateTime("{}T{}:{}".format(pick.iloc[0][0], pick.iloc[0][1], pick.iloc[0][2])) - self.evt.starttime
 
-						# Handle P picks
-						if pick_phase == "P":
-							self.pick_line_color = "red"
+			# 			# Handle P picks
+			# 			if pick_phase == "P":
+			# 				self.pick_line_color = "red"
 
-						# Handle S picks
-						elif pick_phase == "S":
-							self.pick_line_color = "blue"
+			# 			# Handle S picks
+			# 			elif pick_phase == "S":
+			# 				self.pick_line_color = "blue"
 
-						# Handle other picks
-						else:
-							self.pick_line_color = "orange"
+			# 			# Handle other picks
+			# 			else:
+			# 				self.pick_line_color = "orange"
 
-						z_canvas.ax.axvline(pick_time, linewidth=1, color=self.pick_line_color)
-						n_canvas.ax.axvline(pick_time, linewidth=1, color=self.pick_line_color)
-						e_canvas.ax.axvline(pick_time, linewidth=1, color=self.pick_line_color)
+			# 			z_canvas.ax.axvline(pick_time, linewidth=1, color=self.pick_line_color)
+			# 			n_canvas.ax.axvline(pick_time, linewidth=1, color=self.pick_line_color)
+			# 			e_canvas.ax.axvline(pick_time, linewidth=1, color=self.pick_line_color)
 
-				self.pick_line_color = "red"
+			# 	self.pick_line_color = "red"
 
-			except FileNotFoundError:
-				print("No picks exist for this station")
-				pass
+			# except FileNotFoundError:
+			# 	print("No picks exist for this station")
+			# 	pass
 
 		else:
 			self._replotLines()

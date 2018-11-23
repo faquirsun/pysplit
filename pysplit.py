@@ -1080,6 +1080,7 @@ class PickingWindow(qt.QMainWindow):
 				return
 
 			# Open up Wadati plot
+			print(self.stats)
 			self.wadatiWindow = WadatiWindow(self)
 
 		if self.default_filter != None:

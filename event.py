@@ -22,9 +22,18 @@ class Event(object):
 	Base Event class
 	"""
 
-	def __init__(self, file_path):
+	def __init__(self, file_path, event_info):
 
 		self.file_path = file_path
+
+		# Parse out event information
+		self.otime = event_info["otime"]
+		self.evlat = event_info["evlat"]
+		self.evlon = event_info["evlon"]
+		self.evdep = event_info["evdep"]
+		self.evmag = event_info["evmag"]
+
+		self.eventid = event_info["sourceid"]
 
 		# Read in event files
 		self.stream = read(file_path)

@@ -961,6 +961,7 @@ class WadatiWindow(qt.QMainWindow):
 		# Add a p traveltime and SP-time to the plot
 		self.ptravels.append(ptravel)
 		self.sptimes.append(sptime)
+		self.stats.append(station)
 
 		self.plotWadati(station)
 
@@ -979,7 +980,7 @@ class WadatiWindow(qt.QMainWindow):
 
 		tolerance = 10
 		for i in range(len(self.ptravels)):
-			wadati_canvas.ax.scatter(ptravels[i], sptimes[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="EVENT: {}".format(station))
+			wadati_canvas.ax.scatter(ptravels[i], sptimes[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="STATION: {}".format(self.stats[i]))
 
 class PickingWindow(qt.QMainWindow):
 
@@ -1036,6 +1037,7 @@ class PickingWindow(qt.QMainWindow):
 			self.button_lastTrace.setEnabled(False)
 
 			self._updateEventInformation(self.event)
+			print(self.event)
 			self._updateStationInformation(self.station)
 
 		# If picking all events at a given station
@@ -1231,15 +1233,25 @@ class PickingWindow(qt.QMainWindow):
 		self.pick_type = "P"
 		self.pick_line_color = "red"
 
+		# Reset polarity text
+		self.label_pickPolarity.setText("")
+
 	def sPick(self):
 		self.pick_type = "S"
 		self.pick_line_color = "blue"
+
+		# Reset polarity text
+		self.label_pickPolarity.setText("")
 
 	def customPick(self):
 		# Only run if the radio button is being toggled on.
 		if not self.c_radio.isChecked():
 			return
 
+		# Reset polarity text
+		self.label_pickPolarity.setText("")
+
+		# Open custom phase dialogue
 		self.customPickDialogue = CustomPickDialogue()
 
 		if self.customPickDialogue.exec_():
@@ -1428,6 +1440,12 @@ class PickingWindow(qt.QMainWindow):
 				n_canvas.blit(n_canvas.ax.bbox)
 				e_canvas.blit(e_canvas.ax.bbox)
 
+				# Check if P and S have been picked
+				if "P_manual" in self.evt.picks.keys() and "S_manual" in self.evt.picks.keys():
+					ptravel = self.evt.otime + self.evt.picks["P_manual"]["rtime"]
+					sptime  = self.evt.picks["S_manual"] - self.evt.picks["P_manual"]
+					self.WadatiWindow.addPick(ptravel, sptime, self.station)
+
 			# Right-clicking handles the window end time
 			if event.button == 3:
 				# Set the window end line to be redrawn on move
@@ -1545,6 +1563,12 @@ class PickingWindow(qt.QMainWindow):
 			# Advance counter
 			self.counter += 1
 
+		# Save any picks
+		self.saveTrace()
+
+		# Reset to P pick
+		self.pPick()
+
 		# Reset trace removal tracker
 		self.trace_removed = False
 
@@ -1589,6 +1613,15 @@ class PickingWindow(qt.QMainWindow):
 	def previousTrace(self):
 		# Reverse counter
 		self.counter += -1
+
+		# Save any picks
+		self.saveTrace()
+
+		# Reset to P pick
+		self.pPick()
+
+		# Reset trace removal tracker
+		self.trace_removed = False
 
 		# Reset pick tracker
 		self.pick_lines = {}
@@ -1669,7 +1702,7 @@ class PickingWindow(qt.QMainWindow):
 			self.w_end_line = False
 
 			# Create an instance of the Event class
-			self.evt = evt.Event("{}/data/{}/event.{}.{}.*".format(self.catalogue_path, station.upper(), event, station.upper()))
+			self.evt = evt.Event("{}/data/{}/event.{}.{}.*".format(self.catalogue_path, station.upper(), event, station.upper()), self.event_info)
 
 			# Look up any picks
 			try:
@@ -1777,7 +1810,7 @@ class PickingWindow(qt.QMainWindow):
 		self.label_statRet.setText(station_info.et_dep.values[0].isoformat().split("T")[0])
 
 	def _updateEventInformation(self, event):
-		event_info = self.catalogue.source_df.query('sourceid == @event')
+		self.event_info = self.catalogue.source_df.query('sourceid == @event')
 		self.label_eventOdate.setText(event_info.otime.values[0].isoformat().split("T")[0])
 		self.label_eventOtime.setText(event_info.otime.values[0].isoformat().split("T")[1])
 		self.label_eventLon.setText(f"{event_info.evlon.values[0]:.4f}")

@@ -17,13 +17,14 @@ from obspy import read
 import numpy as np
 import os
 from obspy import UTCDateTime
+from obspy.geodetics import locations2degrees
 
 class Event(object):
 	"""
 	Base Event class
 	"""
 
-	def __init__(self, file_path, event_info):
+	def __init__(self, file_path, event_info, station_info):
 
 		self.file_path = file_path
 
@@ -33,6 +34,11 @@ class Event(object):
 		self.evlon = event_info.evlon.values[0]
 		self.evdep = event_info.evdep.values[0]
 		self.evmag = event_info.evmag.values[0]
+
+		# Parse out station information
+		self.slat = station_info.lat.values[0]
+		self.slon = station_info.lon.values[0]
+		self.selv = station_info.dep.values[0]
 
 		self.eventid = event_info["sourceid"]
 
@@ -225,6 +231,11 @@ class Event(object):
 
 			with open(filename, "w+") as f:
 				f.write("{}".format(value))
+
+	@property
+	def distance(self):
+		return locations2degrees(self.evlat, self.evlon, self.slat, self.slon)
+	
 
 	"""
 	Properties from mSEED header:

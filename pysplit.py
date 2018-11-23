@@ -932,8 +932,10 @@ class WadatiWindow(qt.QMainWindow):
 		super(WadatiWindow, self).__init__()
 
 		self.ptravels = []
+		self.stravels = []
 		self.sptimes  = []
 		self.stations = []
+		self.dists    = []
 
 		self.parent = parent
 
@@ -957,21 +959,25 @@ class WadatiWindow(qt.QMainWindow):
 
 		# Plot connection
 		self.wadatiPlot.canvas.mpl_connect('pick_event', self._onPick)
+		self.distancePlot.canvas.mpl_connect('pick_event', self._onPick)
 
 	def calcVpVs(self):
 		# Insert code to calc best fitting line to p travel and s-p times
 		# Should be a straight line
 		pass
 
-	def addPick(self, ptravel, stravel, station):
+	def addPick(self, ptravel, stravel, dist, station):
 		# Calculate sptime
 		sptime = stravel - ptravel
 		# Add a p traveltime and SP-time to the plot
 		self.ptravels.append(ptravel)
+		self.stravels.append(stravel)
 		self.sptimes.append(sptime)
+		self.dists.append(dist)
 		self.stations.append(station)
 
 		self.plotWadati(station)
+		self.plotDistance(station)
 
 	def _onPick(self, event):
 	    artist = event.artist
@@ -985,17 +991,38 @@ class WadatiWindow(qt.QMainWindow):
 		# Clear the canvas
 		wadati_canvas.ax.clear()
 
-		# Try rescaling the image now
-		#wadati_canvas.ax.set_aspect('auto')
+		# Set plot details (axes labels etc)
+		wadati_canvas.ax.set_xlabel("P traveltime / s", fontsize=10)
+		wadati_canvas.ax.set_ylabel("S - P traveltime / s", fontsize=10)
 
-		print(self.ptravels, self.sptimes)
+		# Try rescaling the image now
+		wadati_canvas.ax.set_aspect('auto')
 
 		tolerance = 10
 		for i in range(len(self.ptravels)):
-			print(i)
-			wadati_canvas.ax.scatter(self.ptravels[i], self.sptimes[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="STATION: {}".format(self.stations[i]))
+			wadati_canvas.ax.scatter(self.ptravels[i], self.sptimes[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label=self.stations[i])
 
 		wadati_canvas.draw_idle()
+
+	def plotDistance(self, station):
+		distance_canvas = self.distancePlot.canvas
+
+		# Clear the canvas
+		distance_canvas.ax.clear()
+
+		# Set plot details (axes labels etc)
+		distance_canvas.ax.set_xlabel("Epicentral distance / km", fontsize=10)
+		distance_canvas.ax.set_ylabel("Traveltime / s", fontsize=10)
+
+		# Rescale the image now
+		distance_canvas.ax.set_aspect('auto')
+
+		tolerance = 10
+		for i in range(len(self.ptravels)):
+			distance_canvas.ax.scatter(self.dists[i], self.ptravels[i], 12, marker='o', color="red", picker=tolerance, zorder=10, label=self.stations[i])
+			distance_canvas.ax.scatter(self.dists[i], self.stravels[i], 12, marker='o', color="blue", picker=tolerance, zorder=10, label=self.stations[i])
+
+		distance_canvas.draw_idle()
 
 class PickingWindow(qt.QMainWindow):
 
@@ -1577,7 +1604,7 @@ class PickingWindow(qt.QMainWindow):
 			ptravel += self.evt.picks["P_manual"]["rtime"]
 			stravel = self.evt.starttime - self.evt.otime
 			stravel += self.evt.picks["S_manual"]["rtime"]
-			self.wadatiWindow.addPick(ptravel, stravel, self.station)
+			self.wadatiWindow.addPick(ptravel, stravel, self.evt.distance, self.station)
 
 		# Save any picks
 		self.saveTrace()
@@ -1726,7 +1753,7 @@ class PickingWindow(qt.QMainWindow):
 			self.w_end_line = False
 
 			# Create an instance of the Event class
-			self.evt = evt.Event("{}/data/{}/event.{}.{}.*".format(self.catalogue_path, station.upper(), event, station.upper()), self.event_info)
+			self.evt = evt.Event("{}/data/{}/event.{}.{}.*".format(self.catalogue_path, station.upper(), event, station.upper()), self.event_info, self.station_info)
 
 			# Look up any picks
 			# try:

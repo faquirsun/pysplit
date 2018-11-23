@@ -200,9 +200,6 @@ class Event(object):
 	def save_event(self, pick_path):
 		# Save the traces to mSEED
 		file_path_stem = self.file_path[:-1]
-		self.Z_comp.write("{}z".format(file_path_stem), format="MSEED")
-		self.N_comp.write("{}n".format(file_path_stem), format="MSEED")
-		self.E_comp.write("{}e".format(file_path_stem), format="MSEED")
 
 		head, tail = os.path.split(file_path_stem)
 

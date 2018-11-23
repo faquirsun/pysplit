@@ -981,7 +981,7 @@ class WadatiWindow(qt.QMainWindow):
 
 		tolerance = 10
 		for i in range(len(self.ptravels)):
-			wadati_canvas.ax.scatter(ptravels[i], sptimes[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="STATION: {}".format(self.stations[i]))
+			wadati_canvas.ax.scatter(self.ptravels[i], self.sptimes[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="STATION: {}".format(self.stations[i]))
 
 class PickingWindow(qt.QMainWindow):
 

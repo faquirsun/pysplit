@@ -955,6 +955,9 @@ class WadatiWindow(qt.QMainWindow):
 		# Calculate Vp/Vs button
 		self.button_calcVpVs.clicked.connect(self.calcVpVs)
 
+		# Plot connection
+		self.wadatiPlot.canvas.mpl_connect('pick_event', self._onPick)
+
 	def calcVpVs(self):
 		# Insert code to calc best fitting line to p travel and s-p times
 		# Should be a straight line
@@ -969,6 +972,12 @@ class WadatiWindow(qt.QMainWindow):
 		self.stations.append(station)
 
 		self.plotWadati(station)
+
+	def _onPick(self, event):
+	    artist = event.artist
+	    label = artist.get_label()
+
+	    self.label_station.setText(label)
 
 	def plotWadati(self, station):
 		wadati_canvas = self.wadatiPlot.canvas

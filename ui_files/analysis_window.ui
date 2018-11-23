@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1912</width>
+    <width>1892</width>
     <height>1857</height>
    </rect>
   </property>
@@ -510,12 +510,18 @@
          <property name="text">
           <string>Accept</string>
          </property>
+         <property name="shortcut">
+          <string>A</string>
+         </property>
         </widget>
        </item>
        <item row="1" column="0">
         <widget class="QPushButton" name="rejectButton">
          <property name="text">
           <string>Reject</string>
+         </property>
+         <property name="shortcut">
+          <string>R</string>
          </property>
         </widget>
        </item>
@@ -717,7 +723,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1912</width>
+     <width>1892</width>
      <height>34</height>
     </rect>
    </property>

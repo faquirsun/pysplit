@@ -926,6 +926,59 @@ class CustomPickDialogue(qt.QDialog):
 		self.setWindowTitle('PySplit - Set custom phase pick')
 		self.show()
 
+class WadatiWindow(qt.QMainWindow):
+
+	def __init__(self, parent):
+		super(WadatiWindow, self).__init__()
+
+		self.ptravels = []
+		self.sptimes  = []
+
+		self.parent = parent
+
+	def initUI(self):
+		uic.loadUi('ui_files/wadati_window.ui', self)
+
+		self.connect()
+
+		self.setWindowTitle('PySplit - Wadati plot window')
+		self.show()
+
+	def connect(self):
+		# Calculate Vp/Vs button
+		self.button_calcVpVs.clicked.connect(self.calcVpVs)
+
+	def calcVpVs(self):
+		# Insert code to calc best fitting line to p travel and s-p times
+		# Should be a straight line
+		pass
+
+	def addPick(self, ptravel, stravel, station):
+		# Calculate sptime
+		sptime = stravel - ptravel
+		# Add a p traveltime and SP-time to the plot
+		self.ptravels.append(ptravel)
+		self.sptimes.append(sptime)
+
+		self.plotWadati(station)
+
+	def plotWadati(self, station):
+		wadati_canvas = self.wadatiPlot.canvas
+
+		# Clear the canvas
+		wadati_canvas.ax.clear()
+
+		# Set plot details (axes labels etc)
+		wadati_canvas.ax.set_xlabel("P traveltime / s", fontsize=10)
+		wadati_canvas.ax.set_ylabel("S - P traveltime / s", fontsize=10)
+
+		# Try rescaling the image now
+		wadati_canvas.ax.set_aspect('auto')
+
+		tolerance = 10
+		for i in range(len(self.ptravels)):
+			wadati_canvas.ax.scatter(ptravels[i], sptimes[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="EVENT: {}".format(station))
+
 class PickingWindow(qt.QMainWindow):
 
 	def __init__(self, catalogue, catalogue_name, filt=None, event=None, station=None):
@@ -1025,6 +1078,9 @@ class PickingWindow(qt.QMainWindow):
 			except IndexError:
 				qt.QMessageBox.about(self, "Error!", "There are no stations with recorded arrivals for this event.")
 				return
+
+			# Open up Wadati plot
+			self.wadatiWindow = WadatiWindow(self)
 
 		if self.default_filter != None:
 			self.input_filtType.setCurrentText(self.default_filter["filt_type"])

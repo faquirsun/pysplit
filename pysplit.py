@@ -942,6 +942,10 @@ class WadatiWindow(qt.QMainWindow):
 	def initUI(self):
 		uic.loadUi('ui_files/wadati_window.ui', self)
 
+		# Set plot details (axes labels etc)
+		self.wadatiPlot.canvas.ax.set_xlabel("P traveltime / s", fontsize=10)
+		self.wadatiPlot.canvas.ax.set_ylabel("S - P traveltime / s", fontsize=10)
+
 		self.connect()
 
 		self.setWindowTitle('PySplit - Wadati plot window')
@@ -972,12 +976,10 @@ class WadatiWindow(qt.QMainWindow):
 		# Clear the canvas
 		wadati_canvas.ax.clear()
 
-		# Set plot details (axes labels etc)
-		wadati_canvas.ax.set_xlabel("P traveltime / s", fontsize=10)
-		wadati_canvas.ax.set_ylabel("S - P traveltime / s", fontsize=10)
-
 		# Try rescaling the image now
 		wadati_canvas.ax.set_aspect('auto')
+
+		print("hello")
 
 		tolerance = 10
 		for i in range(len(self.ptravels)):

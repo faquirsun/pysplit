@@ -16,6 +16,7 @@ import obspy
 from obspy import read
 import numpy as np
 import os
+from obspy import UTCDateTime
 
 class Event(object):
 	"""
@@ -27,11 +28,11 @@ class Event(object):
 		self.file_path = file_path
 
 		# Parse out event information
-		self.otime = event_info["otime"]
-		self.evlat = event_info["evlat"]
-		self.evlon = event_info["evlon"]
-		self.evdep = event_info["evdep"]
-		self.evmag = event_info["evmag"]
+		self.otime = event_info.otime.values[0]
+		self.evlat = event_info.evlat.values[0]
+		self.evlon = event_info.evlon.values[0]
+		self.evdep = event_info.evdep.values[0]
+		self.evmag = event_info.evmag.values[0]
 
 		self.eventid = event_info["sourceid"]
 

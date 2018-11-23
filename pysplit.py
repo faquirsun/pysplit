@@ -1810,7 +1810,8 @@ class PickingWindow(qt.QMainWindow):
 		self.label_statRet.setText(station_info.et_dep.values[0].isoformat().split("T")[0])
 
 	def _updateEventInformation(self, event):
-		self.event_info = self.catalogue.source_df.query('sourceid == @event')
+		event_info = self.catalogue.source_df.query('sourceid == @event')
+		self.event_info = event_info
 		self.label_eventOdate.setText(event_info.otime.values[0].isoformat().split("T")[0])
 		self.label_eventOtime.setText(event_info.otime.values[0].isoformat().split("T")[1])
 		self.label_eventLon.setText(f"{event_info.evlon.values[0]:.4f}")

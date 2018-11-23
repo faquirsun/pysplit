@@ -30,6 +30,7 @@ from mpl_toolkits.basemap import Basemap
 from string import Template
 import glob
 import os
+from obspy import UTCDateTime
 
 import catalogue as cat
 import event as evt
@@ -199,24 +200,9 @@ class PySplit(qt.QMainWindow):
 			return
 
 	def newCatalogue(self):
-		self.newCatalogueDialogue = NewCatalogueDialogue()
+		self.newCatalogueDialogue = NewCatalogueDialogue(self)
 
-		if self.newCatalogueDialogue.exec_():
-			# Read in parameters from input dialogue
-			self.catalogue_path = self.newCatalogueDialogue.catBox.text()
-			self.catalogue_name = self.newCatalogueDialogue.catName.text()
-			self.archive_path   = self.newCatalogueDialogue.arcBox.text()
-			self.archive_format = self.newCatalogueDialogue.arcFormBox.text()
-			self.receiver_file  = self.newCatalogueDialogue.recBox.text()
-
-			if self.newCatalogueDialogue.tele_radio.isChecked():
-				self.catalogue_type = "teleseismic"
-			elif self.newCatalogueDialogue.local_radio.isChecked():
-				self.catalogue_type = "local"
-			else:
-				qt.QMessageBox.about(self, "Error!", "You must select a catalogue type.")
-
-		else:
+		if not self.newCatalogueDialogue.exec_():
 			return
 
 		if self.catalogue_type == "teleseismic":
@@ -224,6 +210,7 @@ class PySplit(qt.QMainWindow):
 			self.data_source = "IRIS"
 			self.label_catTypeDisp.setText("Teleseismic")
 
+			# Display teleseismic catalogue parameter form page
 			self.catalogue_forms.setCurrentIndex(1)
 			self.plot_options.setCurrentIndex(1)
 
@@ -234,11 +221,14 @@ class PySplit(qt.QMainWindow):
 			# Set catalogue type label
 			self.label_catTypeDisp.setText("Local")
 
+			# Display local catalogue progress page
 			self.catalogue_forms.setCurrentIndex(0)
 			self.plot_options.setCurrentIndex(0)
 
-			# Open input file dialogue
-			self.getLocalInput()
+			# Get input file
+			self.localInputDialogue = LocalInputDialogue(self)
+			if not self.localInputDialogue.exec_():
+				return
 
 			# Create an instance of the Local Catalogue class
 			self.catalogue = cat.LocalCatalogue("{}/{}".format(self.catalogue_path, self.catalogue_name), self.archive_path, self.receiver_file)
@@ -282,29 +272,6 @@ class PySplit(qt.QMainWindow):
 		# Calculate number of events and update label
 		no_events = str(len(self.catalogue.source_df.index))
 		self.label_noEvents.setText(no_events)
-
-	def getLocalInput(self):
-		self.localInputDialogue = LocalInputDialogue()
-
-		if self.localInputDialogue.exec_():
-			# Read in input file
-			self.local_input_file = self.localInputDialogue.inpBox.text()
-
-			if not os.path.isfile(self.local_input_file):
-				qt.QMessageBox(self, "Error!", "The input file you have chosen does not exist...")
-				return
-
-			# Check if the events have been picked
-			if self.localInputDialogue.picked_Radio.isChecked():
-				self.picked = True
-			else:
-				self.picked = False
-
-		else:
-			return
-
-		# Set data source
-		self.data_source = self.local_input_file
 
 	def plotCatalogueMap(self, replot=False):
 		# Transmit a message to the status bar
@@ -753,8 +720,10 @@ class PySplit(qt.QMainWindow):
 
 class NewCatalogueDialogue(qt.QDialog):
 
-	def __init__(self):
+	def __init__(self, parent):
 		super(NewCatalogueDialogue, self).__init__()
+
+		self.parent = parent
 
 		self.initUI()
 
@@ -764,11 +733,15 @@ class NewCatalogueDialogue(qt.QDialog):
 		self.catDirButton.clicked.connect(self.browseCatalogue)
 		self.arcDirButton.clicked.connect(self.browseArchive)
 		self.receiverFileButton.clicked.connect(self.browseReceivers)
+		self.buttonBox.accepted.connect(self.actionAccept)
+		self.buttonBox.rejected.connect(self.actionReject)
 
 		self.setWindowTitle('PySplit - New catalogue')
 		self.show()
 
 	def browseCatalogue(self):
+
+		self.parent.label_eventOdate.setText("test")
 
 		self.catalogue_path = qt.QFileDialog.getExistingDirectory(self, 'Choose catalogue directory')
 
@@ -787,6 +760,57 @@ class NewCatalogueDialogue(qt.QDialog):
 		self.receiver_file = filename[0]
 
 		self.recBox.setText(self.receiver_file)
+
+	def actionAccept(self):
+		# If the inputs are accepted, set all of the parameters within the parent class
+		# Test if any of the input fields have not been completed
+		if (self.catBox.text() == "") or (self.catName.text() == "") or (self.recBox.text() == ""):
+			qt.QMessageBox.about(self, "Error!", "Please complete the form and try again.")
+			return
+
+		# Catalogue path
+		self.parent.catalogue_path = self.catBox.text()
+		if not os.path.exists(self.parent.catalogue_path):
+			qt.QMessageBox.about(self, "Error!", "You must provide a valid catalogue path.")
+			return
+
+		# Catalogue name
+		self.parent.catalogue_name = self.catName.text()
+		if not type(self.parent.catalogue_name) == str:
+			qt.QMessageBox.about(self, "Error!", "The catalogue name must be a String.")
+			return
+
+		# Archive path
+		self.parent.archive_path = self.arcBox.text()
+		if self.parent.archive_path == "":
+			pass
+		elif not os.path.exists(self.parent.archive_path):
+			qt.QMessageBox.about(self, "Error!", "You must provide a valid archive path.")
+			return
+
+		# Archive format
+		self.parent.archive_format = self.arcFormBox.text()
+		
+		# Receiver file
+		self.parent.receiver_file  = self.recBox.text()
+		if not os.path.exists(self.parent.receiver_file):
+			qt.QMessageBox.about(self, "Error!", "You must provide a valid receiver file.")
+			return
+
+		if self.tele_radio.isChecked():
+			self.parent.catalogue_type = "teleseismic"
+		elif self.local_radio.isChecked():
+			self.parent.catalogue_type = "local"
+		else:
+			qt.QMessageBox.about(self, "Error!", "You must select a catalogue type.")
+			return
+
+		# Send accept signal to Dialog
+		self.accept()
+
+	def actionReject(self):
+		# Send reject signal to Dialog
+		self.reject()
 
 class TelePhaseDialogue(qt.QDialog):
 
@@ -832,8 +856,10 @@ class TelePhaseDialogue(qt.QDialog):
 
 class LocalInputDialogue(qt.QDialog):
 
-	def __init__(self):
+	def __init__(self, parent):
 		super(LocalInputDialogue, self).__init__()
+
+		self.parent = parent
 
 		self.initUI()
 
@@ -841,6 +867,8 @@ class LocalInputDialogue(qt.QDialog):
 		uic.loadUi('ui_files/local_input_dialogue.ui', self)
 
 		self.inpButton.clicked.connect(self.browseLocalFile)
+		self.buttonBox.accepted.connect(self.actionAccept)
+		self.buttonBox.rejected.connect(self.actionReject)
 
 		self.setWindowTitle('PySplit - Local catalogue input type')
 		self.show()
@@ -852,6 +880,25 @@ class LocalInputDialogue(qt.QDialog):
 		self.input_file = filename[0]
 
 		self.inpBox.setText(self.input_file)
+
+	def actionAccept(self):
+		# If the inputs are accepted, set the parameter within the parent class
+		# Perform checks on the input provided
+		if not os.path.isfile(self.inpBox.text()):
+			qt.QMessageBox.about(self, "Error!", "You must provide a valid input file.")
+			return
+
+		# After all checks, set the parameter within the parent class
+		self.parent.local_input_file = self.inpBox.text()
+		self.parent.data_source = self.inpBox.text()
+		self.parent.picked = self.picked_Radio.isChecked()
+
+		# Send accept signal to Dialog
+		self.accept()
+
+	def actionReject(self):
+		# Send reject signal to Dialog
+		self.reject()
 
 class DefaultFilterDialogue(qt.QDialog):
 
@@ -881,8 +928,6 @@ class CustomPickDialogue(qt.QDialog):
 
 class PickingWindow(qt.QMainWindow):
 
-	base_scale = 2
-
 	def __init__(self, catalogue, catalogue_name, filt=None, event=None, station=None):
 		super(PickingWindow, self).__init__()
 
@@ -908,6 +953,9 @@ class PickingWindow(qt.QMainWindow):
 		# Initialise trackers for whether or not multiple events/stations are being picked on
 		self.evts  = False
 		self.stats = False
+
+		# Initialise trace rejection tracker
+		self.trace_removed = False
 
 		# Initialise toggle trackers
 		self.ctrl_toggle  = False
@@ -1010,6 +1058,7 @@ class PickingWindow(qt.QMainWindow):
 		# Connect to plot option buttons
 		self.cidnexttrace = self.button_nextTrace.clicked.connect(self.nextTrace)
 		self.cidlasttrace = self.button_lastTrace.clicked.connect(self.previousTrace)
+		self.cidrjcttrace = self.button_rejectTrace.clicked.connect(self.rejectTrace)
 		self.cidlastzoom  = self.button_toggleLims.clicked.connect(self.toggleLims)
 		self.cidresetplot = self.button_resetPlot.clicked.connect(self.resetPlot)
 
@@ -1017,6 +1066,28 @@ class PickingWindow(qt.QMainWindow):
 		if self.evt != None:
 			print("Saving event...")
 			self.evt.save_event("{}/picks".format(self.catalogue_path))
+		else:
+			return
+
+	def rejectTrace(self):
+		if self.evt != None:
+			print("Deleting trace...")
+			traces = glob.glob(self.evt.file_path)
+			for trace in traces:
+				os.remove(trace)
+
+			# Pass information back to parent and remove arrival from available arrivals?
+
+			# Delete event or station from events/stations list
+			if self.evts:
+				del self.events[self.counter]
+
+			if self.stats:
+				del self.stations[self.counter]
+
+			self.trace_removed = True
+
+			self.nextTrace()
 		else:
 			return
 
@@ -1063,6 +1134,7 @@ class PickingWindow(qt.QMainWindow):
 
 		# Up polarity indicator
 		if event.key() == Qt.Key_U:
+			print("U")
 			if not self.pick_line:
 				return
 			else:
@@ -1072,8 +1144,12 @@ class PickingWindow(qt.QMainWindow):
 				# Update label
 				self.label_pickPolarity.setText(self.pick_polarity)
 
+				# Add to event
+				self.evt._add_stat(stat="polarity", value=self.pick_polarity, pick_type=self.pick_type)
+
 		# Down polarity indicator
 		if event.key() == Qt.Key_D:
+			print("D")
 			if not self.pick_line:
 				return
 			else:
@@ -1238,8 +1314,7 @@ class PickingWindow(qt.QMainWindow):
 				self.w_beg_line = True
 
 				# Add the window beginning to the event stats
-				self.evt._add_stat("window_beg", adjusted_xdata)
-				print(self.evt.Z_comp.stats)
+				self.evt._add_stat(stat="window_beg", value=adjusted_xdata)
 
 				# Make a vertical line artist
 				self.z_window_beg = z_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
@@ -1268,7 +1343,7 @@ class PickingWindow(qt.QMainWindow):
 				pick_time = self.evt.starttime + adjusted_xdata
 
 				# Add the pick to the event stats
-				self.evt._add_stat("pick", adjusted_xdata, pick_type=self.pick_type)
+				self.evt._add_stat(stat="pick", value=adjusted_xdata, pick_type=self.pick_type)
 
 				# Set pick time label
 				self.label_pickTime.setText(pick_time.isoformat())
@@ -1300,7 +1375,7 @@ class PickingWindow(qt.QMainWindow):
 				self.w_end_line = True
 
 				# Add the window ending to the event stats
-				self.evt._add_stat("window_end", adjusted_xdata)
+				self.evt._add_stat(stat="window_end", value=adjusted_xdata)
 
 				# Make a vertical line artist
 				self.z_window_end = z_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
@@ -1406,8 +1481,13 @@ class PickingWindow(qt.QMainWindow):
 		self.plotEvent(self.event, self.station, replot=True)
 
 	def nextTrace(self):
-		# Advance counter
-		self.counter += 1
+		# If previous trace was removed, do not advance counter
+		if not self.trace_removed:
+			# Advance counter
+			self.counter += 1
+
+		# Reset trace removal tracker
+		self.trace_removed = False
 
 		# Reset pick trackers
 		self.pick_lines = {}
@@ -1532,6 +1612,63 @@ class PickingWindow(qt.QMainWindow):
 			# Create an instance of the Event class
 			self.evt = evt.Event("{}/data/{}/event.{}.{}.*".format(self.catalogue_path, station.upper(), event, station.upper()))
 
+			# Look up any picks
+			try:
+				pick_files = glob.glob("{}/picks/{}/event.{}.{}*".format(self.catalogue_path, station.upper(), event, station.upper()))
+				for pick_file in pick_files:
+
+					# Handle window start files
+					if pick_file[-2:] == "wb":
+						# Read in window start time
+						window = pd.read_csv(pick_file, sep=" ", header=None)
+						w_beg_time = window.iloc[0][0]
+
+						# Make a vertical line artist
+						z_canvas.ax.axvline(w_beg_time, linewidth=1, color="green")
+						n_canvas.ax.axvline(w_beg_time, linewidth=1, color="green")
+						e_canvas.ax.axvline(w_beg_time, linewidth=1, color="green")
+
+					# Handle window end files
+					elif pick_file[-2:] == "we":
+						# Read in window end time
+						window = pd.read_csv(pick_file, sep=" ", header=None)
+						w_end_time = window.iloc[0][0]
+
+						# Make a vertical line artist
+						z_canvas.ax.axvline(w_end_time, linewidth=1, color="green")
+						n_canvas.ax.axvline(w_end_time, linewidth=1, color="green")
+						e_canvas.ax.axvline(w_end_time, linewidth=1, color="green")
+
+					# Handle picks
+					else:
+						pick_phase = (pick_file.split(".")[-1]).split("_")[0]
+
+						pick = pd.read_csv(pick_file, sep=" ", header=None)
+
+						pick_time = UTCDateTime("{}T{}:{}".format(pick.iloc[0][0], pick.iloc[0][1], pick.iloc[0][2])) - self.evt.starttime
+
+						# Handle P picks
+						if pick_phase == "P":
+							self.pick_line_color = "red"
+
+						# Handle S picks
+						elif pick_phase == "S":
+							self.pick_line_color = "blue"
+
+						# Handle other picks
+						else:
+							self.pick_line_color = "orange"
+
+						z_canvas.ax.axvline(pick_time, linewidth=1, color=self.pick_line_color)
+						n_canvas.ax.axvline(pick_time, linewidth=1, color=self.pick_line_color)
+						e_canvas.ax.axvline(pick_time, linewidth=1, color=self.pick_line_color)
+
+				self.pick_line_color = "red"
+
+			except FileNotFoundError:
+				print("No picks exist for this station")
+				pass
+
 		else:
 			self._replotLines()
 
@@ -1541,9 +1678,6 @@ class PickingWindow(qt.QMainWindow):
 
 		# Plot the traces
 		self.evt.plot_traces(z_canvas.ax, n_canvas.ax, e_canvas.ax, lims=self.lims)
-
-		# Plot any existing measurements
-		#z_canvas.ax.axvline()
 
 		# Connect to each trace to grab the background once Qt has done resizing
 		z_canvas.mpl_connect('draw_event', self._zDrawEvent)

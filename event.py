@@ -38,18 +38,17 @@ class Event(object):
 		# Detrend the data
 		self.detrend_data()
 
-		# Add window dictionary to each component
-		self.Z_comp.stats.window = {'window_beg': None, 'window_end': None}
-		self.N_comp.stats.window = {'window_beg': None, 'window_end': None}
-		self.E_comp.stats.window = {'window_beg': None, 'window_end': None}
+		# Create dictionary to hold window information
+		self.window = {'window_beg': None, 'window_end': None}
 
-		# Add empty picks dictionary to each component
-		self.Z_comp.stats.picks = {}
-		self.N_comp.stats.picks = {}
-		self.E_comp.stats.picks = {}
+		# Create dictionary to hold picks
+		self.picks = {}
 
-		self.delta = self.Z_comp.stats.delta
-		self.sps   = self.Z_comp.stats.sampling_rate
+	def load_picks(self):
+		pass
+
+	def load_windows(self):
+		pass
 
 	def unsplit(self, phi, dt):
 		# Make copy of the data
@@ -177,34 +176,108 @@ class Event(object):
 
 	def _add_stat(self, stat, value, pick_type=None):
 		if stat == "window_beg" or stat == "window_end":
-			self.Z_comp.stats.window[stat] = value
-			self.N_comp.stats.window[stat] = value
-			self.E_comp.stats.window[stat] = value
+			self.window[stat] = value
 
 		elif stat == "pick":
 			pick = "{}_manual".format(pick_type)
-			self.Z_comp.stats.picks[pick] = value
-			self.N_comp.stats.picks[pick] = value
-			self.E_comp.stats.picks[pick] = value
+			self.picks[pick] = {"rtime": value,
+								"error": self.delta,
+								"polarity": "-"} 
+
+		elif stat == "polarity":
+			pick = "{}_manual".format(pick_type)
+			self.picks[pick]["polarity"] = value
 
 	def save_event(self, pick_path):
 		# Save the traces to mSEED
 		file_path_stem = self.file_path[:-1]
-		print
-		self.Z_comp.write("{}.z".format(file_path_stem), format="MSEED")
-		self.N_comp.write("{}.n".format(file_path_stem), format="MSEED")
-		self.E_comp.write("{}.e".format(file_path_stem), format="MSEED")
+		self.Z_comp.write("{}z".format(file_path_stem), format="MSEED")
+		self.N_comp.write("{}n".format(file_path_stem), format="MSEED")
+		self.E_comp.write("{}e".format(file_path_stem), format="MSEED")
 
 		head, tail = os.path.split(file_path_stem)
 
 		# Create a pick file
-		# for phase, pick in self.Z_comp.stats.picks:
-		# 	filename = "{}/{}{}".format(pick_path, tail, phase)
+		for phase, pick in self.picks.items():
+			pick_time = (self.starttime + pick["rtime"]).isoformat().split("T")
+			ymd = pick_time[0]
+			hmsms = pick_time[1].split(":")
+			hm = "{}:{}".format(hmsms[0], hmsms[1])
+			sms = hmsms[2]
+			filename = "{}/{}/{}{}".format(pick_path, self.station.upper(), tail, phase)
 
-		# 	with open(filename, "w+") as f:
-		# 		f.write("{} {} {} {} {}".format(ymd, hm, sms, err, polarity))
+			with open(filename, "w+") as f:
+				f.write("{} {} {} {} {}".format(ymd, hm, sms, pick["error"], pick["polarity"]))
 
+		for key, value in self.window.items():
+			if key == "window_beg":
+				extension = "wb"
+			elif key == "window_end":
+				extension = "we"
+			filename = "{}/{}/{}{}".format(pick_path, self.station.upper(), tail, extension)
+
+			with open(filename, "w+") as f:
+				f.write("{}".format(value))
+
+	"""
+	Properties from mSEED header:
+	          network : string, optional
+	          			Network code (default is an empty string)
+	          station : string, optional
+	          			Station code (default is an empty string)
+	         location : string, optional
+	         			Location code (default is an empty string)
+	          channel : string, optional
+	          			Channel code (default is an empty string)
+		    starttime : UTCDateTime, optional
+		    			Date and time of the first data sample given in UTC
+		      endtime : UTCDateTime, optional
+		      			Date and time of last data sample given in UTC
+		sampling_rate : float, optional
+						Sampling rate in hertz (default value is 1.0)
+				delta : float, optional
+						Sample distance in seconds (default value is 1.0)
+				 npts : int, optional
+				 		Number of sample points (default value is 0, which implies no data is present)
+				calib : float, optional
+						Calibration factor (default value is 1.0) 
+	"""
+	@property
+	def network(self):
+		return self.Z_comp.stats.network
+
+	@property
+	def station(self):
+		return self.Z_comp.stats.station
+
+	@property
+	def location(self):
+		return self.Z_comp.stats.location
+	
+	@property
+	def channel(self):
+		return self.Z_comp.stats.channel
+	
 	@property
 	def starttime(self):
 		return self.Z_comp.stats.starttime
+
+	@property
+	def endtime(self):
+		return self.Z_comp.stats.endtime
 	
+	@property
+	def sampling_rate(self):
+		return self.Z_comp.stats.sampling_rate
+	
+	@property
+	def delta(self):
+		return self.Z_comp.stats.delta
+
+	@property
+	def npts(self):
+		return self.Z_comp.stats.npts
+
+	@property
+	def calib(self):
+		return self.Z_comp.stats.calib

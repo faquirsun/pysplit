@@ -38,7 +38,7 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QGridLayout" name="gridLayout" rowstretch="1,1,1,0,0" columnstretch="16,4">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="1,1,1,0,0" columnstretch="17,5">
     <item row="0" column="1">
      <widget class="QGroupBox" name="eventInfo">
       <property name="styleSheet">
@@ -900,6 +900,12 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>button_nextTrace</tabstop>
+  <tabstop>button_lastTrace</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>button_toggleLims</tabstop>
+  <tabstop>button_resetPlot</tabstop>
   <tabstop>input_filtType</tabstop>
   <tabstop>input_noPoles</tabstop>
   <tabstop>input_zerophase</tabstop>
@@ -907,12 +913,9 @@
   <tabstop>input_highFreq</tabstop>
   <tabstop>button_removeFilter</tabstop>
   <tabstop>button_applyFilter</tabstop>
+  <tabstop>p_radio</tabstop>
   <tabstop>s_radio</tabstop>
   <tabstop>c_radio</tabstop>
-  <tabstop>button_nextTrace</tabstop>
-  <tabstop>button_lastTrace</tabstop>
-  <tabstop>button_toggleLims</tabstop>
-  <tabstop>button_resetPlot</tabstop>
  </tabstops>
  <resources/>
  <connections>

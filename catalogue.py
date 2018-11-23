@@ -115,21 +115,12 @@ class Catalogue(ABC):
 
 			for phase, ttimes in arrival["traveltime"].items():
 				for traveltime in ttimes:
-
-					# Based on the source and receiver ID's, retrieve the relevant information
+					# Retrieve information on the source
 					otime, evlat, evlon, evdep = self._get_source(self.source_df, arrival.sourceid)
-					stat, slat, slon, sdep     = self._get_receiver(self.receiver_df, arrival.receiverid)
-
-					# Calculate the azimuth between the source-receiver pair
-					dist, az, baz = gps2dist_azimuth(evlat, evlon, slat, slon)
 
 					# Calculate reference time for window to download
 					window_beg = otime + float(traveltime) - window_range
 					window_end = otime + float(traveltime) + window_range
-
-					# Reference times for MSEED file
-					o = otime - window_beg
-					t0 = window_range
 
 					# Data existence tracker
 					file_exists = True
@@ -180,43 +171,9 @@ class Catalogue(ABC):
 							# Generate name of output file
 							if not os.path.exists('{}/data/{}'.format(self.path, stat.upper())):
 								os.makedirs('{}/data/{}'.format(self.path, stat.upper()))
+								os.makedirs('{}/picks/{}'.format(self.path, stat.upper()))
 
 							name = '{}/data/{}/event.{}.{}.{}'.format(self.path, stat.upper(), arrival.sourceid, stat.upper(), comp.lower())
-
-							# # Write the trimmed data to a SAC file
-							# tr.write(name, format="SAC")
-
-							# # Reload SAC file and update all the headers
-							# st = read(name)
-							# tr = st.traces[0]
-
-							# Add station information
-							tr.stats.stla = slat
-							tr.stats.stlo = slon
-							tr.stats.stel = sdep
-
-							# Add event information
-							tr.stats.evla = evlat
-							tr.stats.evlo = evlon
-							tr.stats.evdp = evdep
-
-							# Add distance, azimuth and back-azimuth information
-							tr.stats.dist = dist / 1000.
-							tr.stats.az   = az
-							tr.stats.back_azimuth = baz
-
-							# Add compass definition information
-							tr.stats.cmpaz  = str(self.cmpaz[comp])
-							tr.stats.cmpinc = str(self.cmpinc[comp])
-
-							# Name the component
-							tr.stats.kcmpnm = 'HH' + comp
-
-							# Add timing information
-							tr.stats.t0  = t0
-							tr.stats.kt5 = 3
-							tr.stats.kt0 = 3
-							tr.stats.o   = o
 
 							# Write the file out to MSEED
 							tr.write(name, format="MSEED")
@@ -248,7 +205,7 @@ class Catalogue(ABC):
 	def load_sources(self):
 		# Load sources
 		try:
-			self.source_df = pd.read_csv(self.source_file, sep=',')
+			self.source_df = pd.read_csv(self.source_file)
 			self.source_df['otime'] = self.source_df['otime'].apply(UTCDateTime)
 			return True
 		except:
@@ -257,7 +214,7 @@ class Catalogue(ABC):
 	def load_receivers(self):
 		# Load receivers
 		try:
-			self.receiver_df = pd.read_csv(self.receiver_file, sep=',')
+			self.receiver_df = pd.read_csv(self.receiver_file)
 			self.receiver_df['st_dep'] = self.receiver_df['st_dep'].apply(UTCDateTime)
 			self.receiver_df['et_dep'] = self.receiver_df['et_dep'].apply(UTCDateTime)
 			return True		
@@ -267,7 +224,7 @@ class Catalogue(ABC):
 	def load_arrivals(self):
 		# Load arrivals
 		try:
-			self.arrival_df = pd.read_csv(self.arrival_file, sep=',')
+			self.arrival_df = pd.read_csv(self.arrival_file)
 			# Need to convert all the saved strings to dictionaries
 			self.arrival_df["traveltime"] = self.arrival_df["traveltime"].apply(ast.literal_eval)
 			return True
@@ -337,7 +294,7 @@ class LocalCatalogue(Catalogue):
 
 		lines = []
 		S_lines = []
-		with open(hyp_file, 'r') as f:
+		with open(input_file, 'r') as f:
 			for line in f:
 				if ">" in line:
 					if " P " in line:

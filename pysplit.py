@@ -936,6 +936,8 @@ class WadatiWindow(qt.QMainWindow):
 
 		self.parent = parent
 
+		self.initUI()
+
 	def initUI(self):
 		uic.loadUi('ui_files/wadati_window.ui', self)
 

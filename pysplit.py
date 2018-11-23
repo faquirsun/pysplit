@@ -979,7 +979,7 @@ class WadatiWindow(qt.QMainWindow):
 		# Try rescaling the image now
 		wadati_canvas.ax.set_aspect('auto')
 
-		print("hello")
+		print(self.ptravels, self.stravels)
 
 		tolerance = 10
 		for i in range(len(self.ptravels)):

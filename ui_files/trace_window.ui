@@ -659,7 +659,7 @@
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="button_rejectTrace">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: &amp;quot;Q&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -672,7 +672,7 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="button_viewSpectrogram">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: Shift + &amp;quot;S&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -900,10 +900,10 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>pushButton_2</tabstop>
+  <tabstop>button_viewSpectrogram</tabstop>
   <tabstop>button_nextTrace</tabstop>
   <tabstop>button_lastTrace</tabstop>
-  <tabstop>pushButton</tabstop>
+  <tabstop>button_rejectTrace</tabstop>
   <tabstop>button_toggleLims</tabstop>
   <tabstop>button_resetPlot</tabstop>
   <tabstop>input_filtType</tabstop>

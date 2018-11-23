@@ -14,8 +14,18 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="0">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="10,2,2">
+    <item row="0" column="0" colspan="3">
+     <widget class="MplWidget" name="wadatiPlot" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
      <widget class="QLabel" name="label">
       <property name="font">
        <font>
@@ -31,27 +41,40 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="1">
+    <item row="1" column="1">
      <widget class="QLabel" name="label_vpvs">
       <property name="text">
        <string/>
       </property>
      </widget>
     </item>
-    <item row="0" column="0" colspan="3">
-     <widget class="MplWidget" name="wadatiPlot" native="true">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2">
+    <item row="1" column="2">
      <widget class="QPushButton" name="button_calcVpVs">
       <property name="text">
        <string>Calculate Vp/Vs</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Station:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="label_station">
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </item>

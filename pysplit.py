@@ -1853,6 +1853,7 @@ class PickingWindow(qt.QMainWindow):
 
 	def _updateStationInformation(self, station):
 		station_info = self.catalogue.receiver_df.query('stat == @station')
+		self.station_info = station_info
 		self.label_statName.setText(station)
 		self.label_statLon.setText(f"{station_info.lon.values[0]:.4f}")
 		self.label_statLat.setText(f"{station_info.lat.values[0]:.4f}")

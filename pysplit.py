@@ -986,6 +986,8 @@ class WadatiWindow(qt.QMainWindow):
 			print(i)
 			wadati_canvas.ax.scatter(self.ptravels[i], self.sptimes[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="STATION: {}".format(self.stations[i]))
 
+		wadati_canvas.draw_idle()
+
 class PickingWindow(qt.QMainWindow):
 
 	def __init__(self, catalogue, catalogue_name, filt=None, event=None, station=None):

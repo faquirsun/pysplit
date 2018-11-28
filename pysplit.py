@@ -1669,7 +1669,7 @@ class PickingWindow(qt.QMainWindow):
 		self.saveTrace()
 
 		# Reset to P pick
-		self.p_radio.isChecked(True)
+		self.p_radio.setChecked(True)
 
 		# Reset trace removal tracker
 		self.trace_removed = False

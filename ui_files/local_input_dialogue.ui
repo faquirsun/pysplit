@@ -115,7 +115,7 @@
         </widget>
        </item>
        <item row="0" column="2">
-        <widget class="QPushButton" name="inpButton">
+        <widget class="QPushButton" name="inpButton1">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -148,7 +148,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLineEdit" name="inpBox_2">
+        <widget class="QLineEdit" name="pathInput">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -158,7 +158,7 @@
         </widget>
        </item>
        <item row="0" column="2">
-        <widget class="QPushButton" name="inpButton_2">
+        <widget class="QPushButton" name="inpButton2">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -176,10 +176,10 @@
  <tabstops>
   <tabstop>inputType</tabstop>
   <tabstop>picked_Radio</tabstop>
-  <tabstop>inpBox_2</tabstop>
-  <tabstop>inpButton_2</tabstop>
+  <tabstop>pathInput</tabstop>
+  <tabstop>inpButton2</tabstop>
   <tabstop>inpBox</tabstop>
-  <tabstop>inpButton</tabstop>
+  <tabstop>inpButton1</tabstop>
  </tabstops>
  <resources/>
  <connections/>

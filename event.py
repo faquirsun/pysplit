@@ -235,7 +235,6 @@ class Event(object):
 	@property
 	def distance(self):
 		return locations2degrees(self.evlat, self.evlon, self.slat, self.slon)
-	
 
 	"""
 	Properties from mSEED header:

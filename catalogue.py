@@ -264,24 +264,82 @@ class LocalCatalogue(Catalogue):
 
 	"""
 
-	def generate_catalogue(self, hyp_file):
+	def generate_catalogue(self, local_input, path):
 		"""
-		Extracts earthquake information from a hyp file and
+		Extracts earthquake information from an input file and
 		creates a catalogue.
 		"""
 
-		if not os.path.exists(hyp_file):
+		if not os.path.exists(local_input):
 			print("File doesn't exist.")
 			print("Please provide a valid path.")
 
-		# Copy the hyp file across into the catalogue directory
-		head, tail = os.path.split(hyp_file)
-		os.system("cp {} {}/metafiles/{}".format(hyp_file, self.path, tail))
 
-		self.source_df = self._read_events_from_hyp(hyp_file)
+		if path:
+			# Parse SeisLoc directory
+			sources = glob.glob("{}/outputs/*.event".format(local_input))
 
-		# Output the catalogue
-		self.source_df.to_csv(self.source_file, index=False)
+			# Create DataFrame for source information. Space preallocated
+			# to improve efficiency.
+			self.source_df = pd.DataFrame(index=np.arange(0, len(event_f)), columns=self.source_cols)
+
+			# Loop through the sources and create the source DataFrame, as well
+			# as the arrivals DataFrame
+			for idx, source in enumerate(sources):
+				# Handle source DataFrame 
+				lines = []
+				with open(source, 'r') as f:
+					for line in f:
+						lines.append(line)
+
+				s_info = lines[1]
+				s_info = s_info.rstrip().split(",")
+				otime = UTCDateTime(s_info[0].replace(" ", "T"))
+				evlon = s_info[2]
+				evlat = s_info[3]
+				evdep = s_info[4]
+				evmag = "?"
+
+				self.source_df.loc[idx] = [otime, evlat, evlon, evdep, evmag, idx]
+
+				# Handle arrival DataFrame
+				arrival = glob.glob("{}/outputs/{}.stn".format(local_input, source[:-6]))
+
+				lines = []
+				with open(arrival, 'r') as f:
+					for line in f:
+						lines.append(line)
+				lines = lines[1:]
+
+				for i, line in enumerate(lines):
+					line.rstrip.split(",")
+
+					station = line[0]
+					phase   = line[1]
+					model_t = UTCDateTime(line[2].replace(" ", "T"))
+					if line[3] == -1.0:
+						pass
+					else:
+						pick_t = UTCDateTime(line[3].replace(" ", "T"))
+					if line[4] == -1.0:
+						pick_e = None
+
+					ttime = model_t - otime
+
+					self.arrival_df.loc[i + 1 * idx] = [idx, self._lookup_receiver_id(station), ttime, False]
+
+		elif not path:
+			# Copy the input file across into the catalogue directory
+			head, tail = os.path.split(local_input)
+			os.system("cp {} {}/metafiles/{}".format(local_input, self.path, tail))
+
+			if tail[-3:] == "hyp":
+				self.source_df = self._read_events_from_hyp(local_input)
+			else:
+				print("ADD PARSING FOR OTHER FILE FORMATS")
+
+			# Output the catalogue
+			self.source_df.to_csv(self.source_file, index=False)
 
 	def get_arrivals(self, phases=None, input_file=None):
 		"""

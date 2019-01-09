@@ -475,7 +475,7 @@ class PySplit(qt.QMainWindow):
 			self.statusbar.showMessage("The arrivals file does not exist - attempting to generate one...")
 			if self.catalogue_type == "local":
 				# Load the arrivals from the local input file provided
-				self.catalogue.get_arrivals(input_file=self.local_input_file)
+				self.catalogue.get_arrivals(input_file=self.local_input)
 
 			elif self.catalogue_type == "teleseismic":
 				# Open pop-up to get the phases to be collected
@@ -514,7 +514,10 @@ class PySplit(qt.QMainWindow):
 
 		# Get catalogue type
 		if self.catalogue_type == "local":
-			self.catalogue.generate_catalogue(self.local_input_file)
+			if self.data_source == "SeisLoc":
+				self.catalogue.generate_catalogue(self.local_input, path=True)
+			else:
+				self.catalogue.generate_catalogue(self.local_input, path=False)
 
 		if self.catalogue_type == "teleseismic":
 			self.catalogue.generate_catalogue(starttime=self.startDate_input.date().toString(Qt.ISODate), 
@@ -558,7 +561,7 @@ class PySplit(qt.QMainWindow):
 
 		# Set the local catalogue parameters
 		if self.catalogue_type == "local":
-			d_loc = {'lfile': self.local_input_file}
+			d_loc = {'lfile': self.local_input}
 
 			# Merge the two catalogues
 			d = {**d_cat, **d_loc}
@@ -616,7 +619,7 @@ class PySplit(qt.QMainWindow):
 
 		# Parse local parameters
 		if self.catalogue_type == "local":
-			self.local_input_file = params[10]
+			self.local_input = params[10]
 
 		# Parse teleseismic parameters
 		if self.catalogue_type == "teleseismic":
@@ -866,9 +869,15 @@ class LocalInputDialogue(qt.QDialog):
 	def initUI(self):
 		uic.loadUi('ui_files/local_input_dialogue.ui', self)
 
+		# Display the default input file option (SeisLoc)
+		self.inputBox.setCurrentIndex(1)
+		self.input_type = "SeisLoc"
+
+		# Connect to all actions
 		self.inpButton.clicked.connect(self.browseLocalFile)
 		self.buttonBox.accepted.connect(self.actionAccept)
 		self.buttonBox.rejected.connect(self.actionReject)
+		self.inputType.currentIndexChanged.connect(self.inputSelect)
 
 		self.setWindowTitle('PySplit - Local catalogue input type')
 		self.show()
@@ -884,14 +893,24 @@ class LocalInputDialogue(qt.QDialog):
 	def actionAccept(self):
 		# If the inputs are accepted, set the parameter within the parent class
 		# Perform checks on the input provided
-		if not os.path.isfile(self.inpBox.text()):
-			qt.QMessageBox.about(self, "Error!", "You must provide a valid input file.")
-			return
+		if self.input_type == "SeisLoc":
+			if not os.path.exists(self.pathInput.text()):
+				qt.QMessageBox.about(self, "Error!", "You must provide a valid input directory.")
+				return
 
-		# After all checks, set the parameter within the parent class
-		self.parent.local_input_file = self.inpBox.text()
-		self.parent.data_source = self.inpBox.text()
-		self.parent.picked = self.picked_Radio.isChecked()
+			self.parent.local_input = self.pathInput.text()
+			self.parent.data_source = "SeisLoc"
+			self.parent.picked = self.picked_radio.isChecked()
+
+		else:
+			if not os.path.isfile(self.fileInput.text()):
+				qt.QMessageBox.about(self, "Error!", "You must provide a valid input file.")
+				return
+
+			# After all checks, set the parameter within the parent class
+			self.parent.local_input = self.fileInput.text()
+			self.parent.data_source = self.inputType.currentText()
+			self.parent.picked = self.picked_Radio.isChecked()
 
 		# Send accept signal to Dialog
 		self.accept()
@@ -899,6 +918,17 @@ class LocalInputDialogue(qt.QDialog):
 	def actionReject(self):
 		# Send reject signal to Dialog
 		self.reject()
+
+	def inputSelect(self):
+		# Get the current index
+		self.input_type = self.inputType.currentText()
+
+		# Handle each different type of input
+		if self.input_type == "SeisLoc":
+			self.inputBox.setCurrentIndex(1)
+		else:
+			self.inputBox.setCurrentIndex(0)
+
 
 class DefaultFilterDialogue(qt.QDialog):
 

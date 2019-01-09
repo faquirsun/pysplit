@@ -875,7 +875,7 @@ class LocalInputDialogue(qt.QDialog):
 
 		# Connect to all actions
 		self.inpButton1.clicked.connect(self.browseLocalFile)
-		self.inpButton2.clicked.connect(self.browseLocalFile)
+		self.inpButton2.clicked.connect(self.browseLocalPath)
 		self.buttonBox.accepted.connect(self.actionAccept)
 		self.buttonBox.rejected.connect(self.actionReject)
 		self.inputType.currentIndexChanged.connect(self.inputSelect)
@@ -889,7 +889,13 @@ class LocalInputDialogue(qt.QDialog):
 
 		self.input_file = filename[0]
 
-		self.inpBox.setText(self.input_file)
+		self.fileInput.setText(self.input_file)
+
+	def browseLocalPath(self):
+
+		pathname = qt.QFileDialog.getExistingDirectory(self, 'Choose SeisLoc directory')
+
+		self.pathInput.setText(pathname)
 
 	def actionAccept(self):
 		# If the inputs are accepted, set the parameter within the parent class

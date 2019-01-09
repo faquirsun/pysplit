@@ -336,7 +336,8 @@ class LocalCatalogue(Catalogue):
 			if tail[-3:] == "hyp":
 				self.source_df = self._read_events_from_hyp(local_input)
 			else:
-				self.source_df = pd.read_csv(local_input, header=None)
+				self.source_df = pd.read_csv(local_input)
+				self.source_df["sourceid"] = self.source_df.index
 
 			# Output the catalogue
 			self.source_df.to_csv(self.source_file, index=False)

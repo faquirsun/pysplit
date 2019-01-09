@@ -874,7 +874,8 @@ class LocalInputDialogue(qt.QDialog):
 		self.input_type = "SeisLoc"
 
 		# Connect to all actions
-		self.inpButton.clicked.connect(self.browseLocalFile)
+		self.inpButton1.clicked.connect(self.browseLocalFile)
+		self.inpButton2.clicked.connect(self.browseLocalFile)
 		self.buttonBox.accepted.connect(self.actionAccept)
 		self.buttonBox.rejected.connect(self.actionReject)
 		self.inputType.currentIndexChanged.connect(self.inputSelect)

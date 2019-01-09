@@ -336,7 +336,7 @@ class LocalCatalogue(Catalogue):
 			if tail[-3:] == "hyp":
 				self.source_df = self._read_events_from_hyp(local_input)
 			else:
-				print("ADD PARSING FOR OTHER FILE FORMATS")
+				self.source_df = pd.read_csv(local_input, header=None)
 
 			# Output the catalogue
 			self.source_df.to_csv(self.source_file, index=False)

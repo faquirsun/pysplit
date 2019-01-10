@@ -235,7 +235,7 @@ class PySplit(qt.QMainWindow):
 
 			# Create the catalogue metafile - this contains general information about the catalogue
 			# and is read in when an existing catalogue is loaded
-			self._generate_catalogue_metafile()
+			self._generateCatalogueMetafile()
 			self.generate_catalogue()
 
 			# Plot the map of the catalogue
@@ -475,7 +475,7 @@ class PySplit(qt.QMainWindow):
 			self.statusbar.showMessage("The arrivals file does not exist - attempting to generate one...")
 			if self.catalogue_type == "local":
 				# Load the arrivals from the local input file provided
-				self.catalogue.get_arrivals(input_file=self.local_input)
+				self.catalogue.get_arrivals(input_file=self.local_input, input_type=self.data_source)
 
 			elif self.catalogue_type == "teleseismic":
 				# Open pop-up to get the phases to be collected
@@ -514,10 +514,7 @@ class PySplit(qt.QMainWindow):
 
 		# Get catalogue type
 		if self.catalogue_type == "local":
-			if self.data_source == "SeisLoc":
-				self.catalogue.generate_catalogue(self.local_input, path=True)
-			else:
-				self.catalogue.generate_catalogue(self.local_input, path=False)
+			self.catalogue.generate_catalogue(input_file=self.local_input, input_type=self.data_source)
 
 		if self.catalogue_type == "teleseismic":
 			self.catalogue.generate_catalogue(starttime=self.startDate_input.date().toString(Qt.ISODate), 
@@ -530,7 +527,7 @@ class PySplit(qt.QMainWindow):
 
 			# Create the catalogue metafile - this contains general information about the catalogue
 			# and is read in when an existing catalogue is loaded
-			self._generate_catalogue_metafile()
+			self._generateCatalogueMetafile()
 
 			self.catalogue_forms.setCurrentIndex(0)
 
@@ -539,7 +536,7 @@ class PySplit(qt.QMainWindow):
 			# Plot the map of the catalogue
 			self.plotCatalogueMap()
 
-	def _generate_catalogue_metafile(self):
+	def _generateCatalogueMetafile(self):
 		# Read in the template file
 		filein = open('metafile_template.txt')
 		src = Template(filein.read())

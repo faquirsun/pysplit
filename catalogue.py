@@ -223,13 +223,13 @@ class Catalogue(ABC):
 
 	def load_arrivals(self):
 		# Load arrivals
-		try:
-			self.arrival_df = pd.read_csv(self.arrival_file)
-			# Need to convert all the saved strings to dictionaries
-			self.arrival_df["traveltime"] = self.arrival_df["traveltime"].apply(ast.literal_eval)
-			return True
-		except:
-			return False
+		# try:
+		self.arrival_df = pd.read_csv(self.arrival_file)
+		# Need to convert all the saved strings to dictionaries
+		self.arrival_df["traveltime"] = self.arrival_df["traveltime"].apply(ast.literal_eval)
+		return True
+		# except:
+		# 	return False
 
 	def load_waveforms(self):
 		# Check if the waveforms have been completely downloaded
@@ -264,20 +264,27 @@ class LocalCatalogue(Catalogue):
 
 	"""
 
-	def generate_catalogue(self, local_input, path):
+	def generate_catalogue(self, input_file=None, input_type=None):
 		"""
-		Extracts earthquake information from an input file and
+		Extracts earthquake source information from an input file and
 		creates a catalogue.
+
+		Supported input types:
+			SeisLoc directory
+			PySplit catalogue
+			.hyp file
+			IRIS catalogue## not yet supported
 		"""
 
-		if not os.path.exists(local_input):
+		# Check that the input file/path provided exists
+		if not os.path.exists(input_file):
 			print("File doesn't exist.")
 			print("Please provide a valid path.")
 
-
-		if path:
+		# Input type: SeisLoc
+		if input_type == "SeisLoc":
 			# Parse SeisLoc directory
-			sources = glob.glob("{}/outputs/*.event".format(local_input))
+			sources = glob.glob("{}/outputs/*.event".format(input_file))
 
 			# Create DataFrame for source information. Space preallocated
 			# to improve efficiency.
@@ -303,7 +310,7 @@ class LocalCatalogue(Catalogue):
 				self.source_df.loc[idx] = [otime, evlat, evlon, evdep, evmag, idx]
 
 				# Handle arrival DataFrame
-				arrival = glob.glob("{}/outputs/{}.stn".format(local_input, source[:-6]))
+				arrival = glob.glob("{}/outputs/{}.stn".format(input_file, source[:-6]))
 
 				lines = []
 				with open(arrival, 'r') as f:
@@ -328,64 +335,132 @@ class LocalCatalogue(Catalogue):
 
 					self.arrival_df.loc[i + 1 * idx] = [idx, self._lookup_receiver_id(station), ttime, False]
 
-		elif not path:
+		# Input type: PySplit catalogues
+		elif input_type == "PySplit":
 			# Copy the input file across into the catalogue directory
-			head, tail = os.path.split(local_input)
-			os.system("cp {} {}/metafiles/{}".format(local_input, self.path, tail))
+			head, tail = os.path.split(input_file)
+			os.system("cp {} {}/metafiles/{}".format(input_file, self.path, tail))
+
+			self.source_df = pd.read_csv(input_file)
+			self.source_df["otime"] = self.source_df["otime"].apply(UTCDateTime)
+			self.source_df["sourceid"] = self.source_df.index
+
+			# Output the catalogue
+			self.source_df.to_csv(self.source_file, index=False)
+
+		# Input type: .hyp file
+		elif input_type == ".hyp":
+			# Copy the input file across into the catalogue directory
+			head, tail = os.path.split(input_file)
+			os.system("cp {} {}/metafiles/{}".format(input_file, self.path, tail))
 
 			if tail[-3:] == "hyp":
-				self.source_df = self._read_events_from_hyp(local_input)
+				lines = []
+				with open(self.source_file, 'r') as f:
+					for line in f:
+						if "GEOGRAPHIC" in line:
+							lines.append(line)
+
+				# Create DataFrame for event information. Space preallocated to
+				# improve efficiency.
+				self.source_df = pd.DataFrame(index=np.arange(0, len(lines)), columns=self.source_cols)
+
+				for i in range(len(lines)):
+					line = lines[i].rstrip().split()
+
+					# Get origin time
+					evyear, evmonth, evday  = int(line[2]), int(line[3]), int(line[4])
+					evhour, evmin, evsecflt = int(line[5]), int(line[6]), float(line[7])
+					evsec  = int(evsecflt)
+					evmsec = int(1e6 * (evsecflt - evsec))
+					otime  = UTCDateTime(evyear, evmonth, evday, evhour, evmin, evsec, evmsec)
+
+					# Get hypocentral location
+					evlat = float(line[9])
+					evlon = float(line[11])
+					evdep = float(line[13])
+					evmag = "?" #### ADD PROPER HANDLING FOR HYP FILES THAT HAVE MAGNITUDES IN
+
+					self.source_df.loc[i] = [otime, evlat, evlon, evdep, evmag, i]
+
 			else:
-				self.source_df = pd.read_csv(local_input)
+				print("Please provide a .hyp file.")
+				self.source_df = pd.read_csv(input_file)
 				self.source_df["sourceid"] = self.source_df.index
 
 			# Output the catalogue
 			self.source_df.to_csv(self.source_file, index=False)
 
-	def get_arrivals(self, phases=None, input_file=None):
+		# Input type: IRIS catalogue format
+		elif input_type == "IRIS":
+			# Add support here
+			# 
+			#
+
+	def get_arrivals(self, phases=None, input_file=None, input_type=None):
 		"""
-		Extracts S-phase arrival times from a hyp file and creates a 
-		list of arrivals.
+		Extracts seismic phase arrival times from an input file and 
+		creates a list of arrivals.
 		"""
 		if input_file == None:
-			print("You've not provided a hyp file.")
+			print("You've not provided file.")
 			return
 
-		lines = []
-		S_lines = []
-		with open(input_file, 'r') as f:
-			for line in f:
-				if ">" in line:
-					if " P " in line:
-						continue
+		# Input type: PySplit
+		if input_type == "PySplit":
+			# The arrival file simply needs to contain the origin time
+			# The waveform script will give a +/- 60 second window
+			# around this
+			self.arrival_df = pd.DataFrame(index=np.arange(0, len(self.receiver_df) * len(input_file)), columns=self.arrival_cols)
+			for idx, event in input_file.iterrows():
+				for jdx, station in self.receiver_df.iterrows():
+					# Want to check if the station was available at the time of the event
+					otime = UTCDateTime(event[0])
+					stdp  = UTCDateTime(station[4])
+					etdp  = UTCDateTime(station[5])
+					if (otime >= stdp) & (otime <= etdp):
+						self.arrival_df.loc[jdx + idx * 1] = [idx, station['receiverid'], input_file['otime'], False]
 					else:
-						lines.append(line)
+						self.arrival_df.loc[jdx + idx * 1] = ["-", "-", "-", "-"]
+						continue
 
-				if (">" in line) and (" S " in line):
-					S_lines.append(line)
+		# Input type: .hyp
+		if input_type == ".hyp":
+			lines = []
+			S_lines = []
+			with open(input_file, 'r') as f:
+				for line in f:
+					if ">" in line:
+						if " P " in line:
+							continue
+						else:
+							lines.append(line)
 
-		# Preallocate space for the arrivals DataFrame
-		self.arrival_df = pd.DataFrame(index=np.arange(0, len(S_lines)), columns=self.arrival_cols)
+					if (">" in line) and (" S " in line):
+						S_lines.append(line)
 
-		sourceid = -1
-		# Every time a line starting with PHASE is passed, increment the sourceid
-		for i in range(len(lines)):
-			line = lines[i].rstrip().split()
+			# Preallocate space for the arrivals DataFrame
+			self.arrival_df = pd.DataFrame(index=np.arange(0, len(S_lines)), columns=self.arrival_cols)
 
-			if line[0] == "PHASE":
-				sourceid += 1
-				continue
+			sourceid = -1
+			# Every time a line starting with PHASE is passed, increment the sourceid
+			for i in range(len(lines)):
+				line = lines[i].rstrip().split()
 
-			else:
-				idx = i - (sourceid + 1)
-				print(line[0])
-				station = line[0]
-				try:
-					self.arrival_df.loc[idx] = [sourceid, self._lookup_receiver_id(station), line[15], False]
-				except:
-					print(station, " not found, check it exists?")
-					self.arrival_df.loc[idx] = ["-", "-", "-", "-"]
+				if line[0] == "PHASE":
+					sourceid += 1
 					continue
+
+				else:
+					idx = i - (sourceid + 1)
+					print(line[0])
+					station = line[0]
+					try:
+						self.arrival_df.loc[idx] = [sourceid, self._lookup_receiver_id(station), line[15], False]
+					except:
+						print(station, " not found, check it exists?")
+						self.arrival_df.loc[idx] = ["-", "-", "-", "-"]
+						continue
 
 		# Remove all events that didn't have complete information
 		self.arrival_df = self.arrival_df.drop(self.arrival_df[self.arrival_df.sourceid == "-"].index)
@@ -395,40 +470,6 @@ class LocalCatalogue(Catalogue):
 
 		# Output the catalogue
 		self.arrival_df.to_csv(self.arrival_file, index=False)
-
-	def _read_events_from_hyp(self, hyp_file):
-		"""
-		Read in the contents of the hyp file.
-		"""
-		lines = []
-		with open(hyp_file, 'r') as f:
-			for line in f:
-				if "GEOGRAPHIC" in line:
-					lines.append(line)
-
-		# Create DataFrame for event information. Space preallocated to
-		# improve efficiency.
-		source_df = pd.DataFrame(index=np.arange(0, len(lines)), columns=self.source_cols)
-
-		for i in range(len(lines)):
-			line = lines[i].rstrip().split()
-
-			# Get origin time
-			evyear, evmonth, evday  = int(line[2]), int(line[3]), int(line[4])
-			evhour, evmin, evsecflt = int(line[5]), int(line[6]), float(line[7])
-			evsec  = int(evsecflt)
-			evmsec = int(1e6 * (evsecflt - evsec))
-			otime  = UTCDateTime(evyear, evmonth, evday, evhour, evmin, evsec, evmsec)
-
-			# Get hypocentral location
-			evlat = float(line[9])
-			evlon = float(line[11])
-			evdep = float(line[13])
-			evmag = "?"
-
-			source_df.loc[i] = [otime, evlat, evlon, evdep, evmag, i]
-
-		return source_df
 
 	def _lookup_receiver_id(self, station):
 		"""

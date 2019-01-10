@@ -59,6 +59,11 @@
      </item>
      <item>
       <property name="text">
+       <string>PySplit</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>.hyp file</string>
       </property>
      </item>

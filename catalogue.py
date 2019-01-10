@@ -414,7 +414,6 @@ class LocalCatalogue(Catalogue):
 			# The arrival file simply needs to contain the origin time
 			# The waveform script will give a +/- 60 second window
 			# around this
-			print("2")
 			self.arrival_df = pd.DataFrame(index=np.arange(0, len(self.receiver_df) * len(events_df)), columns=self.arrival_cols)
 			for idx, event in events_df.iterrows():
 				for jdx, station in self.receiver_df.iterrows():
@@ -422,9 +421,8 @@ class LocalCatalogue(Catalogue):
 					otime = UTCDateTime(event[0])
 					stdp  = UTCDateTime(station[4])
 					etdp  = UTCDateTime(station[5])
-					print("3")
 					if (otime >= stdp) & (otime <= etdp):
-						self.arrival_df.loc[jdx + idx * 1] = [idx, station['receiverid'], input_file['otime'], False]
+						self.arrival_df.loc[jdx + idx * 1] = [idx, station['receiverid'], events_df['otime'], False]
 					else:
 						self.arrival_df.loc[jdx + idx * 1] = ["-", "-", "-", "-"]
 						continue

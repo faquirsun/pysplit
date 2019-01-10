@@ -464,9 +464,6 @@ class PySplit(qt.QMainWindow):
 
 	def load_arrivals(self):
 		arrivals = self.catalogue.load_arrivals()
-		print("1")
-		print(self.data_source)
-
 		if arrivals:
 			self.label_arrivalStat.setText("Arrivals generated.")
 			self.label_arrivalStat.setStyleSheet("color: rgb(0, 255, 0)")

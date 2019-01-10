@@ -1904,7 +1904,7 @@ class PickingWindow(qt.QMainWindow):
 		if (type(event_info.evmag.values[0]) == float) or (type(event_info.evmag.values[0]) == np.float64):
 			self.label_eventMag.setText(f"{event_info.evmag.values[0]:.2f}")
 		else:
-			self.label_eventMag.setText(str(event_info.evmag.values[0])
+			self.label_eventMag.setText(str(event_info.evmag.values[0]))
 		self.label_eventID.setText(str(event_info.sourceid.values[0]))
 
 

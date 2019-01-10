@@ -422,7 +422,7 @@ class LocalCatalogue(Catalogue):
 					stdp  = UTCDateTime(station[4])
 					etdp  = UTCDateTime(station[5])
 					if (otime >= stdp) & (otime <= etdp):
-						self.arrival_df.loc[jdx + idx * 1] = [idx, station['receiverid'], events_df['otime'], False]
+						self.arrival_df.loc[jdx + idx * 1] = [idx, station['receiverid'], 0.0, False]
 					else:
 						self.arrival_df.loc[jdx + idx * 1] = ["-", "-", "-", "-"]
 						continue

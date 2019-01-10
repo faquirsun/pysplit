@@ -223,13 +223,13 @@ class Catalogue(ABC):
 
 	def load_arrivals(self):
 		# Load arrivals
-		# try:
-		self.arrival_df = pd.read_csv(self.arrival_file)
-		# Need to convert all the saved strings to dictionaries
-		self.arrival_df["traveltime"] = self.arrival_df["traveltime"].apply(ast.literal_eval)
-		return True
-		# except:
-		# 	return False
+		try:
+			self.arrival_df = pd.read_csv(self.arrival_file)
+			# Need to convert all the saved strings to dictionaries
+			self.arrival_df["traveltime"] = self.arrival_df["traveltime"].apply(ast.literal_eval)
+			return True
+		except FileNotFoundError:
+		 	return False
 
 	def load_waveforms(self):
 		# Check if the waveforms have been completely downloaded

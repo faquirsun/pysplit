@@ -187,8 +187,8 @@ class Event(object):
 
 		# Plot the traces
 		Z_ax.plot(self.Z_comp.times(type="relative"), self.Z_comp.data / self.norm_factor, linewidth=0.5)
-		N_ax.plot(self.N_comp.times(type="relative"), self.N_comp.data / self.norm_factor)
-		E_ax.plot(self.E_comp.times(type="relative"), self.E_comp.data / self.norm_factor)
+		N_ax.plot(self.N_comp.times(type="relative"), self.N_comp.data / self.norm_factor, linewidth=0.5)
+		E_ax.plot(self.E_comp.times(type="relative"), self.E_comp.data / self.norm_factor, linewidth=0.5)
 
 	def _add_stat(self, stat, value, pick_type=None):
 		if stat == "window_beg" or stat == "window_end":

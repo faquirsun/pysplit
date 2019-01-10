@@ -422,7 +422,7 @@ class LocalCatalogue(Catalogue):
 					stdp  = UTCDateTime(station[4])
 					etdp  = UTCDateTime(station[5])
 					if (otime >= stdp) & (otime <= etdp):
-						self.arrival_df.loc[jdx + idx * 1] = [idx, station['receiverid'], 0.0, False]
+						self.arrival_df.loc[jdx + idx * 1] = [idx, station['receiverid'], "{'arr': [0.0]}", False]
 					else:
 						self.arrival_df.loc[jdx + idx * 1] = ["-", "-", "-", "-"]
 						continue
@@ -459,7 +459,7 @@ class LocalCatalogue(Catalogue):
 					print(line[0])
 					station = line[0]
 					try:
-						self.arrival_df.loc[idx] = [sourceid, self._lookup_receiver_id(station), line[15], False]
+						self.arrival_df.loc[idx] = [sourceid, self._lookup_receiver_id(station), "{'arr': [line[15]]}", False]
 					except:
 						print(station, " not found, check it exists?")
 						self.arrival_df.loc[idx] = ["-", "-", "-", "-"]

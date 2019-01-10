@@ -371,12 +371,11 @@ class PySplit(qt.QMainWindow):
 		self.label_eventLon.setText(f"{event_info.evlon.values[0]:.4f}")
 		self.label_eventLat.setText(f"{event_info.evlat.values[0]:.4f}")
 		self.label_eventDepth.setText(f"{event_info.evdep.values[0]:.4f}")
-		if type(event_info.evmag.values[0]) == float:
+		if (type(event_info.evmag.values[0]) == float) or (type(event_info.evmag.values[0]) == np.float64):
 			self.label_eventMag.setText(f"{event_info.evmag.values[0]:.2f}")
 		else:
-			self.label_eventMag.setText(event_info.evmag.values[0])
+			self.label_eventMag.setText(str(event_info.evmag.values[0]))
 		self.label_eventID.setText(str(event_info.sourceid.values[0]))
-
 
 	def loadCatalogue(self):
 		# Open file dialogue and choose catalogue directory
@@ -465,6 +464,7 @@ class PySplit(qt.QMainWindow):
 
 	def load_arrivals(self):
 		arrivals = self.catalogue.load_arrivals()
+		print("1")
 
 		if arrivals:
 			self.label_arrivalStat.setText("Arrivals generated.")

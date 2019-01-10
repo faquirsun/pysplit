@@ -186,7 +186,7 @@ class Event(object):
 			E_ax.set_ylim(ylims)
 
 		# Plot the traces
-		Z_ax.plot(self.Z_comp.times(type="relative"), self.Z_comp.data / self.norm_factor)
+		Z_ax.plot(self.Z_comp.times(type="relative"), self.Z_comp.data / self.norm_factor, linewidth=0.5)
 		N_ax.plot(self.N_comp.times(type="relative"), self.N_comp.data / self.norm_factor)
 		E_ax.plot(self.E_comp.times(type="relative"), self.E_comp.data / self.norm_factor)
 

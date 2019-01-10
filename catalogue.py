@@ -409,12 +409,14 @@ class LocalCatalogue(Catalogue):
 
 		# Input type: PySplit
 		if input_type == "PySplit":
+			# Read in the input file
+			events_df = pd.read_csv(input_file)
 			# The arrival file simply needs to contain the origin time
 			# The waveform script will give a +/- 60 second window
 			# around this
 			print("2")
-			self.arrival_df = pd.DataFrame(index=np.arange(0, len(self.receiver_df) * len(input_file)), columns=self.arrival_cols)
-			for idx, event in input_file.iterrows():
+			self.arrival_df = pd.DataFrame(index=np.arange(0, len(self.receiver_df) * len(events_df)), columns=self.arrival_cols)
+			for idx, event in events_df.iterrows():
 				for jdx, station in self.receiver_df.iterrows():
 					# Want to check if the station was available at the time of the event
 					otime = UTCDateTime(event[0])

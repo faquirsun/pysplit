@@ -113,6 +113,8 @@ class Catalogue(ABC):
 			if arrival['waveform?']:
 				continue
 
+			stat = self.receiver_df[self.receiver_df["receiverid"] == arrival.receiverid].stat.values[0]
+
 			for phase, ttimes in arrival["traveltime"].items():
 				for traveltime in ttimes:
 					# Retrieve information on the source
@@ -418,9 +420,9 @@ class LocalCatalogue(Catalogue):
 			for idx, event in events_df.iterrows():
 				for jdx, station in self.receiver_df.iterrows():
 					# Want to check if the station was available at the time of the event
-					otime = UTCDateTime(event[0])
-					stdp  = UTCDateTime(station[4])
-					etdp  = UTCDateTime(station[5])
+					otime = UTCDateTime(event["otime"])
+					stdp  = UTCDateTime(station["st_dep"])
+					etdp  = UTCDateTime(station["et_dep"])
 					if (otime >= stdp) & (otime <= etdp):
 						self.arrival_df.loc[jdx + idx * 1] = [idx, station['receiverid'], "{'arr': [0.0]}", False]
 					else:

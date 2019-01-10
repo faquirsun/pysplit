@@ -396,6 +396,7 @@ class LocalCatalogue(Catalogue):
 			# Add support here
 			# 
 			#
+			pass
 
 	def get_arrivals(self, phases=None, input_file=None, input_type=None):
 		"""

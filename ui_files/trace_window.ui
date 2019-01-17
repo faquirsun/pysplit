@@ -204,7 +204,7 @@
      </widget>
     </item>
     <item row="0" column="0" rowspan="5">
-     <layout class="QGridLayout" name="gridLayout_2">
+     <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,1,1">
       <property name="leftMargin">
        <number>30</number>
       </property>
@@ -217,37 +217,6 @@
       <property name="bottomMargin">
        <number>30</number>
       </property>
-      <item row="1" column="0">
-       <widget class="QGroupBox" name="n_comp_box">
-        <property name="title">
-         <string>N component</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_6">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>5</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>5</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="MplWidget" name="n_comp_plot" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QGroupBox" name="z_comp_box">
         <property name="title">
@@ -279,35 +248,91 @@
         </layout>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QGroupBox" name="e_comp_box">
-        <property name="title">
-         <string>E component</string>
+      <item row="1" column="0" rowspan="2">
+       <widget class="QStackedWidget" name="toggle_spectrogram">
+        <property name="currentIndex">
+         <number>0</number>
         </property>
-        <layout class="QGridLayout" name="gridLayout_7">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>5</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>5</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="MplWidget" name="e_comp_plot" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QWidget" name="horizontalsPage">
+         <layout class="QGridLayout" name="gridLayout_11">
+          <item row="0" column="0">
+           <widget class="QGroupBox" name="n_comp_box">
+            <property name="title">
+             <string>N component</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_6">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>5</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>5</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="MplWidget" name="n_comp_plot" native="true">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QGroupBox" name="e_comp_box">
+            <property name="title">
+             <string>E component</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_7">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>5</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>5</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="MplWidget" name="e_comp_plot" native="true">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="spectrogramPage">
+         <layout class="QGridLayout" name="gridLayout_12">
+          <item row="0" column="0">
+           <widget class="MplWidget" name="spectrogramPlot" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>

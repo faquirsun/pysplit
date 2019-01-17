@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>794</width>
-    <height>370</height>
+    <width>838</width>
+    <height>785</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,8 +18,8 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>794</width>
-    <height>370</height>
+    <width>838</width>
+    <height>785</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -28,40 +28,10 @@
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>Catalogue directory:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QRadioButton" name="tele_radio">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="text">
-        <string>Teleseismic</string>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
         <string>Catalogue name:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Catalogue type:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -78,6 +48,22 @@
        </property>
       </widget>
      </item>
+     <item row="3" column="1" colspan="2">
+      <widget class="QLineEdit" name="arcBox"/>
+     </item>
+     <item row="2" column="1" colspan="3">
+      <widget class="QLineEdit" name="catName"/>
+     </item>
+     <item row="5" column="1" colspan="2">
+      <widget class="QLineEdit" name="recBox"/>
+     </item>
+     <item row="5" column="3">
+      <widget class="QPushButton" name="receiverFileButton">
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
+     </item>
      <item row="5" column="0">
       <widget class="QLabel" name="label_5">
        <property name="text">
@@ -88,6 +74,9 @@
        </property>
       </widget>
      </item>
+     <item row="1" column="1" colspan="2">
+      <widget class="QLineEdit" name="catBox"/>
+     </item>
      <item row="4" column="0">
       <widget class="QLabel" name="label_7">
        <property name="text">
@@ -95,56 +84,6 @@
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="3">
-      <widget class="QPushButton" name="catDirButton">
-       <property name="text">
-        <string>Browse</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QRadioButton" name="local_radio">
-       <property name="text">
-        <string>Local</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1" colspan="2">
-      <widget class="QLineEdit" name="catBox"/>
-     </item>
-     <item row="3" column="3">
-      <widget class="QPushButton" name="arcDirButton">
-       <property name="text">
-        <string>Browse</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1" colspan="2">
-      <widget class="QLineEdit" name="arcBox"/>
-     </item>
-     <item row="5" column="3">
-      <widget class="QPushButton" name="receiverFileButton">
-       <property name="text">
-        <string>Browse</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1" colspan="2">
-      <widget class="QLineEdit" name="recBox"/>
-     </item>
-     <item row="6" column="3">
-      <widget class="QDialogButtonBox" name="buttonBox">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="standardButtons">
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-       </property>
-       <property name="centerButtons">
-        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -158,16 +97,381 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1" colspan="3">
-      <widget class="QLineEdit" name="catName"/>
+     <item row="1" column="3">
+      <widget class="QPushButton" name="catDirButton">
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QRadioButton" name="tele_radio">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>Teleseismic</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Catalogue type:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Catalogue directory:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="3">
+      <widget class="QPushButton" name="arcDirButton">
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="2">
+      <widget class="QRadioButton" name="local_radio">
+       <property name="text">
+        <string>Local</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0" colspan="4">
+      <widget class="QStackedWidget" name="inputTypePages">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="teleInputPage">
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="1" column="1">
+          <widget class="QDateEdit" name="endDate_input">
+           <property name="calendarPopup">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_minRad">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold;</string>
+           </property>
+           <property name="text">
+            <string>Min. radius:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_centreLon">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold;</string>
+           </property>
+           <property name="text">
+            <string>Central longitude:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="minRad_input"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_minMag">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold;</string>
+           </property>
+           <property name="text">
+            <string>Min. Magnitude:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_endDate">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold;</string>
+           </property>
+           <property name="text">
+            <string>End date:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_startDate">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold;</string>
+           </property>
+           <property name="text">
+            <string>Start date:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_centreLat">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold;</string>
+           </property>
+           <property name="text">
+            <string>Central latitude:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="minMag_input">
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="centreLat_input"/>
+         </item>
+         <item row="0" column="1">
+          <widget class="QDateEdit" name="startDate_input">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="calendarPopup">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="centreLon_input"/>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_maxRad">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold;</string>
+           </property>
+           <property name="text">
+            <string>Max. radius:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QLineEdit" name="maxRad_input"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="localInputPage">
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="2">
+          <widget class="QRadioButton" name="picked_Radio">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Picked?</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="3">
+          <widget class="QStackedWidget" name="inputBox">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <property name="currentIndex">
+            <number>1</number>
+           </property>
+           <widget class="QWidget" name="localFilePage">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_7">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_9">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Input file:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="fileInput">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="placeholderText">
+                <string>Accepted formats: .hyp, IRIS</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QPushButton" name="localFileBrowse">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="text">
+                <string>Browse</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="localPathPage">
+            <layout class="QGridLayout" name="gridLayout_8">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_8">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Input path:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="pathInput">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="placeholderText">
+                <string>Path to SeisLoc ouput directory...</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QPushButton" name="localPathBrowse">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="text">
+                <string>Browse</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Input type:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="inputType">
+           <item>
+            <property name="text">
+             <string>SeisLoc</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>PySplit</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>.hyp file</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>IRIS</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item row="11" column="3">
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       </property>
+       <property name="centerButtons">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>tele_radio</tabstop>
-  <tabstop>local_radio</tabstop>
   <tabstop>catBox</tabstop>
   <tabstop>catDirButton</tabstop>
   <tabstop>catName</tabstop>
@@ -176,7 +480,39 @@
   <tabstop>arcFormBox</tabstop>
   <tabstop>recBox</tabstop>
   <tabstop>receiverFileButton</tabstop>
+  <tabstop>tele_radio</tabstop>
+  <tabstop>local_radio</tabstop>
+  <tabstop>startDate_input</tabstop>
+  <tabstop>endDate_input</tabstop>
+  <tabstop>minMag_input</tabstop>
+  <tabstop>centreLon_input</tabstop>
+  <tabstop>centreLat_input</tabstop>
+  <tabstop>minRad_input</tabstop>
+  <tabstop>maxRad_input</tabstop>
+  <tabstop>inputType</tabstop>
+  <tabstop>picked_Radio</tabstop>
+  <tabstop>pathInput</tabstop>
+  <tabstop>localPathBrowse</tabstop>
+  <tabstop>fileInput</tabstop>
+  <tabstop>localFileBrowse</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>tele_radio</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>inputTypePages</receiver>
+   <slot>update()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>365</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>418</x>
+     <y>519</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

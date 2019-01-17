@@ -59,13 +59,10 @@ class PySplit(qt.QMainWindow):
 
 		# Hide the map widget initially
 		self.mpl.hide()
-		self.catalogue_forms.setCurrentIndex(2)
+		self.catalogue_forms.setCurrentIndex(1)
 
 		# Set initial filter to None
 		self.filt = None
-
-		# Specify input options and disable them on load
-		self.input_options = [self.startDate_input, self.endDate_input, self.minMag_input, self.centreLon_input, self.centreLat_input, self.minRad_input, self.maxRad_input, self.tele_load_button]
 
 		self.setWindowTitle('PySplit - Shear Wave Splitting software')
 		self.setWindowIcon(QtGui.QIcon("misc/icon.png"))
@@ -90,9 +87,6 @@ class PySplit(qt.QMainWindow):
 
 		# Event list connection
 		self.events_list.doubleClicked.connect(self.eventSelect)
-
-		# Catalogue generation button connection
-		self.tele_load_button.clicked.connect(self.generateTeleseismicCatalogue)
 
 		# Catalogue load button connection
 		self.load_events_button.clicked.connect(self.load_events)
@@ -151,30 +145,34 @@ class PySplit(qt.QMainWindow):
 			#self.catalogue.pick_points.set_visible(False)
 
 	def _onPick(self, event):
+		# Retrieve the artist and information contained therein from the mouse event
 	    artist = event.artist
-	    xmouse, ymouse = event.mouseevent.xdata, event.mouseevent.ydata
 	    xy = artist.get_offsets()
 	    label = artist.get_label()
 	    ind = event.ind
+
+	    # Convert the x/y positions of the mouse event to lat/lon using the relevant transform
 	    lon, lat = self.catalogue.m(xy[ind[0]][0], xy[ind[0]][1], inverse=True)
 
-	    # If station
+	    # If the data point selected is a station
 	    if "STAT" in label:
 	    	stat = label.split(": ")[1]
 	    	self._updateStationInformation(stat)
 
 	    	# If in station pick mode, open a Picking Window
 	    	if self.actionPick_stations.isChecked():
-	    		self.pickWindow = PickingWindow(self.catalogue, self.catalogue_name, filt=self.filt, station=stat)
+	    		self.pickWindow = PickingWindow(self.catalogue, self.catalogue_name,
+	    									    filt=self.filt, station=stat)
 
-	    # If event
+	    # If the data point selected is an event
 	    if "EVENT" in label:
 	    	evt = label.split(": ")[1]
 	    	self._updateEventInformation(evt)
 
 	    	# If in event pick mode, open a Picking Window
 	    	if self.actionPick_events.isChecked():
-		    	self.pickWindow = PickingWindow(self.catalogue, self.catalogue_name, filt=self.filt, event=evt)
+		    	self.pickWindow = PickingWindow(self.catalogue, self.catalogue_name,
+		    									filt=self.filt, event=evt)
 
 	def defaultFilter(self):
 		self.defaultFilterDialogue = DefaultFilterDialogue()
@@ -205,41 +203,29 @@ class PySplit(qt.QMainWindow):
 		if not self.newCatalogueDialogue.exec_():
 			return
 
+		self.label_catTypeDisp.setText(self.catalogue_type)
+
 		if self.catalogue_type == "teleseismic":
-			# Set catalogue type and data source labels
-			self.data_source = "IRIS"
-			self.label_catTypeDisp.setText("Teleseismic")
-
-			# Display teleseismic catalogue parameter form page
-			self.catalogue_forms.setCurrentIndex(1)
+			# Display catalogue information
+			self.catalogue_forms.setCurrentIndex(0)
 			self.plot_options.setCurrentIndex(1)
-
 			# Create an instance of the Teleseismic Catalogue class
 			self.catalogue = cat.TeleseismicCatalogue("{}/{}".format(self.catalogue_path, self.catalogue_name), self.archive_path, self.receiver_file)
 
 		elif self.catalogue_type == "local":
-			# Set catalogue type label
-			self.label_catTypeDisp.setText("Local")
-
 			# Display local catalogue progress page
 			self.catalogue_forms.setCurrentIndex(0)
 			self.plot_options.setCurrentIndex(0)
-
-			# Get input file
-			self.localInputDialogue = LocalInputDialogue(self)
-			if not self.localInputDialogue.exec_():
-				return
-
 			# Create an instance of the Local Catalogue class
 			self.catalogue = cat.LocalCatalogue("{}/{}".format(self.catalogue_path, self.catalogue_name), self.archive_path, self.receiver_file)
 
-			# Create the catalogue metafile - this contains general information about the catalogue
-			# and is read in when an existing catalogue is loaded
-			self._generateCatalogueMetafile()
-			self.generate_catalogue()
+		# Create the catalogue metafile - this contains general information about the catalogue
+		# and is read in when an existing catalogue is loaded
+		self._generateCatalogueMetafile()
+		self.generate_catalogue()
 
-			# Plot the map of the catalogue
-			self.plotCatalogueMap()
+		# Plot the map of the catalogue
+		self.plotCatalogueMap()
 
 		# Set the catalogue name label
 		self.label_catNameDisp.setText(self.catalogue_name)
@@ -437,9 +423,6 @@ class PySplit(qt.QMainWindow):
 		# Plot the map of the catalogue
 		self.plotCatalogueMap()
 
-	def generateTeleseismicCatalogue(self):
-		self.generate_catalogue()
-
 	def load_events(self):
 		sources = self.catalogue.load_sources()
 
@@ -515,32 +498,20 @@ class PySplit(qt.QMainWindow):
 			self.catalogue.generate_catalogue(input_file=self.local_input, input_type=self.data_source)
 
 		if self.catalogue_type == "teleseismic":
-			self.catalogue.generate_catalogue(starttime=self.startDate_input.date().toString(Qt.ISODate), 
-											  endtime=self.endDate_input.date().toString(Qt.ISODate),
-											  minmag=float(self.minMag_input.text()),
-											  lon=float(self.centreLon_input.text()),
-											  lat=float(self.centreLat_input.text()),
-											  minrad=float(self.minRad_input.text()),
-											  maxrad=float(self.maxRad_input.text()))
-
-			# Create the catalogue metafile - this contains general information about the catalogue
-			# and is read in when an existing catalogue is loaded
-			self._generateCatalogueMetafile()
-
-			self.catalogue_forms.setCurrentIndex(0)
+			self.catalogue.generate_catalogue(starttime=self.sdate, 
+											  endtime=self.edate,
+											  minmag=float(self.minmag),
+											  lon=float(self.clon),
+											  lat=float(self.clat),
+											  minrad=float(self.minrad),
+											  maxrad=float(self.maxrad))
 
 			self._populateCatalogueInformation()
-
-			# Plot the map of the catalogue
-			self.plotCatalogueMap()
 
 	def _generateCatalogueMetafile(self):
 		# Read in the template file
 		filein = open('metafile_template.txt')
 		src = Template(filein.read())
-
-		self.sdate = self.startDate_input.date().toString(Qt.ISODate)
-		self.edate = self.endDate_input.date().toString(Qt.ISODate)
 
 		# Set the general metadata parameters
 		d_cat = {'name': self.catalogue_name,
@@ -557,24 +528,16 @@ class PySplit(qt.QMainWindow):
 		# Set the local catalogue parameters
 		if self.catalogue_type == "local":
 			d_loc = {'lfile': self.local_input}
-
 			# Merge the two catalogues
 			d = {**d_cat, **d_loc}
 
 		# Set the teleseismic catalogue parameters
 		if self.catalogue_type == "teleseismic":
-			self.minmag = self.minMag_input.text()
-			self.clon   = self.centreLon_input.text()
-			self.clat   = self.centreLat_input.text()
-			self.minrad = self.minRad_input.text()
-			self.maxrad = self.maxRad_input.text()
-
 			d_tel = {'minmag': self.minmag,
 					 'clon': self.clon,
 		 			 'clat': self.clat,
 					 'minrad': self.minrad,
 		 			 'maxrad': self.maxrad}
-
 		 	# Merge the two catalogues
 			d = {**d_cat, **d_tel}
 
@@ -716,6 +679,7 @@ class PySplit(qt.QMainWindow):
 		self.input_minLat.setText(str(f"{min(latpress, latrelease):.2f}"))
 		self.input_maxLat.setText(str(f"{max(latpress, latrelease):.2f}"))
 
+
 class NewCatalogueDialogue(qt.QDialog):
 
 	def __init__(self, parent):
@@ -728,36 +692,70 @@ class NewCatalogueDialogue(qt.QDialog):
 	def initUI(self):
 		uic.loadUi('ui_files/new_catalogue_dialogue.ui', self)
 
+		# Connect to directory browsing buttons
 		self.catDirButton.clicked.connect(self.browseCatalogue)
 		self.arcDirButton.clicked.connect(self.browseArchive)
 		self.receiverFileButton.clicked.connect(self.browseReceivers)
+
+		# Initialise with teleseismic catalogue selected
+		self.tele_radio.setChecked(True)
+		self.inputTypePages.setCurrentIndex(0)
+
+		# Handle toggling of local/teleseismic radio buttons
+		self.tele_radio.toggled.connect(self.teleRadioClicked)
+		self.local_radio.toggled.connect(self.localRadioClicked)
+
+		# Connect to accept/reject actions
 		self.buttonBox.accepted.connect(self.actionAccept)
 		self.buttonBox.rejected.connect(self.actionReject)
+
+		# Set the default input options for local catalogues
+		self.inputBox.setCurrentIndex(1)
+
+		# Connect to local input actions
+		self.localFileBrowse.clicked.connect(self.browseLocalFile)
+		self.localPathBrowse.clicked.connect(self.browseLocalPath)
+		self.inputType.currentIndexChanged.connect(self.inputSelect)
 
 		self.setWindowTitle('PySplit - New catalogue')
 		self.show()
 
 	def browseCatalogue(self):
-
-		self.parent.label_eventOdate.setText("test")
-
 		self.catalogue_path = qt.QFileDialog.getExistingDirectory(self, 'Choose catalogue directory')
-
 		self.catBox.setText(self.catalogue_path)
 
 	def browseArchive(self):
-
 		self.archive_path = qt.QFileDialog.getExistingDirectory(self, 'Choose archive directory')
-
 		self.arcBox.setText(self.archive_path)
 
 	def browseReceivers(self):
-
 		filename = qt.QFileDialog.getOpenFileName(self, 'Open file')
-
 		self.receiver_file = filename[0]
-
 		self.recBox.setText(self.receiver_file)
+
+	def browseLocalFile(self):
+		filename = qt.QFileDialog.getOpenFileName(self, 'Open file')
+		self.input_file = filename[0]
+		self.fileInput.setText(self.input_file)
+
+	def browseLocalPath(self):
+		pathname = qt.QFileDialog.getExistingDirectory(self, 'Choose SeisLoc directory')
+		self.pathInput.setText(pathname)
+
+	def teleRadioClicked(self, enabled):
+		if enabled:
+			self.inputTypePages.setCurrentIndex(0)
+
+	def localRadioClicked(self, enabled):
+		if enabled:
+			self.inputTypePages.setCurrentIndex(1)
+
+	def inputSelect(self):
+		# Handle each different type of input
+		if self.inputType.currentText() == "SeisLoc":
+			self.inputBox.setCurrentIndex(1)
+		else:
+			self.inputBox.setCurrentIndex(0)
 
 	def actionAccept(self):
 		# If the inputs are accepted, set all of the parameters within the parent class
@@ -797,11 +795,31 @@ class NewCatalogueDialogue(qt.QDialog):
 
 		if self.tele_radio.isChecked():
 			self.parent.catalogue_type = "teleseismic"
+			self.parent.data_source = "IRIS"
+			self.parent.sdate  = self.startDate_input.date().toString(Qt.ISODate)
+			self.parent.edate  = self.endDate_input.date().toString(Qt.ISODate)
+			self.parent.minmag = self.minMag_input.text()
+			self.parent.clon   = self.centreLon_input.text()
+			self.parent.clat   = self.centreLat_input.text()
+			self.parent.minrad = self.minRad_input.text()
+			self.parent.maxrad = self.maxRad_input.text()
+
 		elif self.local_radio.isChecked():
+			# Perform checks on the input provided
+			if self.inputType.currentText() == "SeisLoc":
+				if not os.path.exists(self.pathInput.text()):
+					qt.QMessageBox.about(self, "Error!", "You must provide a valid input directory.")
+					return
+				self.parent.local_input = self.pathInput.text()
+			else:
+				if not os.path.isfile(self.fileInput.text()):
+					qt.QMessageBox.about(self, "Error!", "You must provide a valid input file.")
+					return
+				self.parent.local_input = self.fileInput.text()
+
 			self.parent.catalogue_type = "local"
-		else:
-			qt.QMessageBox.about(self, "Error!", "You must select a catalogue type.")
-			return
+			self.parent.data_source = self.inputType.currentText()
+			self.parent.picked = self.picked_radio.isChecked()
 
 		# Send accept signal to Dialog
 		self.accept()
@@ -809,6 +827,7 @@ class NewCatalogueDialogue(qt.QDialog):
 	def actionReject(self):
 		# Send reject signal to Dialog
 		self.reject()
+
 
 class TelePhaseDialogue(qt.QDialog):
 
@@ -852,85 +871,6 @@ class TelePhaseDialogue(qt.QDialog):
 			# Update model
 			self.phase_list.setModel(self.model)
 
-class LocalInputDialogue(qt.QDialog):
-
-	def __init__(self, parent):
-		super(LocalInputDialogue, self).__init__()
-
-		self.parent = parent
-
-		self.initUI()
-
-	def initUI(self):
-		uic.loadUi('ui_files/local_input_dialogue.ui', self)
-
-		# Display the default input file option (SeisLoc)
-		self.inputBox.setCurrentIndex(1)
-		self.input_type = "SeisLoc"
-
-		# Connect to all actions
-		self.inpButton1.clicked.connect(self.browseLocalFile)
-		self.inpButton2.clicked.connect(self.browseLocalPath)
-		self.buttonBox.accepted.connect(self.actionAccept)
-		self.buttonBox.rejected.connect(self.actionReject)
-		self.inputType.currentIndexChanged.connect(self.inputSelect)
-
-		self.setWindowTitle('PySplit - Local catalogue input type')
-		self.show()
-
-	def browseLocalFile(self):
-
-		filename = qt.QFileDialog.getOpenFileName(self, 'Open file')
-
-		self.input_file = filename[0]
-
-		self.fileInput.setText(self.input_file)
-
-	def browseLocalPath(self):
-
-		pathname = qt.QFileDialog.getExistingDirectory(self, 'Choose SeisLoc directory')
-
-		self.pathInput.setText(pathname)
-
-	def actionAccept(self):
-		# If the inputs are accepted, set the parameter within the parent class
-		# Perform checks on the input provided
-		if self.input_type == "SeisLoc":
-			if not os.path.exists(self.pathInput.text()):
-				qt.QMessageBox.about(self, "Error!", "You must provide a valid input directory.")
-				return
-
-			self.parent.local_input = self.pathInput.text()
-			self.parent.data_source = "SeisLoc"
-			self.parent.picked = self.picked_radio.isChecked()
-
-		else:
-			if not os.path.isfile(self.fileInput.text()):
-				qt.QMessageBox.about(self, "Error!", "You must provide a valid input file.")
-				return
-
-			# After all checks, set the parameter within the parent class
-			self.parent.local_input = self.fileInput.text()
-			self.parent.data_source = self.inputType.currentText()
-			self.parent.picked = self.picked_Radio.isChecked()
-
-		# Send accept signal to Dialog
-		self.accept()
-
-	def actionReject(self):
-		# Send reject signal to Dialog
-		self.reject()
-
-	def inputSelect(self):
-		# Get the current index
-		self.input_type = self.inputType.currentText()
-
-		# Handle each different type of input
-		if self.input_type == "SeisLoc":
-			self.inputBox.setCurrentIndex(1)
-		else:
-			self.inputBox.setCurrentIndex(0)
-
 
 class DefaultFilterDialogue(qt.QDialog):
 
@@ -945,6 +885,7 @@ class DefaultFilterDialogue(qt.QDialog):
 		self.setWindowTitle('PySplit - Set default filter')
 		self.show()
 
+
 class CustomPickDialogue(qt.QDialog):
 
 	def __init__(self):
@@ -957,6 +898,7 @@ class CustomPickDialogue(qt.QDialog):
 
 		self.setWindowTitle('PySplit - Set custom phase pick')
 		self.show()
+
 
 class WadatiWindow(qt.QMainWindow):
 
@@ -1056,6 +998,7 @@ class WadatiWindow(qt.QMainWindow):
 
 		distance_canvas.draw_idle()
 
+
 class PickingWindow(qt.QMainWindow):
 
 	def __init__(self, catalogue, catalogue_name, filt=None, event=None, station=None):
@@ -1084,6 +1027,9 @@ class PickingWindow(qt.QMainWindow):
 		self.evts  = False
 		self.stats = False
 
+		# Initialise tracker for spectrogram window
+		self.show_spectrogram = False
+
 		# Initialise trace rejection tracker
 		self.trace_removed = False
 
@@ -1103,6 +1049,7 @@ class PickingWindow(qt.QMainWindow):
 
 	def initUI(self):
 		uic.loadUi('ui_files/trace_window.ui', self)
+		self.toggle_spectrogram.setCurrentIndex(0)
 
 		# If just picking a single event at a single station
 		if not self.evts and not self.stats:
@@ -1190,6 +1137,7 @@ class PickingWindow(qt.QMainWindow):
 		self.cidrfilter = self.button_removeFilter.clicked.connect(self.removeFilter)
 
 		# Connect to plot option buttons
+		self.cidspectrogram = self.button_viewSpectrogram.clicked.connect(self.toggleSpectrogram)
 		self.cidnexttrace = self.button_nextTrace.clicked.connect(self.nextTrace)
 		self.cidlasttrace = self.button_lastTrace.clicked.connect(self.previousTrace)
 		self.cidrjcttrace = self.button_rejectTrace.clicked.connect(self.rejectTrace)
@@ -1624,6 +1572,18 @@ class PickingWindow(qt.QMainWindow):
 		# Replot the traces
 		self.plotEvent(self.event, self.station, replot=True)
 
+	def toggleSpectrogram(self):
+		self.show_spectrogram = not self.show_spectrogram
+		self.plotSpectrogram()
+
+	def plotSpectrogram(self):
+		if self.show_spectrogram:
+			self.toggle_spectrogram.setCurrentIndex(1)
+			self.evt.plotSpectrogram(self.spectrogramPlot.canvas.ax)
+
+		else:
+			self.toggle_spectrogram.setCurrentIndex(0)			
+
 	def nextTrace(self):
 		# If previous trace was removed, do not advance counter
 		if not self.trace_removed:
@@ -1684,6 +1644,8 @@ class PickingWindow(qt.QMainWindow):
 
 		self.plotdisconnect()
 		self.plotEvent(self.event, self.station)
+
+		self.plotSpectrogram()
 
 	def previousTrace(self):
 		# Reverse counter

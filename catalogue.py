@@ -568,14 +568,8 @@ class TeleseismicCatalogue(Catalogue):
 				print("        Latitude: {}".format(evlat))
 				print("       Longitude: {}".format(evlon))
 				print("Removed from catalogue.")
-				event = "-"
-				otime = "-"
-				evlat = "-"
-				evlon = "-"
-				evdep = "-"
-				evmag = "-"
 
-				self.source_df.loc[i] = [otime, evlat, evlon, evdep, evmag, i]
+				self.source_df.loc[i] = ["-", "-", "-", "-", "-", i]
 
 		# Remove all events that didn't have complete information
 		self.source_df = self.source_df.drop(self.source_df[self.source_df.otime == "-"].index)

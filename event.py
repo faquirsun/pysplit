@@ -190,6 +190,9 @@ class Event(object):
 		N_ax.plot(self.N_comp.times(type="relative"), self.N_comp.data / self.norm_factor, linewidth=0.5)
 		E_ax.plot(self.E_comp.times(type="relative"), self.E_comp.data / self.norm_factor, linewidth=0.5)
 
+	def plotSpectrogram(self, ax):
+		self.stream.spectrogram(log=True, axes=ax)
+	
 	def _add_stat(self, stat, value, pick_type=None):
 		if stat == "window_beg" or stat == "window_end":
 			self.window[stat] = value

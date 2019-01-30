@@ -1,0 +1,32 @@
+-------------------------------------------------------------------------------
+###############################################################################
+
+-------------------            --- PySplit ---             --------------------
+-------------------     A python package for shear-wave    --------------------
+-------------------           splitting analysis           --------------------
+-------------------     Author: C. Bacon                   --------------------
+-------------------      Email: conor.bacon@gmail.com      --------------------
+
+###############################################################################
+-------------------------------------------------------------------------------
+
+------------------
+Catalogue metadata
+------------------
+Catalogue name ? $catalogue_name
+Catalogue type ? $catalogue_type
+Catalogue path ? $catalogue_path
+Data source    ? $data_source
+Creation date  ? $creation_date
+Archive path   ? $archive_path
+Archive format ? $archive_format
+Receiver file  ? $receiver_file
+Start date     ? $start_date
+End date       ? $end_date
+
+----------------
+Local parameters
+----------------
+Input file path ? $local_input
+
+-------------------------------------------------------------------------------

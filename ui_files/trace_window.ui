@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>2592</width>
-    <height>1864</height>
+    <height>1876</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -38,601 +38,173 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QGridLayout" name="gridLayout" rowstretch="1,1,1,0,0" columnstretch="17,5">
-    <item row="0" column="1">
-     <widget class="QGroupBox" name="eventInfo">
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="title">
-       <string>Event information</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_8">
-       <property name="leftMargin">
-        <number>20</number>
-       </property>
-       <property name="topMargin">
-        <number>20</number>
-       </property>
-       <property name="rightMargin">
-        <number>20</number>
-       </property>
-       <property name="bottomMargin">
-        <number>20</number>
-       </property>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_25">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
-         </property>
-         <property name="text">
-          <string>Depth: </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_23">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
-         </property>
-         <property name="text">
-          <string>Latitude: </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="label_eventOdate">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_28">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
-         </property>
-         <property name="text">
-          <string>Origin date: </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_29">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
-         </property>
-         <property name="text">
-          <string>Origin time: </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_24">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
-         </property>
-         <property name="text">
-          <string>Longitude: </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_32">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
-         </property>
-         <property name="text">
-          <string>Magnitude: </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_31">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
-         </property>
-         <property name="text">
-          <string>ID: </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="label_eventOtime">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLabel" name="label_eventLon">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLabel" name="label_eventLat">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QLabel" name="label_eventDepth">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QLabel" name="label_eventMag">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QLabel" name="label_eventID">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="0" column="0" rowspan="5">
-     <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,1,1">
-      <property name="leftMargin">
-       <number>30</number>
-      </property>
-      <property name="topMargin">
-       <number>30</number>
-      </property>
-      <property name="rightMargin">
-       <number>30</number>
-      </property>
-      <property name="bottomMargin">
-       <number>30</number>
-      </property>
-      <item row="0" column="0">
-       <widget class="QGroupBox" name="z_comp_box">
-        <property name="title">
-         <string>Z component</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_4">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>5</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>5</number>
-         </property>
-         <item row="0" column="1">
-          <widget class="MplWidget" name="z_comp_plot" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="1" column="0" rowspan="2">
-       <widget class="QStackedWidget" name="toggle_spectrogram">
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="horizontalsPage">
-         <layout class="QGridLayout" name="gridLayout_11">
-          <item row="0" column="0">
-           <widget class="QGroupBox" name="n_comp_box">
-            <property name="title">
-             <string>N component</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_6">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>5</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>5</number>
-             </property>
-             <item row="0" column="0">
-              <widget class="MplWidget" name="n_comp_plot" native="true">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QGroupBox" name="e_comp_box">
-            <property name="title">
-             <string>E component</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_7">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>5</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>5</number>
-             </property>
-             <item row="0" column="0">
-              <widget class="MplWidget" name="e_comp_plot" native="true">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="spectrogramPage">
-         <layout class="QGridLayout" name="gridLayout_12">
-          <item row="0" column="0">
-           <widget class="MplWidget" name="spectrogramPlot" native="true">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item row="1" column="1">
-     <widget class="QGroupBox" name="stationInfo">
-      <property name="title">
-       <string>Station information</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_9">
-       <property name="leftMargin">
-        <number>20</number>
-       </property>
-       <property name="topMargin">
-        <number>20</number>
-       </property>
-       <property name="rightMargin">
-        <number>20</number>
-       </property>
-       <property name="bottomMargin">
-        <number>20</number>
-       </property>
-       <item row="0" column="1">
-        <widget class="QLabel" name="label_statName">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLabel" name="label_statLat">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
-         </property>
-         <property name="text">
-          <string>Name: </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_14">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
-         </property>
-         <property name="text">
-          <string>Deployed: </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="label_statLon">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_13">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
-         </property>
-         <property name="text">
-          <string>Elevation: </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_15">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
-         </property>
-         <property name="text">
-          <string>Retrieved: </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_11">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
-         </property>
-         <property name="text">
-          <string>Latitude: </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_12">
-         <property name="styleSheet">
-          <string notr="true">font-weight: bold;</string>
-         </property>
-         <property name="text">
-          <string>Longitude: </string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLabel" name="label_statElev">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QLabel" name="label_statDep">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QLabel" name="label_statRet">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QGroupBox" name="filterSettings">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,5,5,5,5,5" columnstretch="17,0">
+    <item row="3" column="1">
+     <widget class="QGroupBox" name="uiFilterSettingsGBox">
       <property name="title">
        <string>Filter settings</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_10">
-       <item row="1" column="0" colspan="2">
-        <layout class="QFormLayout" name="formLayout">
-         <property name="labelAlignment">
+       <item row="1" column="0">
+        <widget class="QLabel" name="uiPoleCountLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Number of poles: </string>
+         </property>
+         <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
-         <item row="1" column="0">
-          <widget class="QLabel" name="filterTypeLabel">
-           <property name="text">
-            <string>Filter type: </string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
+         <property name="indent">
+          <number>-1</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="uiHighFreqInput">
+         <property name="placeholderText">
+          <string>e.g. 8 Hz</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="uiFilterTypeLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Filter type: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="uiPoleCountComboBox">
+         <item>
+          <property name="text">
+           <string>2</string>
+          </property>
          </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="input_filtType">
-           <item>
-            <property name="text">
-             <string>Bandpass</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Lowpass</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Highpass</string>
-            </property>
-           </item>
-          </widget>
+         <item>
+          <property name="text">
+           <string>3</string>
+          </property>
          </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="numberOfPolesLabel">
-           <property name="text">
-            <string>Number of poles: </string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-           <property name="indent">
-            <number>-1</number>
-           </property>
-          </widget>
+         <item>
+          <property name="text">
+           <string>4</string>
+          </property>
          </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="input_noPoles">
-           <item>
-            <property name="text">
-             <string>2</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>3</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>4</string>
-            </property>
-           </item>
-          </widget>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="uiLowFreqInput">
+         <property name="placeholderText">
+          <string>e.g. 2 Hz</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="uiFilterTypeComboBox">
+         <item>
+          <property name="text">
+           <string>bandpass</string>
+          </property>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="zerophaseLabel">
-           <property name="text">
-            <string>Zerophase?</string>
-           </property>
-          </widget>
+         <item>
+          <property name="text">
+           <string>lowpass</string>
+          </property>
          </item>
-         <item row="3" column="1">
-          <widget class="QCheckBox" name="input_zerophase"/>
+         <item>
+          <property name="text">
+           <string>highpass</string>
+          </property>
          </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_lowFreq">
-           <property name="text">
-            <string>Lowpass frequency: </string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QLineEdit" name="input_lowFreq">
-           <property name="placeholderText">
-            <string>e.g. 2 Hz</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_highFreq">
-           <property name="text">
-            <string>Highpass frequency: </string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QLineEdit" name="input_highFreq">
-           <property name="placeholderText">
-            <string>e.g. 8 Hz</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0" colspan="2">
-          <widget class="QPushButton" name="button_removeFilter">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: &amp;quot;R&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="text">
-            <string>Remove filter</string>
-           </property>
-           <property name="shortcut">
-            <string>R</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0" colspan="2">
-          <widget class="QPushButton" name="button_applyFilter">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: &amp;quot;A&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="text">
-            <string>Apply filter</string>
-           </property>
-           <property name="shortcut">
-            <string>A</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="uiLowFreqLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Lowpass frequency: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="uiZeroPhaseLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Zerophase?</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="uiZeroPhaseCheckBox"/>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="uiHighFreqLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Highpass frequency: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QPushButton" name="uiApplyFilterButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: &amp;quot;A&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Apply filter</string>
+         </property>
+         <property name="shortcut">
+          <string>A</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QPushButton" name="uiRemoveFilterButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: &amp;quot;R&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Remove filter</string>
+         </property>
+         <property name="shortcut">
+          <string>R</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
     </item>
-    <item row="4" column="1">
-     <widget class="QGroupBox" name="groupBox">
+    <item row="6" column="1">
+     <widget class="QGroupBox" name="uiPlotActionsGBox">
       <property name="title">
-       <string>Plot settings</string>
+       <string>Plot actions</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="1" column="0">
-        <widget class="QPushButton" name="button_nextTrace">
+        <widget class="QPushButton" name="uiNextTraceButton">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: Space&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -645,7 +217,7 @@
         </widget>
        </item>
        <item row="5" column="0">
-        <widget class="QPushButton" name="button_resetPlot">
+        <widget class="QPushButton" name="uiResetPlotButton">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: Ctrl + &amp;quot;R&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -658,7 +230,7 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QPushButton" name="button_lastTrace">
+        <widget class="QPushButton" name="uiLastTraceButton">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: Ctrl + Space&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -671,7 +243,7 @@
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="QPushButton" name="button_toggleLims">
+        <widget class="QPushButton" name="uiToggleLimitsButton">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: Ctrl + &amp;quot;Z&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -684,7 +256,7 @@
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QPushButton" name="button_rejectTrace">
+        <widget class="QPushButton" name="uiRejectTraceButton">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: &amp;quot;Q&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -697,7 +269,7 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QPushButton" name="button_viewSpectrogram">
+        <widget class="QPushButton" name="uiViewSpectrogramButton">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: Shift + &amp;quot;S&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -712,14 +284,14 @@
       </layout>
      </widget>
     </item>
-    <item row="3" column="1">
-     <widget class="QGroupBox" name="groupBox_2">
+    <item row="5" column="1">
+     <widget class="QGroupBox" name="uiPhasePickSettingsGBox">
       <property name="title">
        <string>Phase pick settings</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_5">
        <item row="0" column="3">
-        <widget class="QRadioButton" name="c_radio">
+        <widget class="QRadioButton" name="uiCustomRadio">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: Ctrl + &amp;quot;C&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -732,7 +304,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QRadioButton" name="s_radio">
+        <widget class="QRadioButton" name="uiSRadio">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: &amp;quot;S&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -754,7 +326,7 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QRadioButton" name="p_radio">
+        <widget class="QRadioButton" name="uiPRadio">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortcut: &amp;quot;P&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -770,14 +342,14 @@
         </widget>
        </item>
        <item row="0" column="4">
-        <widget class="QLabel" name="label_customPhase">
+        <widget class="QLabel" name="uiCustomPhaseDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="label_3">
+        <widget class="QLabel" name="uiPhaseLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -790,7 +362,7 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="uiPickTimeLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -803,7 +375,7 @@
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QLabel" name="label_4">
+        <widget class="QLabel" name="uiPolarityLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -816,21 +388,21 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QLabel" name="label_pickPhase">
+        <widget class="QLabel" name="uiPhaseDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QLabel" name="label_pickPolarity">
+        <widget class="QLabel" name="uiPolarityDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="1" column="1" colspan="4">
-        <widget class="QLabel" name="label_pickTime">
+        <widget class="QLabel" name="uiPickTimeDisplay">
          <property name="text">
           <string/>
          </property>
@@ -839,9 +411,369 @@
       </layout>
      </widget>
     </item>
+    <item row="0" column="1">
+     <widget class="QGroupBox" name="uiSourceInfoGBox">
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="title">
+       <string>Source information</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_8">
+       <property name="leftMargin">
+        <number>20</number>
+       </property>
+       <property name="topMargin">
+        <number>20</number>
+       </property>
+       <property name="rightMargin">
+        <number>20</number>
+       </property>
+       <property name="bottomMargin">
+        <number>20</number>
+       </property>
+       <item row="4" column="0">
+        <widget class="QLabel" name="uiSourceDepthLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Depth: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="uiSourceLatLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Latitude: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="uiOriginDateDisplay">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="uiOriginDateLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Origin date: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="uiOriginTimeLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Origin time: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="uiSourceLonLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Longitude: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="uiEventMagLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Magnitude: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="uiSourceIDLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>ID: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="uiOriginTimeDisplay">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLabel" name="uiSourceLonDisplay">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLabel" name="uiSourceLatDisplay">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLabel" name="uiSourceDepthDisplay">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLabel" name="uiSourceMagDisplay">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QLabel" name="uiSourceIDDisplay">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QGroupBox" name="uiReceiverInfoGBox">
+      <property name="title">
+       <string>Receiver information</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_9">
+       <property name="leftMargin">
+        <number>20</number>
+       </property>
+       <property name="topMargin">
+        <number>20</number>
+       </property>
+       <property name="rightMargin">
+        <number>20</number>
+       </property>
+       <property name="bottomMargin">
+        <number>20</number>
+       </property>
+       <item row="0" column="1">
+        <widget class="QLabel" name="uiReceiverNameDisplay">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLabel" name="uiReceiverLatDisplay">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="uiReceiverNameLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Name: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="uiReceiverDepLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Deployed: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="uiReceiverLonDisplay">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="uiReceiverElevLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Elevation: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="uiReceiverRetLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Retrieved: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="uiReceiverLatLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Latitude: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="uiReceiverLonLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Longitude: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLabel" name="uiReceiverElevDisplay">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLabel" name="uiReceiverDepDisplay">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLabel" name="uiReceiverRetDisplay">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="0" rowspan="5">
+     <widget class="QStackedWidget" name="uiToggleSpectrogramStacked">
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="uiHorizontalsPage">
+       <layout class="QGridLayout" name="gridLayout_11">
+        <item row="2" column="1">
+         <widget class="MplWidget" name="uiComponent2Mpl" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="MplWidget" name="uiComponent3Mpl" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="uiSpectrogramPage">
+       <layout class="QGridLayout" name="gridLayout_12">
+        <item row="0" column="0">
+         <widget class="MplWidget" name="uiSpectogramPlot" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="0" column="0" rowspan="2">
+     <widget class="MplWidget" name="uiComponent1Mpl" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
+  <widget class="QMenuBar" name="uiMenuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -850,33 +782,33 @@
      <height>34</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
+   <widget class="QMenu" name="uiFileMenu">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionSave"/>
-    <addaction name="actionExit"/>
+    <addaction name="uiSaveAction"/>
+    <addaction name="uiExitAction"/>
    </widget>
-   <widget class="QMenu" name="menuSettings">
+   <widget class="QMenu" name="uiSettingsMenu">
     <property name="title">
      <string>Settings</string>
     </property>
-    <widget class="QMenu" name="menuPhase_pick">
+    <widget class="QMenu" name="uiPhasePickMenu">
      <property name="title">
       <string>Phase pick</string>
      </property>
-     <addaction name="actionP_pick"/>
-     <addaction name="actionS_pick"/>
-     <addaction name="actionCustom_pick"/>
+     <addaction name="uiPPickAction"/>
+     <addaction name="uiSPickAction"/>
+     <addaction name="uiCustomPickAction"/>
     </widget>
-    <addaction name="actionDefault_filter"/>
-    <addaction name="menuPhase_pick"/>
+    <addaction name="uiDefaultFilterAction"/>
+    <addaction name="uiPhasePickMenu"/>
    </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuSettings"/>
+   <addaction name="uiFileMenu"/>
+   <addaction name="uiSettingsMenu"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionExit">
+  <widget class="QStatusBar" name="uiStatusBar"/>
+  <action name="uiExitAction">
    <property name="text">
     <string>Exit</string>
    </property>
@@ -884,7 +816,7 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="actionSave">
+  <action name="uiSaveAction">
    <property name="text">
     <string>Save</string>
    </property>
@@ -892,7 +824,7 @@
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionDefault_filter">
+  <action name="uiDefaultFilterAction">
    <property name="text">
     <string>Default filter</string>
    </property>
@@ -900,17 +832,17 @@
     <string>Ctrl+F</string>
    </property>
   </action>
-  <action name="actionP_pick">
+  <action name="uiPPickAction">
    <property name="text">
     <string>P pick</string>
    </property>
   </action>
-  <action name="actionS_pick">
+  <action name="uiSPickAction">
    <property name="text">
     <string>S pick</string>
    </property>
   </action>
-  <action name="actionCustom_pick">
+  <action name="uiCustomPickAction">
    <property name="text">
     <string>Custom phase</string>
    </property>
@@ -925,27 +857,20 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>button_viewSpectrogram</tabstop>
-  <tabstop>button_nextTrace</tabstop>
-  <tabstop>button_lastTrace</tabstop>
-  <tabstop>button_rejectTrace</tabstop>
-  <tabstop>button_toggleLims</tabstop>
-  <tabstop>button_resetPlot</tabstop>
-  <tabstop>input_filtType</tabstop>
-  <tabstop>input_noPoles</tabstop>
-  <tabstop>input_zerophase</tabstop>
-  <tabstop>input_lowFreq</tabstop>
-  <tabstop>input_highFreq</tabstop>
-  <tabstop>button_removeFilter</tabstop>
-  <tabstop>button_applyFilter</tabstop>
-  <tabstop>p_radio</tabstop>
-  <tabstop>s_radio</tabstop>
-  <tabstop>c_radio</tabstop>
+  <tabstop>uiViewSpectrogramButton</tabstop>
+  <tabstop>uiNextTraceButton</tabstop>
+  <tabstop>uiLastTraceButton</tabstop>
+  <tabstop>uiRejectTraceButton</tabstop>
+  <tabstop>uiToggleLimitsButton</tabstop>
+  <tabstop>uiResetPlotButton</tabstop>
+  <tabstop>uiPRadio</tabstop>
+  <tabstop>uiSRadio</tabstop>
+  <tabstop>uiCustomRadio</tabstop>
  </tabstops>
  <resources/>
  <connections>
   <connection>
-   <sender>actionExit</sender>
+   <sender>uiExitAction</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>close()</slot>
@@ -961,9 +886,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>c_radio</sender>
+   <sender>uiCustomRadio</sender>
    <signal>toggled(bool)</signal>
-   <receiver>actionCustom_pick</receiver>
+   <receiver>uiCustomPickAction</receiver>
    <slot>trigger()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -977,9 +902,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>s_radio</sender>
+   <sender>uiSRadio</sender>
    <signal>toggled(bool)</signal>
-   <receiver>actionS_pick</receiver>
+   <receiver>uiSPickAction</receiver>
    <slot>trigger()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -993,9 +918,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>p_radio</sender>
+   <sender>uiPRadio</sender>
    <signal>toggled(bool)</signal>
-   <receiver>actionP_pick</receiver>
+   <receiver>uiPPickAction</receiver>
    <slot>trigger()</slot>
    <hints>
     <hint type="sourcelabel">

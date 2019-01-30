@@ -15,17 +15,17 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="0" colspan="2">
-    <widget class="QListView" name="phase_list"/>
+    <widget class="QListView" name="uiPhaseListView"/>
    </item>
    <item row="1" column="0" colspan="2">
-    <widget class="QPushButton" name="button_addPhase">
+    <widget class="QPushButton" name="uiAddPhaseButton">
      <property name="text">
       <string>Add</string>
      </property>
     </widget>
    </item>
    <item row="0" column="0" colspan="2">
-    <widget class="QComboBox" name="input_phaseType">
+    <widget class="QComboBox" name="uiInputPhaseComboBox">
      <item>
       <property name="text">
        <string>SKS</string>

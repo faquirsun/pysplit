@@ -200,7 +200,7 @@
        <string notr="true"/>
       </property>
       <property name="title">
-       <string>Event information</string>
+       <string>Source information</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_8">
        <property name="leftMargin">
@@ -361,7 +361,7 @@
     <item row="1" column="2">
      <widget class="QGroupBox" name="stationInfo">
       <property name="title">
-       <string>Station information</string>
+       <string>Receiver information</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_9">
        <property name="leftMargin">

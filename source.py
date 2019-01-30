@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-The Event class - generate an instance of Event and load stream data and
+The Source class - generate an instance of Source and load stream data and
 metadata.
 
 Methods
@@ -19,40 +19,40 @@ import os
 from obspy import UTCDateTime
 from obspy.geodetics import locations2degrees
 
-class Event(object):
+class Source(object):
 	"""
-	Base Event class
+	Base Source class
 	"""
 
-	def __init__(self, file_path, event_info, station_info):
+	def __init__(self, file_path, source_info, station_info):
 
 		self.file_path = file_path
 
-		# Parse out event information
-		self.otime = event_info.otime.values[0]
-		self.evlat = event_info.evlat.values[0]
-		self.evlon = event_info.evlon.values[0]
-		self.evdep = event_info.evdep.values[0]
-		self.evmag = event_info.evmag.values[0]
+		# Parse out source information
+		self.otime = source_info.otime.values[0]
+		self.evlat = source_info.evlat.values[0]
+		self.evlon = source_info.evlon.values[0]
+		self.evdep = source_info.evdep.values[0]
+		self.evmag = source_info.evmag.values[0]
 
 		# Parse out station information
 		self.slat = station_info.lat.values[0]
 		self.slon = station_info.lon.values[0]
 		self.selv = station_info.dep.values[0]
 
-		self.eventid = event_info["sourceid"]
+		self.sourceid = source_info["sourceid"]
 
-		# Read in event files
+		# Read in source files
 		self.stream = read(file_path)
 
 		tmp_stream = self.stream.copy()
 
-		self.Z_comp = tmp_stream.select(channel="*Z")[0]
-		self.N_comp = tmp_stream.select(channel="*N")[0]
-		self.E_comp = tmp_stream.select(channel="*E")[0]
+		self.component_1 = tmp_stream.select(channel="*Z")[0]
+		self.component_2 = tmp_stream.select(channel="*N")[0]
+		self.component_3 = tmp_stream.select(channel="*E")[0]
 
 		# Detrend the data
-		self.detrend_data()
+		self.detrendData()
 
 		# Create dictionary to hold window information
 		self.window = {'window_beg': None, 'window_end': None}
@@ -60,10 +60,10 @@ class Event(object):
 		# Create dictionary to hold picks
 		self.picks = {}
 
-	def load_picks(self):
+	def loadPicks(self):
 		pass
 
-	def load_windows(self):
+	def loadWindows(self):
 		pass
 
 	def unsplit(self, phi, dt):
@@ -78,22 +78,22 @@ class Event(object):
 
 		comp_vec = np.array([tmp_stream.select(channel="*N")[0], tmp_stream.select(channel="*E")[0]])
 
-		rot_M = self._make_rot_matrix(phi)
+		rot_M = self._makeRotationMatrix(phi)
 
 		rot_comp = rot_M @ comp_vec
 
 		lag_comp = [rot_comp[0], np.roll(rot_comp[1], int(dt / self.delta))]
 
-		rot_M = self._make_rot_matrix(-1 * phi)
+		rot_M = self._makeRotationMatrix(-1 * phi)
 
 		unsplit_comp = rot_M @ lag_comp
 
 		return unsplit_comp
 
-	def _make_rot_matrix(self, phi):
+	def _makeRotationMatrix(self, phi):
 		return np.array([[np.cos(phi), -np.sin(phi)], [np.sin(phi), np.cos(phi)]])
 
-	def filter_sac(self, tr, minfreq, maxfreq, n_poles=2, zero_phase=True):
+	def filterSAC(self, tr, minfreq, maxfreq, n_poles=2, zero_phase=True):
 
 		if zero_phase:
 			p = 2
@@ -113,10 +113,10 @@ class Event(object):
 		tr = obspy.read('{}/f.sac'.format(temp_dir))[0]
 		return tr
 
-	def remove_filter(self):
-		self.detrend_data()
+	def removeFilter(self):
+		self.detrendData()
 
-	def detrend_data(self):
+	def detrendData(self):
 		# Make a copy of the data
 		tmp_stream = self.stream.copy()
 
@@ -124,11 +124,11 @@ class Event(object):
 		tmp_stream = (tmp_stream.detrend("linear")).detrend("demean")
 
 		# Overwrite the 3 components
-		self.Z_comp.data = tmp_stream.select(channel="*Z")[0].data
-		self.N_comp.data = tmp_stream.select(channel="*N")[0].data
-		self.E_comp.data = tmp_stream.select(channel="*E")[0].data
+		self.component_1.data = tmp_stream.select(channel="*Z")[0].data
+		self.component_2.data = tmp_stream.select(channel="*N")[0].data
+		self.component_3.data = tmp_stream.select(channel="*E")[0].data
 
-	def filter_obspy(self, filt_type, minfreq=None, maxfreq=None, n_poles=2, zero_phase=True):
+	def filterObspy(self, filt_type, minfreq=None, maxfreq=None, n_poles=2, zero_phase=True):
 		# Make a copy of the data (so don't have to read a new one if re-filtering)
 		tmp_stream = self.stream.copy()
 
@@ -147,53 +147,53 @@ class Event(object):
 			tmp_stream = tmp_stream.filter(type="highpass", freq=maxfreq, corners=n_poles, zerophase=zero_phase)
 
 		# Overwrite the 3 components
-		self.Z_comp.data = tmp_stream.select(channel="*Z")[0].data
-		self.N_comp.data = tmp_stream.select(channel="*N")[0].data
-		self.E_comp.data = tmp_stream.select(channel="*E")[0].data
+		self.component_1.data = tmp_stream.select(channel="*Z")[0].data
+		self.component_2.data = tmp_stream.select(channel="*N")[0].data
+		self.component_3.data = tmp_stream.select(channel="*E")[0].data
 
-	def plot_traces(self, Z_ax, N_ax, E_ax, lims):
+	def plotTraces(self, component_1_axis, component_2_axis, component_3_axis, lims):
 
 		if lims == None:
 			# Calculate x limits and set them
-			xlims = (self.Z_comp.times(type="relative")[0], self.Z_comp.times(type="relative")[-1])
-			Z_ax.set_xlim(xlims)
-			N_ax.set_xlim(xlims)
-			E_ax.set_xlim(xlims)
+			xlims = (self.component_1.times(type="relative")[0], self.component_1.times(type="relative")[-1])
+			component_1_axis.set_xlim(xlims)
+			component_2_axis.set_xlim(xlims)
+			component_3_axis.set_xlim(xlims)
 
 			# Set y limits to +/- 1
-			Z_ax.set_ylim((-1, 1))
-			N_ax.set_ylim((-1, 1))
-			E_ax.set_ylim((-1, 1))
+			component_1_axis.set_ylim((-1, 1))
+			component_2_axis.set_ylim((-1, 1))
+			component_3_axis.set_ylim((-1, 1))
 
 			# Need to find absolute max of all three traces then normalise them all wrt to that
-			z_max = max(abs(self.Z_comp.data))
-			n_max = max(abs(self.N_comp.data))
-			e_max = max(abs(self.E_comp.data))
+			z_max = max(abs(self.component_1.data))
+			n_max = max(abs(self.component_2.data))
+			e_max = max(abs(self.component_3.data))
 
 			self.norm_factor = max(z_max, n_max, e_max)
 
 		elif lims != None:
 			# Set x limits
 			xlims = lims[0]
-			Z_ax.set_xlim(xlims)
-			N_ax.set_xlim(xlims)
-			E_ax.set_xlim(xlims)
+			component_1_axis.set_xlim(xlims)
+			component_2_axis.set_xlim(xlims)
+			component_3_axis.set_xlim(xlims)
 
 			# Set y limits
 			ylims = lims[1]
-			Z_ax.set_ylim(ylims)
-			N_ax.set_ylim(ylims)
-			E_ax.set_ylim(ylims)
+			component_1_axis.set_ylim(ylims)
+			component_2_axis.set_ylim(ylims)
+			component_3_axis.set_ylim(ylims)
 
 		# Plot the traces
-		Z_ax.plot(self.Z_comp.times(type="relative"), self.Z_comp.data / self.norm_factor, linewidth=0.5)
-		N_ax.plot(self.N_comp.times(type="relative"), self.N_comp.data / self.norm_factor, linewidth=0.5)
-		E_ax.plot(self.E_comp.times(type="relative"), self.E_comp.data / self.norm_factor, linewidth=0.5)
+		component_1_axis.plot(self.component_1.times(type="relative"), self.component_1.data / self.norm_factor, linewidth=0.5)
+		component_2_axis.plot(self.component_2.times(type="relative"), self.component_2.data / self.norm_factor, linewidth=0.5)
+		component_3_axis.plot(self.component_3.times(type="relative"), self.component_3.data / self.norm_factor, linewidth=0.5)
 
 	def plotSpectrogram(self, ax):
 		self.stream.spectrogram(log=True, axes=ax)
 	
-	def _add_stat(self, stat, value, pick_type=None):
+	def _addStat(self, stat, value, pick_type=None):
 		if stat == "window_beg" or stat == "window_end":
 			self.window[stat] = value
 
@@ -207,7 +207,7 @@ class Event(object):
 			pick = "{}_manual".format(pick_type)
 			self.picks[pick]["polarity"] = value
 
-	def save_event(self, pick_path):
+	def saveSource(self, pick_path):
 		# Save the traces to mSEED
 		file_path_stem = self.file_path[:-1]
 
@@ -264,40 +264,40 @@ class Event(object):
 	"""
 	@property
 	def network(self):
-		return self.Z_comp.stats.network
+		return self.component_1.stats.network
 
 	@property
 	def station(self):
-		return self.Z_comp.stats.station
+		return self.component_1.stats.station
 
 	@property
 	def location(self):
-		return self.Z_comp.stats.location
+		return self.component_1.stats.location
 	
 	@property
 	def channel(self):
-		return self.Z_comp.stats.channel
+		return self.component_1.stats.channel
 	
 	@property
 	def starttime(self):
-		return self.Z_comp.stats.starttime
+		return self.component_1.stats.starttime
 
 	@property
 	def endtime(self):
-		return self.Z_comp.stats.endtime
+		return self.component_1.stats.endtime
 	
 	@property
 	def sampling_rate(self):
-		return self.Z_comp.stats.sampling_rate
+		return self.component_1.stats.sampling_rate
 	
 	@property
 	def delta(self):
-		return self.Z_comp.stats.delta
+		return self.component_1.stats.delta
 
 	@property
 	def npts(self):
-		return self.Z_comp.stats.npts
+		return self.component_1.stats.npts
 
 	@property
 	def calib(self):
-		return self.Z_comp.stats.calib
+		return self.component_1.stats.calib

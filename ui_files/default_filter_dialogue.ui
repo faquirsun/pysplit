@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>460</width>
+    <width>578</width>
     <height>331</height>
    </rect>
   </property>
   <property name="maximumSize">
    <size>
-    <width>460</width>
+    <width>578</width>
     <height>331</height>
    </size>
   </property>
@@ -20,120 +20,131 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <layout class="QFormLayout" name="formLayout">
-     <property name="labelAlignment">
+   <item row="3" column="0">
+    <widget class="QLabel" name="uiLowFreqLabel">
+     <property name="styleSheet">
+      <string notr="true">font-weight: bold;</string>
+     </property>
+     <property name="text">
+      <string>Lowpass frequency: </string>
+     </property>
+     <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
-     <item row="2" column="0">
-      <widget class="QLabel" name="numberOfPolesLabel">
-       <property name="text">
-        <string>Number of poles: </string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="indent">
-        <number>-1</number>
-       </property>
-      </widget>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="uiHighFreqInput">
+     <property name="placeholderText">
+      <string>e.g. 8 Hz</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="uiPoleCountComboBox">
+     <item>
+      <property name="text">
+       <string>2</string>
+      </property>
      </item>
-     <item row="2" column="1">
-      <widget class="QComboBox" name="input_noPoles">
-       <item>
-        <property name="text">
-         <string>2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>3</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>4</string>
-        </property>
-       </item>
-      </widget>
+     <item>
+      <property name="text">
+       <string>3</string>
+      </property>
      </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="zerophaseLabel">
-       <property name="text">
-        <string>Zerophase?</string>
-       </property>
-      </widget>
+     <item>
+      <property name="text">
+       <string>4</string>
+      </property>
      </item>
-     <item row="3" column="1">
-      <widget class="QCheckBox" name="input_zerophase"/>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_lowFreq">
-       <property name="text">
-        <string>Lowpass frequency: </string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="input_lowFreq">
-       <property name="placeholderText">
-        <string>e.g. 2 Hz</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="label_highFreq">
-       <property name="text">
-        <string>Highpass frequency: </string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QLineEdit" name="input_highFreq">
-       <property name="placeholderText">
-        <string>e.g. 8 Hz</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="filterTypeLabel">
-       <property name="text">
-        <string>Filter type: </string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="input_filtType">
-       <item>
-        <property name="text">
-         <string>Bandpass</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Lowpass</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Highpass</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-    </layout>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QCheckBox" name="uiZeroPhaseCheckBox"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="uiZeroPhaseLabel">
+     <property name="styleSheet">
+      <string notr="true">font-weight: bold;</string>
+     </property>
+     <property name="text">
+      <string>Zerophase?</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="uiLowFreqInput">
+     <property name="placeholderText">
+      <string>e.g. 2 Hz</string>
+     </property>
+    </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QDialogButtonBox" name="buttonBox">
+    <widget class="QLabel" name="uiPoleCountLabel">
+     <property name="styleSheet">
+      <string notr="true">font-weight: bold;</string>
+     </property>
+     <property name="text">
+      <string>Number of poles: </string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="indent">
+      <number>-1</number>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QComboBox" name="uiFilterTypeComboBox">
+     <item>
+      <property name="text">
+       <string>bandpass</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>lowpass</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>highpass</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="uiFilterTypeLabel">
+     <property name="styleSheet">
+      <string notr="true">font-weight: bold;</string>
+     </property>
+     <property name="text">
+      <string>Filter type: </string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="uiHighFreqLabel">
+     <property name="styleSheet">
+      <string notr="true">font-weight: bold;</string>
+     </property>
+     <property name="text">
+      <string>Highpass frequency: </string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QDialogButtonBox" name="uiButtonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -144,46 +155,6 @@
    </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>input_filtType</tabstop>
-  <tabstop>input_noPoles</tabstop>
-  <tabstop>input_zerophase</tabstop>
-  <tabstop>input_lowFreq</tabstop>
-  <tabstop>input_highFreq</tabstop>
- </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>Dialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>Dialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

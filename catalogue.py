@@ -32,7 +32,7 @@ from obspy.core import read, AttribDict
 from string import Template
 from math import sqrt
 import numpy as np
-from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 
 class Catalogue(ABC):
@@ -65,7 +65,7 @@ class Catalogue(ABC):
 		self.arrival_df   = pd.DataFrame(columns=self.arrival_cols)
 
 		# Receivers
-		self.receiver_cols = ['receiver_name', 'lat', 'lon', 'dep', 'st_dep', 'et_dep', 'receiverid']
+		self.receiver_cols = ['network', 'receiver_name', 'lat', 'lon', 'dep', 'st_dep', 'et_dep', 'receiverid']
 		self.receiver_df   = pd.DataFrame(columns=self.receiver_cols)
 
 	# --------------
@@ -318,7 +318,7 @@ class LocalCatalogue(Catalogue):
 
 	def _generateCatalogueMetafile(self):
 		# Read in the template file
-		filein = open('local_metafile_template.txt')
+		filein = open('templates/local_metafile_template.txt')
 		src = Template(filein.read())
 
 		# Set the general metadata parameters
@@ -549,14 +549,10 @@ class LocalCatalogue(Catalogue):
 		# Output the catalogue
 		self.arrival_df.to_csv(self.arrival_file, index=False)
 
-	def _lookupReceiverID(self, receiver):
-		# Returns the receiver ID for given receiver name
-		return self.receiver_df.query('receiver_name == @receiver')["receiverid"].iloc[0]
-
 	def windowRange(self):
 		return 60.
 
-	def plotGeographic(self, ax, lon0=None, lon1=None, lat0=None, lat1=None, resolution='c'):
+	def plotGeographic(self, map_widget, lon0=None, lon1=None, lat0=None, lat1=None):
 
 		# Find appropriate geographical region
 		lons = self.source_df.evlon.values
@@ -575,31 +571,32 @@ class LocalCatalogue(Catalogue):
 			self.lon1 = lon1
 			self.lat0 = lat0
 			self.lat1 = lat1
-
-		# Create a Basemap of the calculated region and draw any coastlines
-		self.m = Basemap(llcrnrlon=self.lon0, llcrnrlat=self.lat0, urcrnrlon=self.lon1, urcrnrlat=self.lat1,\
-            resolution=resolution, projection='merc', ax=ax)
-		self.m.drawcoastlines()
+			
+		self.map = map_widget.canvas._localMap(lon0=self.lon0, lat0=self.lat0, lon1=self.lon1, lat1=self.lat1)
 
 		# Set plot details (axes labels etc)
-		ax.set_xlabel("Longitude, degrees", fontsize=10)
-		ax.set_ylabel("Latitude, degrees", fontsize=10)
+		self.map.set_xlabel("Longitude, degrees", fontsize=10)
+		self.map.set_ylabel("Latitude, degrees", fontsize=10)
+		self.map.set_extent([self.lon0, self.lon1, self.lat0, self.lat1], ccrs.PlateCarree())
 
 		# Try rescaling the image now
-		ax.set_aspect('auto')
+		self.map.set_aspect('auto')
 
-		x, y = self.m(lons, lats)
 		tolerance = 10
-		for i in range(len(x)):
-			self.m.scatter(x[i], y[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="SOURCE: {}".format(self.source_df.sourceid[i]))
+		for i in range(len(lons)):
+			self.map.scatter(lons[i], lats[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="SOURCE: {}".format(self.source_df.sourceid[i]))
 
-	def plotReceivers(self, ax):
+	def plotReceivers(self, map_widget):
 		lons = self.receiver_df.lon.values
 		lats = self.receiver_df.lat.values
-		x, y = self.m(lons, lats)
 		tolerance = 10
-		for i in range(len(x)):
-			self.m.scatter(x[i], y[i], 75, marker="v", color="green", picker=tolerance, zorder=15, label="REC: {}".format(self.receiver_df.receiver_name[i]))
+		for i in range(len(lons)):
+			self.map.scatter(lons[i], lats[i], 75, marker="v", color="green", picker=tolerance, zorder=15, label="REC: {}".format(self.receiver_df.receiver_name[i]))
+
+	def _lookupReceiverID(self, receiver):
+		# Returns the receiver ID for given receiver name
+		return self.receiver_df.query('receiver_name == @receiver')["receiverid"].iloc[0]
+
 
 
 class TeleseismicCatalogue(Catalogue):
@@ -638,7 +635,7 @@ class TeleseismicCatalogue(Catalogue):
 			print("Catalogue located at {}.".format(self.catalogue_path))
 
 		# Copy receiver file into metafiles directory
-		os.system("cp {} {}/metafiles/receivers.txt".format(self.receiver_path, self.catalogue_path))
+		os.system("cp {} {}/metafiles/receivers.txt".format(self.receiver_file, self.catalogue_path))
 
 		# Set source file location
 		self.source_file = "{}/metafiles/sources.txt".format(self.catalogue_path)
@@ -652,7 +649,7 @@ class TeleseismicCatalogue(Catalogue):
 
 	def _generateCatalogueMetafile(self):
 		# Read in the template file
-		filein = open('teleseismic_metafile_template.txt')
+		filein = open('templates/teleseismic_metafile_template.txt')
 		src = Template(filein.read())
 
 		# Set the general metadata parameters
@@ -660,7 +657,7 @@ class TeleseismicCatalogue(Catalogue):
 			 	 'catalogue_type': self.catalogue_type,
 				 'catalogue_path': self.catalogue_path,
 				 'data_source': self.data_source,
-				 'creation_date': datetime.datetime.now().isoformat(),
+				 'creation_date': self.creation_date,
 				 'archive_path': self.archive_path,
 				 'archive_format': self.archive_format,
 				 'receiver_file': self.receiver_file,
@@ -677,7 +674,7 @@ class TeleseismicCatalogue(Catalogue):
 		output = src.safe_substitute(d_cat)
 
 		# Write out the catalogue metafile
-		with open('{}/{}/metafiles/catalogue_metafile.txt'.format(self.catalogue_path, self.catalogue_name), 'w') as o:
+		with open('{}/metafiles/catalogue_metafile.txt'.format(self.catalogue_path), 'w') as o:
 			o.write(output)
 
 	def generateCatalogue(self):
@@ -787,7 +784,7 @@ class TeleseismicCatalogue(Catalogue):
 	def windowRange(self):
 		return 300.
 
-	def plotGeographic(self, ax):
+	def plotGeographic(self, map_widget):
 		# Find the centre of the array
 		lon_cen = self.receiver_df.lon.mean()
 		lat_cen = self.receiver_df.lat.mean()
@@ -796,16 +793,9 @@ class TeleseismicCatalogue(Catalogue):
 		lons = self.source_df.evlon.values
 		lats = self.source_df.evlat.values
 
-		# Create a Basemap of the calculated region and draw any coastlines
-		ax = plt.axes(projection=ccrs.AzimuthalEquidistant(central_longitude=lon_cen, central_latitude=lat_cen))
-		ax.coastlines
-		self.m = Basemap(projection='aeqd', lon_0=lon_cen, lat_0=lat_cen, ax=ax)
-		self.m.drawcoastlines()
+		ax = map_widget.canvas._teleseismicMap(lon_cen, lat_cen)
 
-		x, y = self.m(lons, lats)
+		#ax.add_wms(wms='http://vmap0.tiles.osgeo.org/wms/vmap0', layers=['basic'])
 		tolerance = 10
-		for i in range(len(x)):
-			self.m.scatter(x[i], y[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="SOURCE: {}".format(self.source_df.sourceid[i]))
-
-	def plotReceivers(self, ax):
-		pass
+		for i in range(len(lons)):
+			ax.scatter(lons[i], lats[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="SOURCE: {}".format(self.source_df.sourceid[i]),  transform=ccrs.Geodetic())

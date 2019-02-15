@@ -16,13 +16,13 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout" rowstretch="1,1,1,1,0" columnstretch="0,0,0">
     <item row="4" column="0">
-     <widget class="QGroupBox" name="partMotionBox">
+     <widget class="QGroupBox" name="uiHodogramGBox">
       <property name="title">
        <string>Particle motion</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="0" column="1">
-        <widget class="MplWidget" name="partMotionAfter" native="true">
+        <widget class="MplWidget" name="uiHodogram2Mpl" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -32,7 +32,7 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="MplWidget" name="partMotionBefore" native="true">
+        <widget class="MplWidget" name="uiHodogram1Mpl" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -45,7 +45,7 @@
      </widget>
     </item>
     <item row="4" column="2">
-     <widget class="QGroupBox" name="splittingResults">
+     <widget class="QGroupBox" name="uiSplittingResultsGBox">
       <property name="title">
        <string>Splitting results</string>
       </property>
@@ -63,7 +63,7 @@
         <number>20</number>
        </property>
        <item row="3" column="0">
-        <widget class="QLabel" name="labelDtErr">
+        <widget class="QLabel" name="uiDelayTimeErrLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -76,7 +76,7 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="labelFastErr">
+        <widget class="QLabel" name="uiFastDirErrLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -89,14 +89,14 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QLabel" name="label_DtErr">
+        <widget class="QLabel" name="uiDelayTimeErrDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="labelFastDir">
+        <widget class="QLabel" name="uiFastDirLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -109,14 +109,14 @@
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QLabel" name="label_SPol">
+        <widget class="QLabel" name="uiSourcePolDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="QLabel" name="labelSPol">
+        <widget class="QLabel" name="uiSourcePolLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -129,7 +129,7 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="labelDt">
+        <widget class="QLabel" name="uiDelayTimeLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -142,21 +142,21 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLabel" name="label_FastDir">
+        <widget class="QLabel" name="uiFastDirDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QLabel" name="label_FastErr">
+        <widget class="QLabel" name="uiFastDirErrDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QLabel" name="label_Dt">
+        <widget class="QLabel" name="uiDelayTimeDisplay">
          <property name="text">
           <string/>
          </property>
@@ -166,13 +166,13 @@
      </widget>
     </item>
     <item row="3" column="0" colspan="2">
-     <widget class="QGroupBox" name="clusterAnalysisBox">
+     <widget class="QGroupBox" name="uiClusterAnalysisGBox">
       <property name="title">
        <string>Cluster analysis</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_5">
        <item row="0" column="1">
-        <widget class="MplWidget" name="partMotion_after_2" native="true">
+        <widget class="MplWidget" name="uiCluster2Mpl" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -182,7 +182,7 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="MplWidget" name="partMotion_before_3" native="true">
+        <widget class="MplWidget" name="uiCluster1Mpl" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -195,7 +195,7 @@
      </widget>
     </item>
     <item row="0" column="2">
-     <widget class="QGroupBox" name="eventInfo">
+     <widget class="QGroupBox" name="uiSourceInfoGBox">
       <property name="styleSheet">
        <string notr="true"/>
       </property>
@@ -216,7 +216,7 @@
         <number>20</number>
        </property>
        <item row="4" column="0">
-        <widget class="QLabel" name="labelEventDep">
+        <widget class="QLabel" name="uiSourceDepthLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -229,7 +229,7 @@
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QLabel" name="labelEventLat">
+        <widget class="QLabel" name="uiSourceLatLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -242,14 +242,14 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLabel" name="label_eventOdate">
+        <widget class="QLabel" name="uiOriginDateDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="labelEventODate">
+        <widget class="QLabel" name="uiOriginDateLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -262,7 +262,7 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="labelEventOTime">
+        <widget class="QLabel" name="uiOriginTimeLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -275,7 +275,7 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="labelEventLon">
+        <widget class="QLabel" name="uiSourceLonLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -288,7 +288,7 @@
         </widget>
        </item>
        <item row="5" column="0">
-        <widget class="QLabel" name="labelEventMag">
+        <widget class="QLabel" name="uiSourceMagLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -301,7 +301,7 @@
         </widget>
        </item>
        <item row="6" column="0">
-        <widget class="QLabel" name="labelEventID">
+        <widget class="QLabel" name="uiSourceIDLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -314,42 +314,42 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QLabel" name="label_eventOtime">
+        <widget class="QLabel" name="uiOriginTimeDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QLabel" name="label_eventLon">
+        <widget class="QLabel" name="uiSourceLonDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QLabel" name="label_eventLat">
+        <widget class="QLabel" name="uiSourceLatDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QLabel" name="label_eventDepth">
+        <widget class="QLabel" name="uiSourceDepthDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QLabel" name="label_eventMag">
+        <widget class="QLabel" name="uiSourceMagDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="6" column="1">
-        <widget class="QLabel" name="label_eventID">
+        <widget class="QLabel" name="uiSourceIDDisplay">
          <property name="text">
           <string/>
          </property>
@@ -359,7 +359,7 @@
      </widget>
     </item>
     <item row="1" column="2">
-     <widget class="QGroupBox" name="stationInfo">
+     <widget class="QGroupBox" name="uiReceiverInfoGBox">
       <property name="title">
        <string>Receiver information</string>
       </property>
@@ -377,21 +377,21 @@
         <number>20</number>
        </property>
        <item row="0" column="1">
-        <widget class="QLabel" name="label_statName">
+        <widget class="QLabel" name="uiReceiverNameDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QLabel" name="label_statLat">
+        <widget class="QLabel" name="uiReceiverLatDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="labelStatName">
+        <widget class="QLabel" name="uiReceiverNameLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -404,7 +404,7 @@
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="QLabel" name="labelStatDep">
+        <widget class="QLabel" name="uiReceiverDepLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -417,14 +417,14 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QLabel" name="label_statLon">
+        <widget class="QLabel" name="uiReceiverLonDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QLabel" name="labelStatElv">
+        <widget class="QLabel" name="uiReceiverElevLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -437,7 +437,7 @@
         </widget>
        </item>
        <item row="5" column="0">
-        <widget class="QLabel" name="labelStatRet">
+        <widget class="QLabel" name="uiReceiverRetLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -450,7 +450,7 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="labelStatLat">
+        <widget class="QLabel" name="uiReceiverLatLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -463,7 +463,7 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="labelStatLon">
+        <widget class="QLabel" name="uiReceiverLonLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -476,21 +476,21 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QLabel" name="label_statElev">
+        <widget class="QLabel" name="uiReceiverElevDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QLabel" name="label_statDep">
+        <widget class="QLabel" name="uiReceiverDepDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QLabel" name="label_statRet">
+        <widget class="QLabel" name="uiReceiverRetDisplay">
          <property name="text">
           <string/>
          </property>
@@ -500,13 +500,13 @@
      </widget>
     </item>
     <item row="3" column="2">
-     <widget class="QGroupBox" name="processingBox">
+     <widget class="QGroupBox" name="uiProcessGBox">
       <property name="title">
        <string>Processing</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
-        <widget class="QPushButton" name="acceptButton">
+        <widget class="QPushButton" name="uiAcceptButton">
          <property name="text">
           <string>Accept</string>
          </property>
@@ -516,7 +516,7 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QPushButton" name="rejectButton">
+        <widget class="QPushButton" name="uiRejectButton">
          <property name="text">
           <string>Reject</string>
          </property>
@@ -529,13 +529,13 @@
      </widget>
     </item>
     <item row="4" column="1">
-     <widget class="QGroupBox" name="confidence_plot_box">
+     <widget class="QGroupBox" name="uiConfIntervalGBox">
       <property name="title">
        <string>Confidence interval plot</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_4">
        <item row="0" column="0">
-        <widget class="MplWidget" name="confidence_plot" native="true">
+        <widget class="MplWidget" name="uiConfidenceMpl" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -548,7 +548,7 @@
      </widget>
     </item>
     <item row="2" column="2">
-     <widget class="QGroupBox" name="pickInfo">
+     <widget class="QGroupBox" name="uiPickInfoGBox">
       <property name="title">
        <string>Pick information</string>
       </property>
@@ -566,7 +566,7 @@
         <number>20</number>
        </property>
        <item row="1" column="0">
-        <widget class="QLabel" name="labelWinStart">
+        <widget class="QLabel" name="uiWindowStartLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -579,7 +579,7 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="labelWinEnd">
+        <widget class="QLabel" name="uiWindowEndLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -592,14 +592,14 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QLabel" name="label_WinEnd">
+        <widget class="QLabel" name="uiWindowEndDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="labelPickTime">
+        <widget class="QLabel" name="uiPickTimeLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>
@@ -612,14 +612,14 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QLabel" name="label_WinStart">
+        <widget class="QLabel" name="uiWindowStartDisplay">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLabel" name="label_PickTime">
+        <widget class="QLabel" name="uiPickTimeDisplay">
          <property name="text">
           <string/>
          </property>
@@ -629,13 +629,13 @@
      </widget>
     </item>
     <item row="0" column="1" rowspan="3">
-     <widget class="QGroupBox" name="rotatedTracesBox">
+     <widget class="QGroupBox" name="uiRotatedTracesGBox">
       <property name="title">
        <string>Rotated and corrected traces</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="MplWidget" name="radialPlot" native="true">
+        <widget class="MplWidget" name="uiRadialMpl" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -645,7 +645,7 @@
         </widget>
        </item>
        <item>
-        <widget class="MplWidget" name="transversePlot" native="true">
+        <widget class="MplWidget" name="uiTransverseMpl" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -655,7 +655,7 @@
         </widget>
        </item>
        <item>
-        <widget class="MplWidget" name="corrRadialPlot" native="true">
+        <widget class="MplWidget" name="uiCorrRadialMpl" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -665,7 +665,7 @@
         </widget>
        </item>
        <item>
-        <widget class="MplWidget" name="corrTransversePlot" native="true">
+        <widget class="MplWidget" name="uiCorrTransverseMpl" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -678,13 +678,13 @@
      </widget>
     </item>
     <item row="0" column="0" rowspan="3">
-     <widget class="QGroupBox" name="originalTracesBox">
+     <widget class="QGroupBox" name="uiOriginalTracesGBox">
       <property name="title">
        <string>Original traces</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="MplWidget" name="originalZPlot" native="true">
+        <widget class="MplWidget" name="uiOriginalComp1Mpl" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -694,7 +694,7 @@
         </widget>
        </item>
        <item>
-        <widget class="MplWidget" name="originalNPlot" native="true">
+        <widget class="MplWidget" name="uiOriginalComp2Mpl" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -704,7 +704,7 @@
         </widget>
        </item>
        <item>
-        <widget class="MplWidget" name="originalEPlot" native="true">
+        <widget class="MplWidget" name="uiOriginalComp3Mpl" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>

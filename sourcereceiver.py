@@ -248,7 +248,18 @@ class SourceReceiverPair(object):
 		component_3_axis.plot(self.component_3.times(type="relative"), self.component_3.data / self.norm_factor, linewidth=0.5)
 
 	def plotSpectrogram(self, ax):
+		# Plots the spectrogram of the data on provided axes
 		self.stream.spectrogram(log=True, axes=ax)
+
+	def plotHodogram(self, ax):
+		# Grab the windows (if they exist)
+		# Normalise the particle motion plots
+		norm = max(max(abs(self.component_3.data)), max(abs(self.component_2.data)))
+		x = [x / norm for x in self.component_3.data]
+		y = [x / norm for x in self.component_2.data]
+
+		# Plot to axes
+		ax.plot(x, y)
 
 	# ------------------
 

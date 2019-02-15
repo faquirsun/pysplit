@@ -505,7 +505,7 @@
         </widget>
        </item>
        <item row="5" column="0">
-        <widget class="QLabel" name="uiEventMagLabel">
+        <widget class="QLabel" name="uiSourceMagLabel">
          <property name="styleSheet">
           <string notr="true">font-weight: bold;</string>
          </property>

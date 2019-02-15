@@ -389,7 +389,7 @@
       <bool>false</bool>
      </property>
      <property name="placeholderText">
-      <string>Default: {year}/{jday}/*_{stat}_{comp}2.m</string>
+      <string>Example: {year}/{jday}/*{receiver}.{comp}*</string>
      </property>
     </widget>
    </item>
@@ -499,12 +499,12 @@
     <widget class="QComboBox" name="uiArchiveFormatComboBox">
      <item>
       <property name="text">
-       <string>Archive format 1</string>
+       <string>SeisComp3</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Archive format 2</string>
+       <string>Cambridge Volcano Seismology</string>
       </property>
      </item>
      <item>

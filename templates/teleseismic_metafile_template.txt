@@ -19,6 +19,7 @@ Catalogue path ? $catalogue_path
 Data source    ? $data_source
 Creation date  ? $creation_date
 Archive path   ? $archive_path
+Archive type   ? $archive_type
 Archive format ? $archive_format
 Receiver file  ? $receiver_file
 Start date     ? $start_date

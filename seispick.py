@@ -364,10 +364,10 @@ class SeisPick(qt.QMainWindow):
 
 		# Show the matplotlib widget and clear it
 		self.uiMapMpl.show()
-		#self.uiMapMpl.canvas.ax.clear()
 
 		# If replotting, grab the new parameters
 		if replot:
+			self.uiMapMpl.canvas.ax.clear()
 			self.catalogue.plotGeographic(self.uiMapMpl,
 										   lon0=float(self.uiMinLonInput.text()),
 										   lon1=float(self.uiMaxLonInput.text()),
@@ -535,14 +535,14 @@ class SeisPick(qt.QMainWindow):
 		self.uiMapMpl.canvas.blit(self.uiMapMpl.canvas.ax.bbox)
 
 		# Convert the x and y positions to lon/lat
-		lonpress, latpress     = self.catalogue.m(xpress, ypress, inverse=True)
-		lonrelease, latrelease = self.catalogue.m(xrelease, yrelease, inverse=True) 
+		lonpress, latpress     = xpress, ypress
+		lonrelease, latrelease = xrelease, yrelease
 
 		# Set the text values of the lon/lat input boxes
-		self.uiMinLonInput.setText(str(f"{min(lonpress, lonrelease):.2f}"))
-		self.uiMaxLonInput.setText(str(f"{max(lonpress, lonrelease):.2f}"))
-		self.uiMinLatInput.setText(str(f"{min(latpress, latrelease):.2f}"))
-		self.uiMaxLatInput.setText(str(f"{max(latpress, latrelease):.2f}"))
+		self.uiMinLonInput.setText(str(f"{min(xpress, xrelease):.2f}"))
+		self.uiMaxLonInput.setText(str(f"{max(xpress, xrelease):.2f}"))
+		self.uiMinLatInput.setText(str(f"{min(ypress, yrelease):.2f}"))
+		self.uiMaxLatInput.setText(str(f"{max(ypress, yrelease):.2f}"))
 
 	# -------------------------
 
@@ -737,6 +737,14 @@ class NewCatalogueDialogue(qt.QDialog):
 		elif not os.path.exists(archive_path):
 			qt.QMessageBox.about(self, "Error!", "You must provide a valid archive path.")
 			return
+
+		archive_type = self.uiArchiveFormatComboBox.currentText()
+		# SeisComp3 
+		if archive_type == "SeisComp3":
+			archive_format = "{year}/*/{receiver}/{comp}/*.{receiver}..{comp}.D.{year}.{jday}"
+		# Cambridge Volcano Seismology archive format
+		elif archive_type == "Cambridge Volcano Seismology":
+			archive_format = "{year}/{jday}/*_{receiver}_{comp}*"
 		
 		# Receiver file
 		receiver_file  = self.uiReceiverFileInput.text()
@@ -782,7 +790,8 @@ class NewCatalogueDialogue(qt.QDialog):
 								'data_source': data_source,
 								'creation_date': QDateTime.currentDateTime().toUTC().toString(Qt.ISODate),
 								'archive_path': archive_path,
-								'archive_format': self.uiArchiveFormatInput.text(),
+								'archive_type': archive_type,
+								'archive_format': archive_format,
 								'receiver_file': receiver_file,
 								'start_date': self.uiStartDateInput.date().toString(Qt.ISODate),
 								'end_date': self.uiEndDateInput.date().toString(Qt.ISODate)}

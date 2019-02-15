@@ -23,16 +23,13 @@ import sys
 import glob
 import ast
 import pandas as pd
-import datetime
 from obspy.clients.fdsn import Client
 from obspy import UTCDateTime
 from obspy.taup import TauPyModel
-from obspy.geodetics import locations2degrees, gps2dist_azimuth
-from obspy.core import read, AttribDict
+from obspy.geodetics import locations2degrees
+from obspy.core import read
 from string import Template
-from math import sqrt
 import numpy as np
-import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 
 class Catalogue(ABC):
@@ -81,9 +78,8 @@ class Catalogue(ABC):
 		self.initCatalogue(**catalogue_parameters)
 
 	def getWaveforms(self):
-		# Get window range
-		window_range = self.windowRange()
-
+		# Iterate over the arrivals DataFrame and cut the relevant seismic data from
+		# the continuous archive
 		for i, arrival in self.arrival_df.iterrows():
 
 			# If the waveforms has already been retrieved, skip it.
@@ -98,8 +94,8 @@ class Catalogue(ABC):
 					otime, evlat, evlon, evdep = self._getSource(self.source_df, arrival.sourceid)
 
 					# Calculate reference time for window to download
-					window_beg = otime + float(traveltime) - window_range
-					window_end = otime + float(traveltime) + window_range
+					window_beg = otime + float(traveltime) - self.window()
+					window_end = otime + float(traveltime) + self.window()
 
 					# Data existence tracker
 					file_exists = True
@@ -114,25 +110,19 @@ class Catalogue(ABC):
 							continue
 
 						evyear = str(window_beg.year)
-						evjday = str(window_beg.julday)
-						nxjday = str((window_beg + 86400).julday)
+						evjday = str(window_beg.julday).zfill(3)
+						nxjday = str((window_beg + 86400).julday).zfill(3)
 
-						# Julian day must be a 3 character string
-						while (len(evjday) != 3):
-							evjday = '0' + evjday
-						while (len(nxjday) != 3):
-							nxjday = '0' + nxjday
-
-						# Copy all files for a given day + the next
-						file_to_grab = '{}/{}/{}/*_{}_{}2.m'.format(self.archive, evyear, evjday, rec.upper(), comp)
-						next_to_grab = '{}/{}/{}/*_{}_{}2.m'.format(self.archive, evyear, nxjday, rec.upper(), comp)
+						# Create file strings for event day and the following day
+						event_day_file = '{}/{}'.format(self.archive_path, self.archive_format.format(year=evyear, jday=evjday, receiver=rec.upper(), comp=comp))
+						next_day_file  = '{}/{}'.format(self.archive_path, self.archive_format.format(year=evyear, jday=nxjday, receiver=rec.upper(), comp=comp))
 
 						# Grab files
-						os.system('scp {} {}/tmp/.'.format(file_to_grab, self.catalogue_path))
+						os.system('scp {} {}/tmp/.'.format(event_day_file, self.catalogue_path))
 						if (window_beg.julday != window_end.julday):
-							os.system('scp {} {}/tmp/.'.format(next_to_grab, self.catalogue_path))
+							os.system('scp {} {}/tmp/.'.format(next_day_file, self.catalogue_path))
 
-						files = sorted(glob.glob('{}/tmp/*_{}_{}2.m'.format(self.catalogue_path, rec.upper(), comp)))
+						files = sorted(glob.glob('{}/tmp/*'.format(self.catalogue_path)))
 
 						try:
 							file = files[0]
@@ -140,7 +130,7 @@ class Catalogue(ABC):
 							file_exists = False
 							continue
 
-						st = read('{}/tmp/*_{}_{}2.m'.format(self.catalogue_path, rec.upper(), comp))
+						st = read('{}/tmp/*'.format(self.catalogue_path))
 
 						# Trim and save the file locally
 						try:
@@ -216,6 +206,20 @@ class Catalogue(ABC):
 		# Returns true if all waveforms have been downloaded
 		return self.arrival_df["waveform?"].all()
 
+	def filterReceivers(self):
+		# Now filter the receivers against this list
+		available_receivers = self.arrival_df.drop_duplicates(subset="receiverid", keep="first").receiverid
+		available_receivers_names = []
+
+		for i, receiverid in available_receivers.items():
+			rec, slat, slon, sdep = self._getReceiver(self.receiver_df, receiverid)
+			available_receivers_names.append(rec)
+
+		self.receiver_df = self.receiver_df.loc[self.receiver_df['receiver_name'].isin(available_receivers_names)]
+
+		# Output the new receiver file
+		self.receiver_df.to_csv(self.receiver_file, index=False)
+
 	def filterSpatial(self):
 		pass
 
@@ -238,6 +242,15 @@ class Catalogue(ABC):
 
 	# --------------
 
+	@property
+	def window(self):
+		return self._window
+
+	@window.setter
+	def window(self, value):
+		self._window = value
+	
+
 	# ----------------
 	# Abstract methods
 	# ----------------
@@ -258,9 +271,6 @@ class Catalogue(ABC):
 	def getArrivals(self):
 		pass
 
-	@abstractmethod
-	def windowRange(self):
-		pass
 	@abstractmethod
 	def plotGeographic(self):
 		pass
@@ -284,6 +294,7 @@ class LocalCatalogue(Catalogue):
 		self.data_source    = kwargs.get("data_source")
 		self.creation_date  = kwargs.get("creation_date")
 		self.archive_path   = kwargs.get("archive_path")
+		self.archive_type   = kwargs.get("archive_type")
 		self.archive_format = kwargs.get("archive_format")
 		self.receiver_file  = kwargs.get("receiver_file")
 		self.start_date     = kwargs.get("start_date")
@@ -304,7 +315,8 @@ class LocalCatalogue(Catalogue):
 		# Copy receiver file into metafiles directory
 		os.system("cp {} {}".format(self.receiver_file, receiver_file_new))
 
-		#self.receiver_file = 
+		# Set default window time, in seconds
+		self._window = 60.
 
 		# Set source file location
 		self.source_file = "{}/metafiles/sources.txt".format(self.catalogue_path)
@@ -314,7 +326,7 @@ class LocalCatalogue(Catalogue):
 
 		# Set receiver file location
 		self.receiver_file = "{}/metafiles/receivers.txt".format(self.catalogue_path)
-		self.receiver_df = pd.read_csv(self.receiver_file, sep=',')
+		self.loadReceivers()
 
 	def _generateCatalogueMetafile(self):
 		# Read in the template file
@@ -328,6 +340,7 @@ class LocalCatalogue(Catalogue):
 				 'data_source': self.data_source,
 				 'creation_date': self.creation_date,
 				 'archive_path': self.archive_path,
+				 'archive_type': self.archive_type,
 				 'archive_format': self.archive_format,
 				 'receiver_file': self.receiver_file,
 				 'start_date': self.start_date,
@@ -549,8 +562,8 @@ class LocalCatalogue(Catalogue):
 		# Output the catalogue
 		self.arrival_df.to_csv(self.arrival_file, index=False)
 
-	def windowRange(self):
-		return 60.
+		# Now filter the receivers against this list
+		self.filterReceivers()
 
 	def plotGeographic(self, map_widget, lon0=None, lon1=None, lat0=None, lat1=None):
 
@@ -598,7 +611,6 @@ class LocalCatalogue(Catalogue):
 		return self.receiver_df.query('receiver_name == @receiver')["receiverid"].iloc[0]
 
 
-
 class TeleseismicCatalogue(Catalogue):
 	"""
 
@@ -612,6 +624,7 @@ class TeleseismicCatalogue(Catalogue):
 		self.data_source    = kwargs.get("data_source")
 		self.creation_date  = kwargs.get("creation_date")
 		self.archive_path   = kwargs.get("archive_path")
+		self.archive_type   = kwargs.get("archive_type")
 		self.archive_format = kwargs.get("archive_format")
 		self.receiver_file  = kwargs.get("receiver_file")
 		self.start_date     = kwargs.get("start_date")
@@ -637,6 +650,9 @@ class TeleseismicCatalogue(Catalogue):
 		# Copy receiver file into metafiles directory
 		os.system("cp {} {}/metafiles/receivers.txt".format(self.receiver_file, self.catalogue_path))
 
+		# Set default window time, in seconds
+		self._window = 300.
+
 		# Set source file location
 		self.source_file = "{}/metafiles/sources.txt".format(self.catalogue_path)
 
@@ -645,7 +661,7 @@ class TeleseismicCatalogue(Catalogue):
 
 		# Read in receiver file
 		self.receiver_file = "{}/metafiles/receivers.txt".format(self.catalogue_path)
-		self.receiver_df = pd.read_csv(self.receiver_file, sep=',')
+		self.loadReceivers()
 
 	def _generateCatalogueMetafile(self):
 		# Read in the template file
@@ -659,6 +675,7 @@ class TeleseismicCatalogue(Catalogue):
 				 'data_source': self.data_source,
 				 'creation_date': self.creation_date,
 				 'archive_path': self.archive_path,
+				 'archive_type': self.archive_type,
 				 'archive_format': self.archive_format,
 				 'receiver_file': self.receiver_file,
 				 'start_date': self.start_date,
@@ -728,14 +745,10 @@ class TeleseismicCatalogue(Catalogue):
 
 		# Evaluate the arrivals
 		for i, receiver in self.receiver_df.iterrows():
-			print("i", i)
-			print(" ")
-			print(receiver)
 			# Filter for sources occurring during receiver deployment
 			tmp_df = self.source_df[self.source_df['otime'].between(receiver.st_dep, receiver.et_dep)]
 
 			for j, source in tmp_df.iterrows():
-				print("j", j)
 				tmp_dist = locations2degrees(source.evlat, source.evlon, receiver.lat, receiver.lon)
 				phase_arr = model.get_travel_times(source_depth_in_km=source.evdep,
 												   distance_in_degree=tmp_dist,
@@ -769,20 +782,7 @@ class TeleseismicCatalogue(Catalogue):
 		self.arrival_df.to_csv(self.arrival_file, index=False)
 
 		# Now filter the receivers against this list
-		available_receivers = self.arrival_df.drop_duplicates(subset="receiverid", keep="first").receiverid
-		available_receivers_names = []
-
-		for i, receiverid in available_receivers.items():
-			rec, slat, slon, sdep = self._getReceiver(self.receiver_df, receiverid)
-			available_receivers_names.append(rec)
-
-		self.receiver_df = self.receiver_df.loc[self.receiver_df['receiver_name'].isin(available_receivers_names)]
-
-		# Output the new receiver file
-		self.receiver_df.to_csv(self.receiver_file, index=False)
-
-	def windowRange(self):
-		return 300.
+		self.filterReceivers()
 
 	def plotGeographic(self, map_widget):
 		# Find the centre of the array
@@ -795,7 +795,6 @@ class TeleseismicCatalogue(Catalogue):
 
 		ax = map_widget.canvas._teleseismicMap(lon_cen, lat_cen)
 
-		#ax.add_wms(wms='http://vmap0.tiles.osgeo.org/wms/vmap0', layers=['basic'])
 		tolerance = 10
 		for i in range(len(lons)):
 			ax.scatter(lons[i], lats[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="SOURCE: {}".format(self.source_df.sourceid[i]),  transform=ccrs.Geodetic())

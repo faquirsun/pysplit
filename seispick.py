@@ -1,40 +1,28 @@
 #!/usr/bin/env python3
 
 """
-The SeisPick GUI class system - this class handles the connection between
-the backend (Source and Catalogue class systems) and the user interface.
+This module requires that 'numpy', 'pandas', 'matplotlib' and 'PyQT5' are
+installed in your Python environment
 
-Methods
- 
-
-Attributes
-
+The back-end is found within the sourcereceiver and catalogue modules.
 
 Author: Hemmelig
 """
 
 import numpy as np
 import pandas as pd
-from mpl_toolkits.basemap import Basemap
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
-import sys
 from PyQt5.QtCore import Qt, QDate, QDateTime
 import PyQt5.QtWidgets as qt
 import PyQt5.QtGui as QtGui
-from obspy import read
 from PyQt5 import uic
-from mpl_toolkits.basemap import Basemap
+import sys
 import glob
 import os
 import re
-from obspy import UTCDateTime
 
 import catalogue as cat
-import receiver as spr
-import source as sps
 import sourcereceiver as spsr
 
 def atoi(text):
@@ -49,8 +37,18 @@ def natural_keys(text):
     return [ atoi(c) for c in re.split('(\d+)', text) ]
 
 class SeisPick(qt.QMainWindow):
-	"""
-	The SeisPick class - base class for generation of, and interaction with, the SeisPick GUI.
+	"""SeisPick class
+
+	Base class that connects PyQT5 SeisPick GUI to the back-end system of classes
+
+	Attributes
+	----------
+
+	Methods
+	-------
+
+	Properties
+	----------
 	"""
 
 	# ------------------------------
@@ -58,17 +56,19 @@ class SeisPick(qt.QMainWindow):
 	# ------------------------------
 
 	def __init__(self):
+		"""Class initialisation
+
+		"""
 		super().__init__()
 
 		self.initUI()
 
 	def initUI(self):
-		# Load the ui file
 		uic.loadUi('ui_files/main.ui', self)
 
 		# Initialise toggle trackers
-		self.ctrl_toggle  = False
-		self.shift_toggle = False
+		self.ctrl  = False
+		self.shift = False
 
 		# Initialise empty dictionary for catalogue parameters
 		self.catalogue_parameters = {}
@@ -130,20 +130,20 @@ class SeisPick(qt.QMainWindow):
 	def keyPressEvent(self, event):
 		# Toggle Ctrl Modifier on
 		if event.key() == Qt.Key_Control:
-			self.ctrl_toggle = True
+			self.ctrl = True
 
 		# Toggle Shift Modifier on
 		if event.key() == Qt.Key_Shift:
-			self.shift_toggle = True
+			self.shift = True
 
 	def keyReleaseEvent(self, event):
 		# Toggle Ctrl Modifier off
 		if event.key() == Qt.Key_Control:
-			self.ctrl_toggle = False
+			self.ctrl = False
 
 		# Toggle Shift Modifier off
 		if event.key() == Qt.Key_Shift:
-			self.shift_toggle = False
+			self.shift = False
 
 	def defaultFilter(self):
 		self.defaultFilterDialogue = DefaultFilterDialogue(self)
@@ -204,14 +204,14 @@ class SeisPick(qt.QMainWindow):
 			# Display catalogue information
 			self.uiPlotOptionsStacked.setCurrentIndex(1)
 			# Create an instance of the Teleseismic Catalogue class
-			self.catalogue = cat.TeleseismicCatalogue()
+			self.catalogue = cat.TeleseismicCatalogue(new, **self.catalogue_parameters)
 
 		elif self.catalogue_parameters["catalogue_type"] == "local":
 			self.uiStatusBar.showMessage("Creating an instance of LocalCatalogue...")
 			# Display local catalogue progress page
 			self.uiPlotOptionsStacked.setCurrentIndex(0)
 			# Create an instance of the Local Catalogue class
-			self.catalogue = cat.LocalCatalogue()
+			self.catalogue = cat.LocalCatalogue(new, **self.catalogue_parameters)
 
 		if new:
 			# Populate the new catalogue with parameters
@@ -220,11 +220,12 @@ class SeisPick(qt.QMainWindow):
 			# Generate the catalogue
 			self.catalogue.generateCatalogue()
 		else:
+			pass
 			# Load catalogue with parameters
-			self.catalogue.loadCatalogue(self.catalogue_parameters)
-			self.uiStatusBar.showMessage("Loading existing catalogue files...")
-			self.loadReceivers()
-			self.loadSources()
+			# self.catalogue.loadCatalogue(self.catalogue_parameters)
+			# self.uiStatusBar.showMessage("Loading existing catalogue files...")
+			# self.loadReceivers()
+			# self.loadSources()
 
 		# Populate the information wiedgets
 		self._populateReceiverList()
@@ -291,7 +292,7 @@ class SeisPick(qt.QMainWindow):
 	def _populateReceiverList(self):
 		# Populate the receiver list
 		model = QtGui.QStandardItemModel(self.uiReceiversListView)
-		for receiver in self.catalogue.receiver_df.receiver_name.values:
+		for receiver in self.catalogue.rec_df.receiver_name.values:
 			item = QtGui.QStandardItem(receiver)
 			model.appendRow(item)
 		self.uiReceiversListView.setModel(model)
@@ -306,7 +307,7 @@ class SeisPick(qt.QMainWindow):
 		self.uiMinMagDisplay.setText(self.catalogue_parameters["minmag"])
 
 		# Calculate number of sources and update label
-		no_sources = str(len(self.catalogue.source_df.index))
+		no_sources = str(len(self.catalogue.src_df.index))
 		self.uiSourceCountDisplay.setText(no_sources)
 
 	def _parseCatalogueMetafile(self):
@@ -324,26 +325,28 @@ class SeisPick(qt.QMainWindow):
 					param = line[1][:-1]
 				params.append(param)
 
+
 		catalogue_parameters = {'catalogue_name': params[0],
 								'catalogue_type': params[1],
 								'catalogue_path': params[2],
 								'data_source': params[3],
 								'cdate': params[4],
 								'archive_path': params[5],
-								'archive_format': params[6],
-								'receiver_file': params[7],
-								'start_date': params[8],
-								'end_date':params[9]}
+								'archive_type': params[6],
+								'archive_format': params[7],
+								'rec_file': params[8],
+								'start_date': params[9],
+								'end_date':params[10]}
 
 		if catalogue_parameters['catalogue_type'] == "local":
-			d_specific = {'local_input': params[10]}
+			d_specific = {'local_input': params[11]}
 
 		if catalogue_parameters['catalogue_type'] == "teleseismic":
-			d_specific = {'minmag': params[10],
-			 			  'clon': params[11],
-					 	  'clat': params[12],
-						  'minrad': params[13],
-						  'maxrad': params[14]}
+			d_specific = {'minmag': params[11],
+			 			  'clon': params[12],
+					 	  'clat': params[13],
+						  'minrad': params[14],
+						  'maxrad': params[15]}
 
 		self.catalogue_parameters = {**catalogue_parameters, **d_specific}
 
@@ -432,13 +435,15 @@ class SeisPick(qt.QMainWindow):
 	    label = artist.get_label()
 	    ind = event.ind
 
+	    print(event.mouseevent.key)
+
 	    # Convert the x/y positions of the mouse event to lat/lon using the relevant transform
 	    lon, lat = xy[ind[0]][0], xy[ind[0]][1]
 
 	    # If the data point selected is a receiver
 	    if "REC" in label:
 	    	rec = label.split(": ")[1]
-	    	self.receiver = spr.Receiver(self.catalogue.receiver_df.query('receiver_name == @rec'))
+	    	self.receiver = spsr.Receiver(self.catalogue.rec_df.query('receiver_name == @rec'))
 	    	self._updateReceiverInformation()
 
 	    	# If in receiver pick mode, open a Picking Window
@@ -448,7 +453,7 @@ class SeisPick(qt.QMainWindow):
 	    # If the data point selected is an source
 	    if "SOURCE" in label:
 	    	src = label.split(": ")[1]
-	    	self.source = sps.Source(self.catalogue.source_df.query('sourceid == @src'))
+	    	self.source = spsr.Source(self.catalogue.src_df.query('sourceid == @src'))
 	    	self._updateSourceInformation()
 
 	    	# If in source pick mode, open a Picking Window
@@ -456,7 +461,8 @@ class SeisPick(qt.QMainWindow):
 		    	self.pickWindow = PickingWindow(self, self.catalogue, source=self.source)
 
 	def _onMapClick(self, event):
-		if not self.shift_toggle:
+		print(event.key)
+		if not self.shift:
 			return
 		if self.catalogue.catalogue_type == "teleseismic":
 			return
@@ -473,7 +479,7 @@ class SeisPick(qt.QMainWindow):
 		self.map_click = xpress, ypress
 
 	def _onMapMove(self, event):
-		if not self.shift_toggle:
+		if not self.shift:
 			return
 		if self.catalogue.catalogue_type == "teleseismic":
 			return
@@ -503,7 +509,7 @@ class SeisPick(qt.QMainWindow):
 		self.uiMapMpl.canvas.blit(self.uiMapMpl.canvas.ax.bbox)
 
 	def _onMapRelease(self, event):
-		if not self.shift_toggle:
+		if not self.shift:
 			return
 		if self.catalogue.catalogue_type == "teleseismic":
 			return
@@ -555,7 +561,8 @@ class SeisPick(qt.QMainWindow):
 		receiver = self.uiReceiversListView.model().data(index)
 
 		# Lookup receiver information and create Receiver object
-		self.receiver = spr.Receiver(self.catalogue.receiver_df.query('receiver_name == @receiver'))
+		self.receiver = spsr.Receiver(self.catalogue.rec_df.query('receiver_name == @receiver'))
+		self.list_receiver = self.receiver
 
 		# Load receiver information and print to display
 		self._updateReceiverInformation()
@@ -576,13 +583,13 @@ class SeisPick(qt.QMainWindow):
 		source = self.uiSourcesListView.model().data(index).split(" ")[1]
 
 		# Look up source information and create Source object
-		self.source = sps.Source(self.catalogue.source_df.query('sourceid == @source'))
+		self.source = spsr.Source(self.catalogue.src_df.query('sourceid == @source'))
 
 		# Load source information and print to display
 		self._updateSourceInformation()
 
 		# Open up picking window
-		self.pickWindow = PickingWindow(self, self.catalogue, receiver=self.receiver, source=self.source)
+		self.pickWindow = PickingWindow(self, self.catalogue, receiver=self.list_receiver, source=self.source)
 
 	def _updateReceiverInformation(self):
 		self.uiReceiverNameDisplay.setText(self.receiver.station)
@@ -672,8 +679,8 @@ class NewCatalogueDialogue(qt.QDialog):
 
 	def browseReceivers(self):
 		filename = qt.QFileDialog.getOpenFileName(self, 'Open file')
-		self.receiver_file = filename[0]
-		self.uiReceiverFileInput.setText(self.receiver_file)
+		self.rec_file = filename[0]
+		self.uiReceiverFileInput.setText(self.rec_file)
 
 	def browseLocalFile(self):
 		filename = qt.QFileDialog.getOpenFileName(self, 'Open file')
@@ -747,8 +754,8 @@ class NewCatalogueDialogue(qt.QDialog):
 			archive_format = "{year}/{jday}/*_{receiver}_{comp}*"
 		
 		# Receiver file
-		receiver_file  = self.uiReceiverFileInput.text()
-		if not os.path.exists(receiver_file):
+		rec_file  = self.uiReceiverFileInput.text()
+		if not os.path.exists(rec_file):
 			qt.QMessageBox.about(self, "Error!", "You must provide a valid receiver file.")
 			return
 
@@ -792,7 +799,7 @@ class NewCatalogueDialogue(qt.QDialog):
 								'archive_path': archive_path,
 								'archive_type': archive_type,
 								'archive_format': archive_format,
-								'receiver_file': receiver_file,
+								'rec_file': rec_file,
 								'start_date': self.uiStartDateInput.date().toString(Qt.ISODate),
 								'end_date': self.uiEndDateInput.date().toString(Qt.ISODate)}
 		self.parent.catalogue_parameters = {**catalogue_parameters, **d_specific}
@@ -829,7 +836,7 @@ class TelePhaseDialogue(qt.QDialog):
 		self.connect()
 
 		# Populate the receiver list
-		self.model = QtGui.QStandardItemModel(self.phase_list)
+		self.model = QtGui.QStandardItemModel(self.uiPhaseListView)
 
 		self.setWindowTitle('SeisPick - Teleseismic phase selection')
 		self.setWindowIcon(QtGui.QIcon("misc/icon.png"))
@@ -1183,6 +1190,197 @@ class WadatiWindow(qt.QMainWindow):
 	# ------------------
 
 
+class SplittingAnalysisWindow(qt.QMainWindow):
+
+	# ------------------------------
+	# Class initialisation functions
+	# ------------------------------
+
+	def __init__(self, event, cataloge_type):
+		super().__init__()
+
+		self.event = event
+
+		# Set up default inputs for splitting analysis
+		#	np_phi 		: number of grid points for fast direction
+		#	np_dt  		: number of grid points for lag time
+		# 	tlag_scale  : max lag time of error surface 
+		self.np_phi = 181
+		if catalogue_type == "local":
+			# Default maximum of 1 second delay
+			self.np_dt = 101
+		elif catalogue_type == "teleseismic":
+			# Default maximum of 4 seconds delay
+			self.np_dt = 401
+		self.tlag_scale = (self.np_dt - 1) * self.event.delta
+
+		# Create copies of the event traces
+		tmp_stream = self.event.stream.copy()
+
+		# Detrend the data
+		tmp_stream = (tmp_stream.detrend("linear")).detrend("demean")
+
+		# Grab the North and East components
+		self.N = tmp_stream.select(channel="*N").data
+		self.E = tmp_stream.select(channel="*E").data
+
+		# Rotate components to Radial-Transverse
+		tmp_stream.rotate(method="NE->RT", back_azimuth=self.event.baz)
+		self.R = tmp_stream.select(channel="*R").data
+		self.T = tmp_stream.select(channel="*T").data
+
+		# Initialise grade variables
+		self._grade = None
+
+		# Populate source and receiver information boxes
+		self._updateSourceInformation()
+		self._updateReceiverInformation()
+
+		self.initUI()
+
+	def initUI(self):
+		uic.loadUi('ui_files/sws_window.ui', self)
+
+		self.calculateSplitting()
+
+		### TO-DO : Plot hodograms (use sliced traces, move code into this class from sourcereceiver.py)
+		###			Plot error landscape
+		###			Plot corrected traces
+		### 		Populate splitting results box
+
+	# ------------------------------
+
+	# ------------------------------
+	# Connection and event functions
+	# ------------------------------
+
+	def connect(self):
+		# Connect to accept/reject buttons
+		self.uiAcceptButton.clicked.connect(self.accept)
+		self.uiRejectButton.clicked.connect(self.reject)
+
+		# Connect to null button
+		self.uiNullButton.clicked.connect(self.setNull)
+
+		# Connect to grading buttons
+		self.uiGrade1Button.clicked.connect(lambda: self.gradeSplit("1"))
+		self.uiGrade2Button.clicked.connect(lambda: self.gradeSplit("2"))
+		self.uiGrade3Button.clicked.connect(lambda: self.gradeSplit("3"))
+		self.uiGrade4Button.clicked.connect(lambda: self.gradeSplit("4"))
+
+	# ------------------------------
+
+	def rotateComponents(self):
+		pass
+
+	def calculateSplitting(self):
+		### TO-DO : Grab event traces
+		###		  	Rotate onto Radial and Transverse
+		###			Detrend data
+		###			Based on S pick, find dominant freq
+		###			Create window and slice traces
+		###			Run splitting analysis (c-compiled python package)
+		###				Run over window start
+		###					Run over window end
+		###						Run over ranges of phi and dt
+		###				Return all measurements of phi and dt for window sizes
+		###				Return error landscape
+		###			# Calculate source polarisation
+		pass
+
+	def accept(self):
+		pass
+
+	def reject(self):
+		pass
+
+	def setNull(self):
+		pass
+
+	def gradeSplit(self, grade):
+		self.grade = grade
+		pass
+
+	# ------------------
+	# Plotting functions
+	# ------------------
+
+	def plotTraces(self):
+		# Grab a copy of the traces and rotate onto R-T
+		tmp_stream = self.event.stream.copy()
+		tmp_stream.rotate(method="NE->RT", back_azimuth=self.event.baz)
+
+		R = tmp_stream.select(channel="*R")
+		T = tmp_stream.select(channel="*T")
+
+		self.uiRadialMpl.plot(R.times(type="relative"), R.data, linewidth=0.5)
+		self.uiTransverseMpl.plot(T.times(type="relative"), T.data, linewidth=0.5)
+
+		### TO-DO: Add corrected traces
+
+	def plotClusterAnalysis(self):
+		pass
+
+	def plotHodograms(self):
+		# Plot particle motion of uncorrected waveforms
+		self.event.plotHodogram(self.uiHodogram1Mpl.canvas.ax)
+
+		# Plot particle motion of corrected waveforms
+		self.event.plotHodogram(self.uiHodogram2Mpl.canvas.ax, phi=self.fast_direction, dt=self.delay_time)
+
+	def plotConfidencePlot(self):
+		pass
+
+	# ------------------
+
+	# ---------------------------
+	# Information boxes functions
+	# ---------------------------
+
+	def _updateSourceInformation(self):
+		self.uiReceiverNameDisplay.setText(self.event.receiver.station)
+		self.uiReceiverLonDisplay.setText(f"{self.event.receiver.longitude:.4f}")
+		self.uiReceiverLatDisplay.setText(f"{self.event.receiver.latitude:.4f}")
+		self.uiReceiverElevDisplay.setText(f"{self.event.receiver.elevation:.4f}")
+		self.uiReceiverDepDisplay.setText(self.event.receiver.start_deployment.isoformat().split("T")[0])
+		self.uiReceiverRetDisplay.setText(self.event.receiver.end_deployment.isoformat().split("T")[0])
+
+	def _updateReceiverInformation(self):
+		self.uiOriginDateDisplay.setText(self.event.source.otime.isoformat().split("T")[0])
+		self.uiOriginTimeDisplay.setText(self.event.source.otime.isoformat().split("T")[1])
+		self.uiSourceLonDisplay.setText(f"{self.event.source.longitude:.4f}")
+		self.uiSourceLatDisplay.setText(f"{self.event.source.latitude:.4f}")
+		self.uiSourceDepthDisplay.setText(f"{self.source.depth:.4f}")
+		if (type(self.event.source.magnitude) == float) or (type(self.event.source.magnitude) == np.float64):
+			self.uiSourceMagDisplay.setText(f"{self.event.source.magnitude:.2f}")
+		else:
+			self.uiSourceMagDisplay.setText(str(self.event.source.magnitude))
+		self.uiSourceIDDisplay.setText(str(self.event.source.sourceid))
+
+	def _updateSplittingResults(self):
+		self.uiFastDirDisplay.setText(self.fast_direction)
+		self.uiFastDirErrDisplay.setText(self.fast_direction_error)
+		self.uiDelayTimeDisplay.setText(self.delay_time)
+		self.uiDelayTimeErrDisplay.setText(self.delay_time_error)
+		self.uiSourcePolDisplay.setText(self.source_polarisation)
+
+	# ---------------------------
+
+	# ----------
+	# Properties
+	# ----------
+
+	@property
+	def grade(self):
+		return self._grade
+
+	@grade.setter
+	def grade(self, value):
+		self._grade = value
+	
+	# ----------
+
+
 class PickingWindow(qt.QMainWindow):
 
 	# ------------------------------
@@ -1214,6 +1412,9 @@ class PickingWindow(qt.QMainWindow):
 		# Initialise pick tracker
 		self.pick_lines = {}
 
+		# Initialise component rotation tracker
+		self.components = "ZNE"
+
 		# Initialise tracker for spectrogram window
 		self.show_spectrogram = False
 
@@ -1221,8 +1422,8 @@ class PickingWindow(qt.QMainWindow):
 		self.trace_removed = False
 
 		# Initialise toggle trackers
-		self.ctrl_toggle  = False
-		self.shift_toggle = False
+		self.ctrl  = False
+		self.shift = False
 
 		# If picking all receivers for a given source
 		if receiver == None and source != None:
@@ -1260,7 +1461,7 @@ class PickingWindow(qt.QMainWindow):
 			self.counter = 0
 
 			try:
-				self.source = sps.Source(self.sources[self.counter])
+				self.source = spsr.Source(self.sources[self.counter])
 			except IndexError:
 				qt.QMessageBox.about(self, "Error!", "There are no sources with recorded arrivals at this receiver.")
 				return
@@ -1328,6 +1529,7 @@ class PickingWindow(qt.QMainWindow):
 		self.cidrfilter = self.uiRemoveFilterButton.clicked.connect(self.removeFilter)
 
 		# Connect to plot option buttons
+		self.cidrotatecomps = self.uiRotateCompButton.clicked.connect(self.rotateComponents)
 		self.cidspectrogram = self.uiViewSpectrogramButton.clicked.connect(self.toggleSpectrogram)
 		self.cidnexttrace = self.uiNextTraceButton.clicked.connect(self.nextTrace)
 		self.cidlasttrace = self.uiLastTraceButton.clicked.connect(self.previousTrace)
@@ -1377,11 +1579,11 @@ class PickingWindow(qt.QMainWindow):
 	def keyPressEvent(self, event):
 		# Toggle Ctrl Modifier on
 		if event.key() == Qt.Key_Control:
-			self.ctrl_toggle = True
+			self.ctrl = True
 
 		# Toggle Shift Modifier on
 		if event.key() == Qt.Key_Shift:
-			self.shift_toggle = True
+			self.shift = True
 
 		# Up polarity indicator
 		if event.key() == Qt.Key_U:
@@ -1395,7 +1597,7 @@ class PickingWindow(qt.QMainWindow):
 				self.uiPolarityDisplay.setText(self.pick_polarity)
 
 				# Add to source
-				self.src.addData(data="polarity", value=self.pick_polarity, pick_type=self.pick_type)
+				self.src.addData(info_type="polarity", value=self.pick_polarity, pick_type=self.pick_type)
 
 		# Down polarity indicator
 		if event.key() == Qt.Key_D:
@@ -1409,16 +1611,16 @@ class PickingWindow(qt.QMainWindow):
 				self.uiPolarityDisplay.setText(self.pick_polarity)
 
 				# Add to source
-				self.src.addData(data="polarity", value=self.pick_polarity, pick_type=self.pick_type)
+				self.src.addData(info_type="polarity", value=self.pick_polarity, pick_type=self.pick_type)
 
 	def keyReleaseEvent(self, event):
 		# Toggle Ctrl Modifier off
 		if event.key() == Qt.Key_Control:
-			self.ctrl_toggle = False
+			self.ctrl = False
 
 		# Toggle Shift Modifier off
 		if event.key() == Qt.Key_Shift:
-			self.shift_toggle = False
+			self.shift = False
 
 	def _onMove(self, event):
 		# Temp variables for accessing canvases
@@ -1427,7 +1629,7 @@ class PickingWindow(qt.QMainWindow):
 		component_3_canvas = self.uiComponent3Mpl.canvas
 
 		if event.inaxes is component_1_canvas.ax or component_2_canvas.ax or component_3_canvas.ax:
-			if self.shift_toggle:
+			if self.shift:
 				if not self._zoom_click:
 					return
 				if self._trace_drag_lock is not self:
@@ -1454,7 +1656,7 @@ class PickingWindow(qt.QMainWindow):
 			component_2_canvas.restore_region(self.component_2_background)
 			component_3_canvas.restore_region(self.component_3_background)
 
-			if self.shift_toggle:
+			if self.shift:
 				# Set rectangle values
 				comp_1_rectangle = Rectangle((xpress, ypress), dx, dy,
 										  edgecolor='red', fill=False)
@@ -1488,7 +1690,7 @@ class PickingWindow(qt.QMainWindow):
 
 	def _onClick(self, event):
 		# Check for shift modifier - this enables the draggable zoom
-		if self.shift_toggle:
+		if self.shift:
 			if self._trace_drag_lock is not None:
 				return
 
@@ -1510,12 +1712,12 @@ class PickingWindow(qt.QMainWindow):
 			adjusted_xdata = round(event.xdata / dt) * dt
 
 			# Left-clicking handles the window start time
-			if event.button == 1 and not self.ctrl_toggle:
+			if event.button == 1 and not self.ctrl:
 				# Set the window start line to be redrawn on move
 				self.w_beg_line = True
 
 				# Add the window beginning to the event stats
-				self.src.addData(data="wb", value=adjusted_xdata)
+				self.src.addData(info_type="window", value=adjusted_xdata, pick_type="wb")
 
 				# Make a vertical line artist
 				self.component_1_window_beg = component_1_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
@@ -1536,12 +1738,12 @@ class PickingWindow(qt.QMainWindow):
 				component_3_canvas.blit(component_3_canvas.ax.bbox)
 
 			# Middle-clicking handles the arrival pick time
-			if event.button == 2 or (event.button == 1 and self.ctrl_toggle):
+			if event.button == 2 or (event.button == 1 and self.ctrl):
 				# Set the pick line to be redrawn on move
 				self.pick_line = True
 
 				# Add the pick to the event stats
-				self.src.addData(data="pick", value=adjusted_xdata, pick_type=self.pick_type)
+				self.src.addData(info_type="pick", value=adjusted_xdata, pick_type=self.pick_type)
 
 				# Set pick time label
 				pick_time = self.src.starttime + adjusted_xdata
@@ -1574,7 +1776,7 @@ class PickingWindow(qt.QMainWindow):
 				self.w_end_line = True
 
 				# Add the window ending to the event stats
-				self.src.addData(data="we", value=adjusted_xdata)
+				self.src.addData(info_type="window", value=adjusted_xdata, pick_type="we")
 
 				# Make a vertical line artist
 				self.component_1_window_end = component_1_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
@@ -1595,7 +1797,7 @@ class PickingWindow(qt.QMainWindow):
 				component_3_canvas.blit(component_3_canvas.ax.bbox)
 
 	def _onRelease(self, event):
-		if self.shift_toggle:
+		if self.shift:
 		
 			if self._trace_drag_lock is not self:
 				return
@@ -1683,7 +1885,7 @@ class PickingWindow(qt.QMainWindow):
 			self.src.filterObspy(self.filt)
 
 		# Plot the traces
-		self.src.plotTraces(component_1_canvas.ax, component_2_canvas.ax, component_3_canvas.ax, lims=self.lims)
+		self.src.plotTraces([component_1_canvas.ax, component_2_canvas.ax, component_3_canvas.ax], lims=self.lims)
 
 		# Connect to each trace to grab the background once Qt has done resizing
 		component_1_canvas.mpl_connect('draw_event', self._component1DrawEvent)
@@ -1860,6 +2062,22 @@ class PickingWindow(qt.QMainWindow):
 	# ---------------------
 	# Plot actions handlers
 	# ---------------------
+	def rotateComponents(self):
+		if self.components == "ZNE":
+			# Switch component tracker
+			self.components = "ZRT"
+
+			# Rotate components
+			self.src.rotate(method="NE->RT")
+
+		elif self.components == "ZRT":
+			# Switch component tracker
+			self.components = "ZNE"
+
+			# Rotate components
+			self.src.rotate(method="RT->NE")
+
+		self.plotTraces(replot=True)
 
 	def toggleSpectrogram(self):
 		self.show_spectrogram = not self.show_spectrogram
@@ -1989,6 +2207,7 @@ class PickingWindow(qt.QMainWindow):
 		self.plotTraces()
 
 	# ---------------------
+
 
 if __name__ == "__main__":
 

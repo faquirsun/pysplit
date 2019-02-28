@@ -21,7 +21,7 @@ Creation date  ? $creation_date
 Archive path   ? $archive_path
 Archive type   ? $archive_type
 Archive format ? $archive_format
-Receiver file  ? $receiver_file
+Rec file       ? $rec_file
 Start date     ? $start_date
 End date       ? $end_date
 

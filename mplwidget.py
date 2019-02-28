@@ -6,7 +6,13 @@ from matplotlib.figure import Figure
 import cartopy.crs as ccrs
 
 class MplCanvas(FigureCanvas):
-	"""Class to represent the FigureCanvas widget"""
+	"""Class to represent the FigureCanvas widget
+
+	Attributes
+	----------
+	fig : matplotlib Figure object
+		Figure that contains the 
+	"""
 	def __init__(self):
 		# Setup Matplotlib Figure and Axis
 		self.fig = Figure()
@@ -47,6 +53,10 @@ class MplWidget(qt.QWidget):
 		qt.QWidget.__init__(self, parent)
 		# set the canvas to the Matplotlib widget
 		self.canvas = MplCanvas()
+
+		self.canvas.setFocusPolicy(QtCore.Qt.ClickFocus)
+		self.canvas.setFocus()
+
 		# create a vertical box layout
 		self.vbl = qt.QVBoxLayout()
 		# add mpl widget to vertical box

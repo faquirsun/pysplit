@@ -690,8 +690,8 @@ class TeleseismicCatalogue(Catalogue):
 							phase_dict[key].append(time)
 
 							dict1 = {"sourceid": src.sourceid,
-									 "receiverid": rec.name
-									 "traveltime": phase_dict
+									 "receiverid": rec.name,
+									 "traveltime": phase_dict,
 									 "waveform?": False}
 							rows_list.append(dict1)
 

@@ -362,19 +362,18 @@ class SeisPick(qt.QMainWindow):
 										   lat0=float(self.uiMinLatInput.text()),
 										   lat1=float(self.uiMaxLatInput.text()))
 
-			if self.uiReceiversCheckBox.isChecked():
+			if self.uiReceiversCheckBox.isChecked() and self.catalogue.catalogue_type == "local":
 				self.catalogue.plotReceivers(self.uiMapMpl)
 
 		else:
 			# Plot the sources
 			self.catalogue.plotGeographic(self.uiMapMpl)
 
-			# Plot the receivers
-			if self.uiReceiversCheckBox.isChecked():
-				self.catalogue.plotReceivers(self.uiMapMpl)
-
 			# Grab the latitude and longitude of the map and send to input options
 			if self.catalogue.catalogue_type == "local":
+				# Plot the receivers
+				if self.uiReceiversCheckBox.isChecked():
+					self.catalogue.plotReceivers(self.uiMapMpl)
 				self.uiMinLonInput.setText(str(f"{self.catalogue.lon0:.5f}"))
 				self.uiMaxLonInput.setText(str(f"{self.catalogue.lon1:.5f}"))
 				self.uiMinLatInput.setText(str(f"{self.catalogue.lat0:.5f}"))

@@ -33,6 +33,7 @@ import numpy as np
 import cartopy.crs as ccrs
 import pathlib
 import shutil
+import metainfo as psm
 
 class Catalogue(ABC):
 	"""
@@ -53,7 +54,7 @@ class Catalogue(ABC):
 
 	cmpaz  = {'N':0, 'Z':0, 'E':90}
 	cmpinc = {'N':90, 'Z':0, 'E':90}
-	src_cols = ['otime', 'lat', 'lon', 'dep', 'mag']
+	src_cols = ['otime', 'lat', 'lon', 'dep', 'mag', 'sourceid']
 	arr_cols = ['sourceid', 'receiver', 'traveltime', 'waveform?']
 
 	def __init__(self, new=False, **kwargs):
@@ -73,10 +74,10 @@ class Catalogue(ABC):
 		self.src_df = pd.DataFrame(columns=self.src_cols)
 		self.arr_df = pd.DataFrame(columns=self.arr_cols)
 
-		self.network = psm.Network(self.rec_file)
-
 		for key, value in kwargs.items():
 			setattr(self, key, value)
+
+		self.network = psm.Network(self.rec_file)
 
 		self.cat_dir = pathlib.Path(self.catalogue_path)
 		dirs = ["", "metafiles", "data", "tmp", "plots", "picks"]
@@ -327,12 +328,12 @@ class LocalCatalogue(Catalogue):
 				s_info = lines[1]
 				s_info = s_info.rstrip().split(",")
 				otime = UTCDateTime(s_info[0].replace(" ", "T"))
-				evlon = s_info[2]
-				evlat = s_info[3]
-				evdep = s_info[4]
-				evmag = "?"
+				lon = s_info[2]
+				lat = s_info[3]
+				dep = s_info[4]
+				mag = "?"
 
-				self.src_df.loc[idx] = [otime, evlat, evlon, evdep, evmag, idx]
+				self.src_df.loc[idx] = [otime, lat, lon, dep, mag, idx]
 
 				# Handle arrival DataFrame
 				arrival = glob.glob("{}/outputs/{}.stn".format(self.local_input, source[:-6]))
@@ -400,12 +401,12 @@ class LocalCatalogue(Catalogue):
 					otime  = UTCDateTime(evyear, evmonth, evday, evhour, evmin, evsec, evmsec)
 
 					# Get hypocentral location
-					evlat = float(line[9])
-					evlon = float(line[11])
-					evdep = float(line[13])
-					evmag = "?" #### ADD PROPER HANDLING FOR HYP FILES THAT HAVE MAGNITUDES IN
+					lat = float(line[9])
+					lon = float(line[11])
+					dep = float(line[13])
+					mag = "?" #### ADD PROPER HANDLING FOR HYP FILES THAT HAVE MAGNITUDES IN
 
-					self.src_df.loc[i] = [otime, evlat, evlon, evdep, evmag, i]
+					self.src_df.loc[i] = [otime, lat, lon, dep, mag, i]
 
 			else:
 				print("Please provide a .hyp file.")
@@ -444,9 +445,9 @@ class LocalCatalogue(Catalogue):
 			# The arrival file simply needs to contain the origin time
 			# The waveform script will give a +/- 60 second window
 			# around this
-			self.arr_df = pd.DataFrame(index=np.arange(0, len(self.rec_df) * len(sources_df)), columns=self.arr_cols)
+			self.arr_df = pd.DataFrame(index=np.arange(0, len(self.network.receivers) * len(sources_df)), columns=self.arr_cols)
 			for idx, source in sources_df.iterrows():
-				for jdx, receiver in self.rec_df.iterrows():
+				for jdx, receiver in self.network.receivers.iterrows():
 					# Want to check if the receiver was available at the time of the source
 					otime = UTCDateTime(source["otime"])
 					stdp  = UTCDateTime(receiver["st_dep"])
@@ -506,47 +507,48 @@ class LocalCatalogue(Catalogue):
 	def plotGeographic(self, map_widget, lims=None):
 
 		# Find appropriate geographical region
-		lons = self.src_df.evlon.values
-		lats = self.src_df.evlat.values
+		lons = self.src_df.lon.values
+		lats = self.src_df.lat.values
+		sids = self.src_df.sourceid.values
 
 		if lims == None: 
 			londiff = (lons.max() - lons.min()) * 0.1
 			latdiff = (lats.max() - lats.min()) * 0.1
-			lon0 = lons.min() - londiff
-			lon1 = lons.max() + londiff
-			lat0 = lats.min() - latdiff
-			lat1 = lats.max() + latdiff
+			self.lon0 = lons.min() - londiff
+			self.lon1 = lons.max() + londiff
+			self.lat0 = lats.min() - latdiff
+			self.lat1 = lats.max() + latdiff
 
 		else:
-			lon0 = lims["lon0"]
-			lon1 = lims["lon1"]
-			lat0 = lims["lat0"]
-			lat1 = lims["lat1"]
+			self.lon0 = lims["lon0"]
+			self.lon1 = lims["lon1"]
+			self.lat0 = lims["lat0"]
+			self.lat1 = lims["lat1"]
 			
-		self.map = map_widget.canvas._localMap(lon0=lon0, lat0=lat0, lon1=lon1, lat1=lat1)
+		self.map = map_widget.canvas._localMap(lon0=self.lon0, lat0=self.lat0, lon1=self.lon1, lat1=self.lat1)
 
 		# Set plot details (axes labels etc)
 		self.map.set_xlabel("Longitude, degrees", fontsize=10)
 		self.map.set_ylabel("Latitude, degrees", fontsize=10)
-		self.map.set_extent([lon0, lon1, lat0, lat1], ccrs.PlateCarree())
+		self.map.set_extent([self.lon0, self.lon1, self.lat0, self.lat1], ccrs.PlateCarree())
 
 		# Try rescaling the image now
 		self.map.set_aspect('auto')
 
 		tolerance = 10
 		for i in range(len(lons)):
-			self.map.scatter(lons[i], lats[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="SOURCE: {}".format(self.src_df.sourceid[i]))
+			self.map.scatter(lons[i], lats[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="SOURCE: {}".format(sids[i]))
 
 	def plotReceivers(self, map_widget):
-		lons = self.rec_df.lon.values
-		lats = self.rec_df.lat.values
+		lons = self.network.receivers.lon.values
+		lats = self.network.receivers.lat.values
 		tolerance = 10
 		for i in range(len(lons)):
-			self.map.scatter(lons[i], lats[i], 75, marker="v", color="green", picker=tolerance, zorder=15, label="REC: {}".format(self.rec_df.receiver_name[i]))
+			self.map.scatter(lons[i], lats[i], 75, marker="v", color="green", picker=tolerance, zorder=15, label="REC: {}".format(self.network.receivers.name[i]))
 
 	def _lookupReceiverID(self, receiver):
 		# Returns the receiver ID for given receiver name
-		return self.rec_df.query('receiver_name == @receiver')["receiverid"].iloc[0]
+		return self.network.receivers.query('name == @receiver')["receiverid"].iloc[0]
 
 
 class TeleseismicCatalogue(Catalogue):
@@ -621,18 +623,21 @@ class TeleseismicCatalogue(Catalogue):
 			try:
 				source = sources[i]
 				otime = source.preferred_origin().get('time')
-				evlat = source.preferred_origin().get('latitude')
-				evlon = source.preferred_origin().get('longitude')
-				evdep = source.preferred_origin().get('depth') / 1000.0
-				evmag = source.preferred_magnitude().get('mag')
+				lat = source.preferred_origin().get('latitude')
+				lon = source.preferred_origin().get('longitude')
+				dep = source.preferred_origin().get('depth') / 1000.0
+				mag = source.preferred_magnitude().get('mag')
 
-				self.src_df.loc[i] = [otime, evlat, evlon, evdep, evmag, i]
+				# sourceid = ### Come up with file naming format
+				sourceid = i
+
+				self.src_df.loc[i] = [otime, lat, lon, dep, mag, sourceid]
 
 			except TypeError:
 				print("No recorded depth for source:")
 				print("     Origin time: {}".format(otime))
-				print("        Latitude: {}".format(evlat))
-				print("       Longitude: {}".format(evlon))
+				print("        Latitude: {}".format(lat))
+				print("       Longitude: {}".format(lon))
 				print("Removed from catalogue.")
 
 				self.src_df.loc[i] = ["-", "-", "-", "-", "-", i]
@@ -686,8 +691,8 @@ class TeleseismicCatalogue(Catalogue):
 
 	def plotGeographic(self, map_widget=None):
 		network_centre = self.network.centre
-		lons = self.src_df.evlon.values
-		lats = self.src_df.evlat.values
+		lons = self.src_df.lon.values
+		lats = self.src_df.lat.values
 
 		if not map_widget:
 			pass

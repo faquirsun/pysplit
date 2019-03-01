@@ -4,7 +4,7 @@
 This module requires that 'numpy', 'pandas', 'matplotlib' and 'PyQT5' are
 installed in your Python environment
 
-The back-end is found within the sourcereceiver and catalogue modules.
+The back-end is found within the seispick.metainfo and seispick.catalogue modules.
 
 Author: Hemmelig
 """
@@ -22,8 +22,8 @@ import glob
 import os
 import re
 
+import metainfo as psm
 import catalogue as cat
-import sourcereceiver as spsr
 
 def atoi(text):
     return int(text) if text.isdigit() else text
@@ -37,9 +37,11 @@ def natural_keys(text):
     return [ atoi(c) for c in re.split('(\d+)', text) ]
 
 class SeisPick(qt.QMainWindow):
-	"""SeisPick class
+	"""
+	SeisPick class
 
-	Base class that connects PyQT5 SeisPick GUI to the back-end system of classes
+	Base class that connects the PyQt5 SeisPick GUI to the back-end system of 
+	classes
 
 	Attributes
 	----------
@@ -51,12 +53,9 @@ class SeisPick(qt.QMainWindow):
 	----------
 	"""
 
-	# ------------------------------
-	# Class initialisation functions
-	# ------------------------------
-
 	def __init__(self):
-		"""Class initialisation
+		"""
+		Class initialisation
 
 		"""
 		super().__init__()
@@ -292,7 +291,7 @@ class SeisPick(qt.QMainWindow):
 	def _populateReceiverList(self):
 		# Populate the receiver list
 		model = QtGui.QStandardItemModel(self.uiReceiversListView)
-		for receiver in self.catalogue.rec_df.receiver_name.values:
+		for receiver in self.catalogue.network.receivers.name.values:
 			item = QtGui.QStandardItem(receiver)
 			model.appendRow(item)
 		self.uiReceiversListView.setModel(model)
@@ -443,7 +442,7 @@ class SeisPick(qt.QMainWindow):
 	    # If the data point selected is a receiver
 	    if "REC" in label:
 	    	rec = label.split(": ")[1]
-	    	self.receiver = spsr.Receiver(self.catalogue.rec_df.query('receiver_name == @rec'))
+	    	self.receiver = psm.Receiver(self.catalogue.network.receivers.query('name == @rec'))
 	    	self._updateReceiverInformation()
 
 	    	# If in receiver pick mode, open a Picking Window
@@ -453,7 +452,7 @@ class SeisPick(qt.QMainWindow):
 	    # If the data point selected is an source
 	    if "SOURCE" in label:
 	    	src = label.split(": ")[1]
-	    	self.source = spsr.Source(self.catalogue.src_df.query('sourceid == @src'))
+	    	self.source = psm.Source(self.catalogue.src_df.query('sourceid == @src'))
 	    	self._updateSourceInformation()
 
 	    	# If in source pick mode, open a Picking Window
@@ -561,7 +560,7 @@ class SeisPick(qt.QMainWindow):
 		receiver = self.uiReceiversListView.model().data(index)
 
 		# Lookup receiver information and create Receiver object
-		self.receiver = spsr.Receiver(self.catalogue.rec_df.query('receiver_name == @receiver'))
+		self.receiver = psm.Receiver(self.catalogue.network.receivers.query('name == @receiver'))
 		self.list_receiver = self.receiver
 
 		# Load receiver information and print to display
@@ -583,7 +582,7 @@ class SeisPick(qt.QMainWindow):
 		source = self.uiSourcesListView.model().data(index).split(" ")[1]
 
 		# Look up source information and create Source object
-		self.source = spsr.Source(self.catalogue.src_df.query('sourceid == @source'))
+		self.source = psm.Source(self.catalogue.src_df.query('sourceid == @source'))
 
 		# Load source information and print to display
 		self._updateSourceInformation()
@@ -596,8 +595,8 @@ class SeisPick(qt.QMainWindow):
 		self.uiReceiverLonDisplay.setText(f"{self.receiver.longitude:.4f}")
 		self.uiReceiverLatDisplay.setText(f"{self.receiver.latitude:.4f}")
 		self.uiReceiverElevDisplay.setText(f"{self.receiver.elevation:.4f}")
-		self.uiReceiverDepDisplay.setText(self.receiver.start_deployment.isoformat().split("T")[0])
-		self.uiReceiverRetDisplay.setText(self.receiver.end_deployment.isoformat().split("T")[0])
+		self.uiReceiverDepDisplay.setText(self.receiver.deployment.isoformat().split("T")[0])
+		self.uiReceiverRetDisplay.setText(self.receiver.retrieval.isoformat().split("T")[0])
 
 	def _updateSourceInformation(self):
 		self.uiOriginDateDisplay.setText(self.source.otime.isoformat().split("T")[0])
@@ -1342,8 +1341,8 @@ class SplittingAnalysisWindow(qt.QMainWindow):
 		self.uiReceiverLonDisplay.setText(f"{self.event.receiver.longitude:.4f}")
 		self.uiReceiverLatDisplay.setText(f"{self.event.receiver.latitude:.4f}")
 		self.uiReceiverElevDisplay.setText(f"{self.event.receiver.elevation:.4f}")
-		self.uiReceiverDepDisplay.setText(self.event.receiver.start_deployment.isoformat().split("T")[0])
-		self.uiReceiverRetDisplay.setText(self.event.receiver.end_deployment.isoformat().split("T")[0])
+		self.uiReceiverDepDisplay.setText(self.event.receiver.deployment.isoformat().split("T")[0])
+		self.uiReceiverRetDisplay.setText(self.event.receiver.retrieval.isoformat().split("T")[0])
 
 	def _updateReceiverInformation(self):
 		self.uiOriginDateDisplay.setText(self.event.source.otime.isoformat().split("T")[0])
@@ -1407,7 +1406,6 @@ class PickingWindow(qt.QMainWindow):
 		# Set default pick type and line color
 		self.pick_type = "P"
 		self.pick_line_color = "red"
-		self.pick_polarity = ""
 
 		# Initialise pick tracker
 		self.pick_lines = {}
@@ -1461,7 +1459,7 @@ class PickingWindow(qt.QMainWindow):
 			self.counter = 0
 
 			try:
-				self.source = spsr.Source(self.sources[self.counter])
+				self.source = psm.Source(self.sources[self.counter])
 			except IndexError:
 				qt.QMessageBox.about(self, "Error!", "There are no sources with recorded arrivals at this receiver.")
 				return
@@ -1539,35 +1537,35 @@ class PickingWindow(qt.QMainWindow):
 	
 	def plotconnect(self):
 		# Connect each canvas to track motion - this will create a 
-		self.cidzcompmove = self.uiComponent1Mpl.canvas.mpl_connect('motion_notify_event', self._onMove)
-		self.cidncompmove = self.uiComponent2Mpl.canvas.mpl_connect('motion_notify_event', self._onMove)
-		self.cidecompmove = self.uiComponent3Mpl.canvas.mpl_connect('motion_notify_event', self._onMove)
+		self.c1_moveid = self.uiComponent1Mpl.canvas.mpl_connect('motion_notify_event', self._onMove)
+		self.c2_moveid = self.uiComponent2Mpl.canvas.mpl_connect('motion_notify_event', self._onMove)
+		self.c3_moveid = self.uiComponent3Mpl.canvas.mpl_connect('motion_notify_event', self._onMove)
 
 		# Connect to clicks
-		self.cidzcompclick = self.uiComponent1Mpl.canvas.mpl_connect('button_press_event', self._onClick)
-		self.cidncompclick = self.uiComponent2Mpl.canvas.mpl_connect('button_press_event', self._onClick)
-		self.cidecompclick = self.uiComponent3Mpl.canvas.mpl_connect('button_press_event', self._onClick)
+		self.c1_clickid = self.uiComponent1Mpl.canvas.mpl_connect('button_press_event', self._onClick)
+		self.c2_clickid = self.uiComponent2Mpl.canvas.mpl_connect('button_press_event', self._onClick)
+		self.c3_clickid = self.uiComponent3Mpl.canvas.mpl_connect('button_press_event', self._onClick)
 
 		# Connect to releases
-		self.cidzcomprelease = self.uiComponent1Mpl.canvas.mpl_connect('button_release_event', self._onRelease)
-		self.cidncomprelease = self.uiComponent2Mpl.canvas.mpl_connect('button_release_event', self._onRelease)
-		self.cidecomprelease = self.uiComponent3Mpl.canvas.mpl_connect('button_release_event', self._onRelease)
+		self.c1_releaseid = self.uiComponent1Mpl.canvas.mpl_connect('button_release_event', self._onRelease)
+		self.c2_releaseid = self.uiComponent2Mpl.canvas.mpl_connect('button_release_event', self._onRelease)
+		self.c3_releaseid = self.uiComponent3Mpl.canvas.mpl_connect('button_release_event', self._onRelease)
 
 	def plotdisconnect(self):
 		# Disconnect each canvas to track motion - this will create a 
-		self.uiComponent1Mpl.canvas.mpl_disconnect(self.cidzcompmove)
-		self.uiComponent2Mpl.canvas.mpl_disconnect(self.cidncompmove)
-		self.uiComponent3Mpl.canvas.mpl_disconnect(self.cidecompmove)
+		self.uiComponent1Mpl.canvas.mpl_disconnect(self.c1_moveid)
+		self.uiComponent2Mpl.canvas.mpl_disconnect(self.c2_moveid)
+		self.uiComponent3Mpl.canvas.mpl_disconnect(self.c3_moveid)
 
 		# Disconnect to clicks
-		self.uiComponent1Mpl.canvas.mpl_disconnect(self.cidzcompclick)
-		self.uiComponent2Mpl.canvas.mpl_disconnect(self.cidncompclick)
-		self.uiComponent3Mpl.canvas.mpl_disconnect(self.cidecompclick)
+		self.uiComponent1Mpl.canvas.mpl_disconnect(self.c1_clickid)
+		self.uiComponent2Mpl.canvas.mpl_disconnect(self.c2_clickid)
+		self.uiComponent3Mpl.canvas.mpl_disconnect(self.c3_clickid)
 
 		# Disconnect to releases
-		self.uiComponent1Mpl.canvas.mpl_disconnect(self.cidzcomprelease)
-		self.uiComponent2Mpl.canvas.mpl_disconnect(self.cidncomprelease)
-		self.uiComponent3Mpl.canvas.mpl_disconnect(self.cidecomprelease)
+		self.uiComponent1Mpl.canvas.mpl_disconnect(self.c1_releaseid)
+		self.uiComponent2Mpl.canvas.mpl_disconnect(self.c2_releaseid)
+		self.uiComponent3Mpl.canvas.mpl_disconnect(self.c3_releaseid)
 	
 	def saveTrace(self):
 		if self.src != None:
@@ -1577,41 +1575,21 @@ class PickingWindow(qt.QMainWindow):
 			return
 
 	def keyPressEvent(self, event):
-		# Toggle Ctrl Modifier on
 		if event.key() == Qt.Key_Control:
 			self.ctrl = True
 
-		# Toggle Shift Modifier on
 		if event.key() == Qt.Key_Shift:
 			self.shift = True
 
-		# Up polarity indicator
-		if event.key() == Qt.Key_U:
+		if event.key() == Qt.Key_U or event.key() == Qt.Key_D:
 			if not self.pick_line:
 				return
 			else:
-				# Set pick polarity
-				self.pick_polarity = "U"
-
-				# Update label
-				self.uiPolarityDisplay.setText(self.pick_polarity)
-
-				# Add to source
-				self.src.addData(info_type="polarity", value=self.pick_polarity, pick_type=self.pick_type)
-
-		# Down polarity indicator
-		if event.key() == Qt.Key_D:
-			if not self.pick_line:
-				return
-			else:
-				# Set pick polarity
-				self.pick_polarity = "D"
-
-				# Update label
-				self.uiPolarityDisplay.setText(self.pick_polarity)
-
-				# Add to source
-				self.src.addData(info_type="polarity", value=self.pick_polarity, pick_type=self.pick_type)
+				pick_polarity = chr(event.key())
+				self.uiPolarityDisplay.setText(pick_polarity)
+				self.src.addPick(info_type="polarity", 
+								 value=pick_polarity, 
+								 pick_type=self.pick_type)
 
 	def keyReleaseEvent(self, event):
 		# Toggle Ctrl Modifier off
@@ -1624,11 +1602,11 @@ class PickingWindow(qt.QMainWindow):
 
 	def _onMove(self, event):
 		# Temp variables for accessing canvases
-		component_1_canvas = self.uiComponent1Mpl.canvas
-		component_2_canvas = self.uiComponent2Mpl.canvas
-		component_3_canvas = self.uiComponent3Mpl.canvas
+		c1_canvas = self.uiComponent1Mpl.canvas
+		c2_canvas = self.uiComponent2Mpl.canvas
+		c3_canvas = self.uiComponent3Mpl.canvas
 
-		if event.inaxes is component_1_canvas.ax or component_2_canvas.ax or component_3_canvas.ax:
+		if event.inaxes is c1_canvas.ax or c2_canvas.ax or c3_canvas.ax:
 			if self.shift:
 				if not self._zoom_click:
 					return
@@ -1647,46 +1625,46 @@ class PickingWindow(qt.QMainWindow):
 				x = event.xdata
 
 				# Set the x value of the cursor to the current position
-				self.component_1_cursor.set_data([x, x], self.component_1_y_data)
-				self.component_2_cursor.set_data([x, x], self.component_2_y_data)
-				self.component_3_cursor.set_data([x, x], self.component_3_y_data)
+				self.c1_cursor.set_data([x, x], self.c1_y)
+				self.c2_cursor.set_data([x, x], self.c2_y)
+				self.c3_cursor.set_data([x, x], self.c3_y)
 
 			# restore the background region
-			component_1_canvas.restore_region(self.component_1_background)
-			component_2_canvas.restore_region(self.component_2_background)
-			component_3_canvas.restore_region(self.component_3_background)
+			c1_canvas.restore_region(self.c1_bg)
+			c2_canvas.restore_region(self.c2_bg)
+			c3_canvas.restore_region(self.c3_bg)
 
 			if self.shift:
 				# Set rectangle values
-				comp_1_rectangle = Rectangle((xpress, ypress), dx, dy,
+				c1_rect = Rectangle((xpress, ypress), dx, dy,
 										  edgecolor='red', fill=False)
-				comp_2_rectangle = Rectangle((xpress, ypress), dx, dy,
+				c2_rect = Rectangle((xpress, ypress), dx, dy,
 										  edgecolor='red', fill=False)
-				comp_3_rectangle = Rectangle((xpress, ypress), dx, dy,
+				c3_rect = Rectangle((xpress, ypress), dx, dy,
 										  edgecolor='red', fill=False)
 				# Add the rectangle patch to each canvas
-				component_1_canvas.ax.add_patch(comp_1_rectangle)
-				component_2_canvas.ax.add_patch(comp_2_rectangle)
-				component_3_canvas.ax.add_patch(comp_3_rectangle)
+				c1_canvas.ax.add_patch(c1_rect)
+				c2_canvas.ax.add_patch(c2_rect)
+				c3_canvas.ax.add_patch(c3_rect)
 
 				# Redraw just the rectangle
-				component_1_canvas.ax.draw_artist(comp_1_rectangle)
-				component_2_canvas.ax.draw_artist(comp_2_rectangle)
-				component_3_canvas.ax.draw_artist(comp_3_rectangle)
+				c1_canvas.ax.draw_artist(c1_rect)
+				c2_canvas.ax.draw_artist(c2_rect)
+				c3_canvas.ax.draw_artist(c3_rect)
 
 			else:
 				# Redraw just the current cursor
-				component_1_canvas.ax.draw_artist(self.component_1_cursor)
-				component_2_canvas.ax.draw_artist(self.component_2_cursor)
-				component_3_canvas.ax.draw_artist(self.component_3_cursor)
+				c1_canvas.ax.draw_artist(self.c1_cursor)
+				c2_canvas.ax.draw_artist(self.c2_cursor)
+				c3_canvas.ax.draw_artist(self.c3_cursor)
 
 			# Plot any lines that are currently being stored
 			self._replotLines()				
 
 			# blit just the redrawn area
-			component_1_canvas.blit(component_1_canvas.ax.bbox)
-			component_2_canvas.blit(component_2_canvas.ax.bbox)
-			component_3_canvas.blit(component_3_canvas.ax.bbox)
+			c1_canvas.blit(c1_canvas.ax.bbox)
+			c2_canvas.blit(c2_canvas.ax.bbox)
+			c3_canvas.blit(c3_canvas.ax.bbox)
 
 	def _onClick(self, event):
 		# Check for shift modifier - this enables the draggable zoom
@@ -1703,9 +1681,9 @@ class PickingWindow(qt.QMainWindow):
 			self.trace_click = xpress, ypress
 
 		else:
-			component_1_canvas = self.uiComponent1Mpl.canvas
-			component_2_canvas = self.uiComponent2Mpl.canvas
-			component_3_canvas = self.uiComponent3Mpl.canvas
+			c1_canvas = self.uiComponent1Mpl.canvas
+			c2_canvas = self.uiComponent2Mpl.canvas
+			c3_canvas = self.uiComponent3Mpl.canvas
 
 			dt = self.src.delta
 
@@ -1714,28 +1692,28 @@ class PickingWindow(qt.QMainWindow):
 			# Left-clicking handles the window start time
 			if event.button == 1 and not self.ctrl:
 				# Set the window start line to be redrawn on move
-				self.w_beg_line = True
+				self.wbeg_vline = True
 
 				# Add the window beginning to the event stats
-				self.src.addData(info_type="window", value=adjusted_xdata, pick_type="wb")
+				self.src.addPick(info_type="window", value=adjusted_xdata, pick_type="wb")
 
 				# Make a vertical line artist
-				self.component_1_window_beg = component_1_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
-				self.component_2_window_beg = component_2_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
-				self.component_3_window_beg = component_3_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
+				self.c1_wbeg = c1_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
+				self.c2_wbeg = c2_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
+				self.c3_wbeg = c3_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
 
 				# Restore the background region
-				component_1_canvas.restore_region(self.component_1_background)
-				component_2_canvas.restore_region(self.component_2_background)
-				component_3_canvas.restore_region(self.component_3_background)
+				c1_canvas.restore_region(self.c1_bg)
+				c2_canvas.restore_region(self.c2_bg)
+				c3_canvas.restore_region(self.c3_bg)
 
 				# Plot any lines that are currently being stored
 				self._replotLines()
 
 				# blit the redrawn area
-				component_1_canvas.blit(component_1_canvas.ax.bbox)
-				component_2_canvas.blit(component_2_canvas.ax.bbox)
-				component_3_canvas.blit(component_3_canvas.ax.bbox)
+				c1_canvas.blit(c1_canvas.ax.bbox)
+				c2_canvas.blit(c2_canvas.ax.bbox)
+				c3_canvas.blit(c3_canvas.ax.bbox)
 
 			# Middle-clicking handles the arrival pick time
 			if event.button == 2 or (event.button == 1 and self.ctrl):
@@ -1743,7 +1721,7 @@ class PickingWindow(qt.QMainWindow):
 				self.pick_line = True
 
 				# Add the pick to the event stats
-				self.src.addData(info_type="pick", value=adjusted_xdata, pick_type=self.pick_type)
+				self.src.addPick(info_type="pick", value=adjusted_xdata, pick_type=self.pick_type)
 
 				# Set pick time label
 				pick_time = self.src.starttime + adjusted_xdata
@@ -1751,24 +1729,24 @@ class PickingWindow(qt.QMainWindow):
 				self.uiPhaseDisplay.setText(self.pick_type)
 
 				# Make a vertical line artist
-				self.comp_1_pick = component_1_canvas.ax.axvline(adjusted_xdata, linewidth=1, color=self.pick_line_color, animated=True)
-				self.comp_2_pick = component_2_canvas.ax.axvline(adjusted_xdata, linewidth=1, color=self.pick_line_color, animated=True)
-				self.comp_3_pick = component_3_canvas.ax.axvline(adjusted_xdata, linewidth=1, color=self.pick_line_color, animated=True)
+				self.comp_1_pick = c1_canvas.ax.axvline(adjusted_xdata, linewidth=1, color=self.pick_line_color, animated=True)
+				self.comp_2_pick = c2_canvas.ax.axvline(adjusted_xdata, linewidth=1, color=self.pick_line_color, animated=True)
+				self.comp_3_pick = c3_canvas.ax.axvline(adjusted_xdata, linewidth=1, color=self.pick_line_color, animated=True)
 
 				self.pick_lines[self.pick_type] = [self.comp_1_pick, self.comp_2_pick, self.comp_3_pick]
 
 				# Restore the background region
-				component_1_canvas.restore_region(self.component_1_background)
-				component_2_canvas.restore_region(self.component_2_background)
-				component_3_canvas.restore_region(self.component_3_background)
+				c1_canvas.restore_region(self.c1_bg)
+				c2_canvas.restore_region(self.c2_bg)
+				c3_canvas.restore_region(self.c3_bg)
 
 				# Plot any lines that are currently being stored
 				self._replotLines()
 
 				# blit the redrawn area
-				component_1_canvas.blit(component_1_canvas.ax.bbox)
-				component_2_canvas.blit(component_2_canvas.ax.bbox)
-				component_3_canvas.blit(component_3_canvas.ax.bbox)
+				c1_canvas.blit(c1_canvas.ax.bbox)
+				c2_canvas.blit(c2_canvas.ax.bbox)
+				c3_canvas.blit(c3_canvas.ax.bbox)
 
 			# Right-clicking handles the window end time
 			if event.button == 3:
@@ -1776,25 +1754,25 @@ class PickingWindow(qt.QMainWindow):
 				self.w_end_line = True
 
 				# Add the window ending to the event stats
-				self.src.addData(info_type="window", value=adjusted_xdata, pick_type="we")
+				self.src.addPick(info_type="window", value=adjusted_xdata, pick_type="we")
 
 				# Make a vertical line artist
-				self.component_1_window_end = component_1_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
-				self.component_2_window_end = component_2_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
-				self.component_3_window_end = component_3_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
+				self.c1_wend = c1_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
+				self.c2_wend = c2_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
+				self.c3_wend = c3_canvas.ax.axvline(adjusted_xdata, linewidth=1, color="green", animated=True)
 
 				# Restore the background region
-				component_1_canvas.restore_region(self.component_1_background)
-				component_2_canvas.restore_region(self.component_2_background)
-				component_3_canvas.restore_region(self.component_3_background)
+				c1_canvas.restore_region(self.c1_bg)
+				c2_canvas.restore_region(self.c2_bg)
+				c3_canvas.restore_region(self.c3_bg)
 
 				# Plot any lines that are currently being stored
 				self._replotLines()
 
 				# blit the redrawn area
-				component_1_canvas.blit(component_1_canvas.ax.bbox)
-				component_2_canvas.blit(component_2_canvas.ax.bbox)
-				component_3_canvas.blit(component_3_canvas.ax.bbox)
+				c1_canvas.blit(c1_canvas.ax.bbox)
+				c2_canvas.blit(c2_canvas.ax.bbox)
+				c3_canvas.blit(c3_canvas.ax.bbox)
 
 	def _onRelease(self, event):
 		if self.shift:
@@ -1829,19 +1807,19 @@ class PickingWindow(qt.QMainWindow):
 
 	def plotTraces(self, replot=False):
 
-		component_1_canvas = self.uiComponent1Mpl.canvas
-		component_2_canvas = self.uiComponent2Mpl.canvas
-		component_3_canvas = self.uiComponent3Mpl.canvas
+		c1_canvas = self.uiComponent1Mpl.canvas
+		c2_canvas = self.uiComponent2Mpl.canvas
+		c3_canvas = self.uiComponent3Mpl.canvas
 
 		# Clear the canvases
-		component_1_canvas.ax.clear()
-		component_2_canvas.ax.clear()
-		component_3_canvas.ax.clear()
+		c1_canvas.ax.clear()
+		c2_canvas.ax.clear()
+		c3_canvas.ax.clear()
 
 		# Create background variables
-		self.component_1_background = None
-		self.component_2_background = None
-		self.component_3_background = None
+		self.c1_bg = None
+		self.c2_bg = None
+		self.c3_bg = None
 
 		# Create the lock and click variables
 		self._zoom_click      = False
@@ -1857,25 +1835,25 @@ class PickingWindow(qt.QMainWindow):
 			self.filt = self.default_filt
 
 			# Make the window and pick lines not show on move
-			self.w_beg_line = False
+			self.wbeg_vline = False
 			self.pick_line  = False
 			self.w_end_line = False
 
 			# Create an instance of the Source class
-			self.src = spsr.SourceReceiverPair(self.catalogue_path, self.source, self.receiver)
+			self.src = psm.SourceReceiverPair(self.catalogue_path, self.source, self.receiver)
 
 			# Look up any picks and make vertical lines
 			for pick, data in self.src.picks.items():
+				print(pick)
 				pick_time = data["rtime"]
-				component_1_canvas.ax.axvline(pick_time, linewidth=1, color="gray")
-				component_2_canvas.ax.axvline(pick_time, linewidth=1, color="gray")
-				component_3_canvas.ax.axvline(pick_time, linewidth=1, color="gray")
+				if pick == "we" or pick == "wb":
+					color = "green"
+				else:
+					color = "gray"
 
-			for pick, data in self.src.window.items():
-				window_time = data
-				component_1_canvas.ax.axvline(window_time, linewidth=1, color="blue")
-				component_2_canvas.ax.axvline(window_time, linewidth=1, color="blue")
-				component_3_canvas.ax.axvline(window_time, linewidth=1, color="blue")
+				c1_canvas.ax.axvline(pick_time, linewidth=1, color=color)
+				c2_canvas.ax.axvline(pick_time, linewidth=1, color=color)
+				c3_canvas.ax.axvline(pick_time, linewidth=1, color=color)
 
 		else:
 			self._replotLines()
@@ -1885,72 +1863,72 @@ class PickingWindow(qt.QMainWindow):
 			self.src.filterObspy(self.filt)
 
 		# Plot the traces
-		self.src.plotTraces([component_1_canvas.ax, component_2_canvas.ax, component_3_canvas.ax], lims=self.lims)
+		self.src.plotTraces([c1_canvas.ax, c2_canvas.ax, c3_canvas.ax], lims=self.lims)
 
 		# Connect to each trace to grab the background once Qt has done resizing
-		component_1_canvas.mpl_connect('draw_event', self._component1DrawEvent)
-		component_2_canvas.mpl_connect('draw_event', self._component2DrawEvent)
-		component_3_canvas.mpl_connect('draw_event', self._component3DrawEvent)
+		c1_canvas.mpl_connect('draw_event', self._c1DrawEvent)
+		c2_canvas.mpl_connect('draw_event', self._c2DrawEvent)
+		c3_canvas.mpl_connect('draw_event', self._c3DrawEvent)
 
 		# Draw when Qt has done all resizing
-		component_1_canvas.draw_idle()
-		component_2_canvas.draw_idle()
-		component_3_canvas.draw_idle()
+		c1_canvas.draw_idle()
+		c2_canvas.draw_idle()
+		c3_canvas.draw_idle()
 
 		# Initialise the cursor to track mouse position on the axes
-		self.component_1_cursor = component_1_canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
-		_, self.component_1_y_data = self.component_1_cursor.get_data()
-		self.component_2_cursor = component_2_canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
-		_, self.component_2_y_data = self.component_2_cursor.get_data()
-		self.component_3_cursor = component_3_canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
-		_, self.component_3_y_data = self.component_3_cursor.get_data()
+		self.c1_cursor = c1_canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
+		_, self.c1_y = self.c1_cursor.get_data()
+		self.c2_cursor = c2_canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
+		_, self.c2_y = self.c2_cursor.get_data()
+		self.c3_cursor = c3_canvas.ax.axvline(5, linewidth=1, color='0.5', animated=True)
+		_, self.c3_y = self.c3_cursor.get_data()
 
 		self.plotconnect()
 
-	def _component1DrawEvent(self, event):
+	def _c1DrawEvent(self, event):
 		# Grab the trace background when it is drawn
-		self.component_1_background = event.canvas.copy_from_bbox(event.canvas.ax.bbox)
+		self.c1_bg = event.canvas.copy_from_bbox(event.canvas.ax.bbox)
 
-	def _component2DrawEvent(self, event):
+	def _c2DrawEvent(self, event):
 		# Grab the trace background when it is drawn
-		self.component_2_background = event.canvas.copy_from_bbox(event.canvas.ax.bbox)
+		self.c2_bg = event.canvas.copy_from_bbox(event.canvas.ax.bbox)
 
-	def _component3DrawEvent(self, event):
+	def _c3DrawEvent(self, event):
 		# Grab the trace background when it is drawn
-		self.component_3_background = event.canvas.copy_from_bbox(event.canvas.ax.bbox)
+		self.c3_bg = event.canvas.copy_from_bbox(event.canvas.ax.bbox)
 
 	def _replotLines(self):
 		# For clarity
-		component_1_canvas = self.uiComponent1Mpl.canvas
-		component_2_canvas = self.uiComponent2Mpl.canvas
-		component_3_canvas = self.uiComponent3Mpl.canvas
+		c1_canvas = self.uiComponent1Mpl.canvas
+		c2_canvas = self.uiComponent2Mpl.canvas
+		c3_canvas = self.uiComponent3Mpl.canvas
 
-		if self.w_beg_line:
+		if self.wbeg_vline:
 			# Redraw the window line
-			component_1_canvas.ax.draw_artist(self.component_1_window_beg)
-			component_2_canvas.ax.draw_artist(self.component_2_window_beg)
-			component_3_canvas.ax.draw_artist(self.component_3_window_beg)
+			c1_canvas.ax.draw_artist(self.c1_wbeg)
+			c2_canvas.ax.draw_artist(self.c2_wbeg)
+			c3_canvas.ax.draw_artist(self.c3_wbeg)
 
 		if self.pick_line:
 			# Redraw the pick lines
 			for phase, pick_lines in self.pick_lines.items():
-				component_1_canvas.ax.draw_artist(pick_lines[0])
-				component_2_canvas.ax.draw_artist(pick_lines[1])
-				component_3_canvas.ax.draw_artist(pick_lines[2])
+				c1_canvas.ax.draw_artist(pick_lines[0])
+				c2_canvas.ax.draw_artist(pick_lines[1])
+				c3_canvas.ax.draw_artist(pick_lines[2])
 
 		if self.w_end_line:
 			# Redraw the window line
-			component_1_canvas.ax.draw_artist(self.component_1_window_end)
-			component_2_canvas.ax.draw_artist(self.component_2_window_end)
-			component_3_canvas.ax.draw_artist(self.component_3_window_end)
+			c1_canvas.ax.draw_artist(self.c1_wend)
+			c2_canvas.ax.draw_artist(self.c2_wend)
+			c3_canvas.ax.draw_artist(self.c3_wend)
 
 	def _updateReceiverInformation(self):
 		self.uiReceiverNameDisplay.setText(self.receiver.station)
 		self.uiReceiverLonDisplay.setText(f"{self.receiver.longitude:.4f}")
 		self.uiReceiverLatDisplay.setText(f"{self.receiver.latitude:.4f}")
 		self.uiReceiverElevDisplay.setText(f"{self.receiver.elevation:.4f}")
-		self.uiReceiverDepDisplay.setText(self.receiver.start_deployment.isoformat().split("T")[0])
-		self.uiReceiverRetDisplay.setText(self.receiver.end_deployment.isoformat().split("T")[0])
+		self.uiReceiverDepDisplay.setText(self.receiver.deployment.isoformat().split("T")[0])
+		self.uiReceiverRetDisplay.setText(self.receiver.retrieval.isoformat().split("T")[0])
 
 	def _updateSourceInformation(self):
 		self.uiOriginDateDisplay.setText(self.source.otime.isoformat().split("T")[0])
@@ -2030,19 +2008,14 @@ class PickingWindow(qt.QMainWindow):
 	# -------------------
 
 	def updatePick(self, pick_type):
-		# Handle each type of pick individually
-
-		# P
 		if pick_type == "P":
 			self.pick_type = pick_type
 			self.pick_line_color = "red"
 
-		# S
 		elif pick_type == "S":
 			self.pick_type = pick_type
 			self.pick_line_color = "blue"
 
-		# Custom pick
 		elif pick_type == "C":
 			# Only run if the radio button is being toggled on
 			if not self.uiCustomRadio.isChecked():
@@ -2054,7 +2027,6 @@ class PickingWindow(qt.QMainWindow):
 			if not self.customPickDialogue.exec_():
 				return
 
-		# Reset polarity text
 		self.uiPolarityDisplay.setText("")
 	
 	# -------------------
@@ -2125,12 +2097,11 @@ class PickingWindow(qt.QMainWindow):
 
 		# Reset pick tracker
 		self.pick_lines = {}
-		self.pick_polarity = ""
 		self.pick_time = ""
 		self.pick_phase = ""
 
 		# Set all the labels
-		self.uiPolarityDisplay.setText(self.pick_polarity)
+		self.uiPolarityDisplay.setText("")
 		self.uiPickTimeDisplay.setText(self.pick_time)
 		self.uiPhaseDisplay.setText(self.pick_phase)
 

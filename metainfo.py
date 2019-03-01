@@ -104,9 +104,9 @@ class SourceReceiverPair(object):
 
 		# Source files
 		data_dir = pathlib.Path(catalogue_path) / "data" / receiver.station
-		src_path = data_dir / srp_fname
+		src_path = (data_dir / srp_fname).with_suffix(".*")
 
-		self.stream = read(source_file)
+		self.stream = read(str(src_path))
 
 		self.components = "ZNE"
 
@@ -168,7 +168,8 @@ class SourceReceiverPair(object):
 		self._updateComponents(tmp_stream)
 
 	def rotate(self, method=None, phi=None):
-		"""Rotates the seismic data and updates the component attributes.
+		"""
+		Rotates the seismic data and updates the component attributes.
 
 		Parameters
 		----------
@@ -187,18 +188,20 @@ class SourceReceiverPair(object):
 
 		self.stream.rotate(method, back_azimuth=self.baz)
 
-		self._updateComponents(tmp_stream)
+		self._updateComponents(self.stream)
 
 	def saveData(self):
-		"""Save pick data.
+		"""
+		Save pick data.
 
 		"""
-		p = self.pick_path.with_ext(".pf")
+		p = self.pick_path.with_suffix(".pf")
 		with open(p, 'w') as f:
 			print(self.picks, file=f)
 
 	def addPick(self, info_type, value, pick_type):
-		"""Add pick information to dictionary
+		"""
+		Add pick information to dictionary
 
 		Parameters
 		----------
@@ -243,9 +246,9 @@ class SourceReceiverPair(object):
 		"""Load pick data.
 
 		"""
-		p = self.pick_path.with_ext(".pf")
+		p = self.pick_path.with_suffix(".pf")
 		try:
-			with p.open(pick_file) as f:
+			with open(p) as f:
 				picks = f.readline()
 				picks = ast.literal_eval(picks)
 		except FileNotFoundError:
@@ -575,6 +578,8 @@ class Source(object):
 		self._magnitude = src_info.mag.values[0]
 		self._sourceid  = src_info.sourceid.values[0]
 
+		print(self.sourceid)
+
 	@property
 	def otime(self):
 		"""Get the origin time"""
@@ -607,6 +612,11 @@ class Source(object):
 		else:
 			#raise TypeError("Magnitudes must be of type 'float'")
 			self._magnitude = None
+
+	@property
+	def sourceid(self):
+		"""Get the unique source ID"""
+		return self._sourceid
 
 
 class Network(object):

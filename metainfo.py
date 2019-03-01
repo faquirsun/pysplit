@@ -689,7 +689,7 @@ class Network(object):
 			print("There is no receiver with id \"{}\" in this network".format(receiverid))
 
 	def filterReceivers(self, arrivals):
-		available = arrivals.drop_duplicates(subset="name", keep="first").name.values
+		available = arrivals.drop_duplicates(subset="receiverid", keep="first").receiverid.values
 		return self.receivers.loc[self.receivers['name'].isin(available)]
 
 	def _loadReceivers(self, rec_file):

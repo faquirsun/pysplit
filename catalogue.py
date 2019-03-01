@@ -664,6 +664,8 @@ class TeleseismicCatalogue(Catalogue):
 		idx = -1
 
 		for i, receiver in self.network.receivers.iterrows():
+			print(receiver)
+			print(receiver.name)
 			tmp_df = self.src_df[self.src_df['otime'].between(receiver.deployment, receiver.retrieval)]
 
 			for j, source in tmp_df.iterrows():

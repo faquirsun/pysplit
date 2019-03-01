@@ -212,20 +212,6 @@ class SeisPick(qt.QMainWindow):
 			# Create an instance of the Local Catalogue class
 			self.catalogue = cat.LocalCatalogue(new, **self.catalogue_parameters)
 
-		if new:
-			# Populate the new catalogue with parameters
-			self.catalogue.newCatalogue(self.catalogue_parameters)
-			self.uiStatusBar.showMessage("Generating new catalogue...")
-			# Generate the catalogue
-			self.catalogue.generateCatalogue()
-		else:
-			pass
-			# Load catalogue with parameters
-			# self.catalogue.loadCatalogue(self.catalogue_parameters)
-			# self.uiStatusBar.showMessage("Loading existing catalogue files...")
-			# self.loadReceivers()
-			# self.loadSources()
-
 		# Populate the information wiedgets
 		self._populateReceiverList()
 		if self.catalogue_parameters["catalogue_type"] == "teleseismic":

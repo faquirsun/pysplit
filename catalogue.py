@@ -664,16 +664,15 @@ class TeleseismicCatalogue(Catalogue):
 		idx = -1
 
 		for i, receiver in self.network.receivers.iterrows():
-			print(receiver)
-			print(receiver.name)
-			tmp_df = self.src_df[self.src_df['otime'].between(receiver.deployment, receiver.retrieval)]
+			rec = psm.Receiver(receiver)
+			tmp_df = self.src_df[self.src_df['otime'].between(rec.deployment, rec.retrieval)]
 
 			for j, source in tmp_df.iterrows():
-				tmp_dist = locations2degrees(source.lat, source.lon, receiver.lat, receiver.lon)
+				tmp_dist = locations2degrees(source.lat, source.lon, rec.latitude, rec.longitude)
 				phase_arr = model.get_travel_times(source_depth_in_km=source.dep,
 												   distance_in_degree=tmp_dist,
 												   phase_list=phases,
-												   receiver_depth_in_km=receiver.elv / 1000)
+												   receiver_depth_in_km=rec.elevation / 1000)
 
 				if not phase_arr:
 					continue

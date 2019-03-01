@@ -705,3 +705,6 @@ class TeleseismicCatalogue(Catalogue):
 		tolerance = 10
 		for i in range(len(lons)):
 			ax.scatter(lons[i], lats[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="SOURCE: {}".format(self.src_df.sourceid[i]),  transform=ccrs.Geodetic())
+
+	def plotReceivers(self):
+		pass

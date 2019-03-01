@@ -55,7 +55,7 @@ class Catalogue(ABC):
 	cmpaz  = {'N':0, 'Z':0, 'E':90}
 	cmpinc = {'N':90, 'Z':0, 'E':90}
 	src_cols = ['otime', 'lat', 'lon', 'dep', 'mag', 'sourceid']
-	arr_cols = ['sourceid', 'receiver', 'traveltime', 'waveform?']
+	arr_cols = ['sourceid', 'receiverid', 'traveltime', 'waveform?']
 
 	def __init__(self, new=False, **kwargs):
 		"""

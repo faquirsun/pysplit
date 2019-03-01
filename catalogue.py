@@ -363,7 +363,7 @@ class LocalCatalogue(Catalogue):
 
 					ttime = model_t - otime
 
-					self.arr_df.loc[i + 1 * idx] = [idx, self._lookupReceiverID(receiver), ttime, False]
+					self.arr_df.loc[i + 1 * idx] = [idx, receiver, ttime, False]
 
 		# Input type: PySplit catalogues
 		elif self.data_source == "PySplit":
@@ -494,7 +494,7 @@ class LocalCatalogue(Catalogue):
 					print(line[0])
 					receiver = line[0]
 					try:
-						self.arr_df.loc[idx] = [sourceid, self._lookupReceiverID(receiver), "{'arr': [line[15]]}", False]
+						self.arr_df.loc[idx] = [sourceid, receiver, "{'arr': [line[15]]}", False]
 					except:
 						print(receiver, " not found, check it exists?")
 						self.arr_df.loc[idx] = ["-", "-", "-", "-"]
@@ -661,6 +661,8 @@ class TeleseismicCatalogue(Catalogue):
 		"""
 		model = TauPyModel(model="ak135")
 
+		idx = -1
+
 		for i, receiver in self.network.receivers.iterrows():
 			tmp_df = self.src_df[self.src_df['otime'].between(receiver.deployment, receiver.retrieval)]
 
@@ -675,18 +677,18 @@ class TeleseismicCatalogue(Catalogue):
 					continue
 				else:
 					phase_dict = {}
-					for i in range(len(phase_arr)):
-						key  = phase_arr[i].purist_name
-						time = phase_arr[i].time
+					for k in range(len(phase_arr)):
+						key  = phase_arr[k].purist_name
+						time = phase_arr[k].time
 						
 						if key in phase_dict:
-							phase_dict[key].append(phase_arr[i].time)
+							phase_dict[key].append(phase_arr[k].time)
 						else:
 							phase_dict[key] = []
 							phase_dict[key].append(time)
 
-					tmp = pd.DataFrame([int(source.sourceid), receiver.name, phase_dict, False], index=self.arr_cols).T
-					self.arr_df = self.arr_df.append(tmp, ignore_index=True)
+						idx += 1
+						self.arr_df.loc[idx] = [int(source.sourceid), receiver.name, phase_dict, False]
 
 		self.arr_df.to_csv(self.arr_file, index=False)
 

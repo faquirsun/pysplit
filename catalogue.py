@@ -95,7 +95,7 @@ class Catalogue(ABC):
 		self.src_file = self.cat_dir / "metafiles" / "sources.txt"
 		self._loadSources()
 		self.arr_file = self.cat_dir / "metafiles" / "arrivals.txt"
-		#self.loadArrivals()
+		arrivals = self.loadArrivals()
 
 		if new:
 			self._generateCatalogueMetafile()
@@ -169,7 +169,7 @@ class Catalogue(ABC):
 
 		self.arr_df.to_csv(self.arr_file, index=False)
 
-	def loadSources(self):
+	def _loadSources(self):
 		if self.src_file.is_file():
 			self.src_df = pd.read_csv(self.src_file)
 			self.src_df['otime'] = self.src_df['otime'].apply(UTCDateTime)
@@ -180,7 +180,6 @@ class Catalogue(ABC):
 			self.arr_df["traveltime"] = self.arr_df["traveltime"].apply(ast.literal_eval)
 
 			return True
-
 		else:
 			return False
 

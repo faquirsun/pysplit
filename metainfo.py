@@ -690,7 +690,6 @@ class Network(object):
 
 	def filterReceivers(self, arrivals):
 		available = arrivals.drop_duplicates(subset="receiverid", keep="first").name.values
-
 		return self.receivers.loc[self.receivers['name'].isin(available)]
 
 	def _loadReceivers(self, rec_file):

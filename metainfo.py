@@ -705,4 +705,4 @@ class Network(object):
 	@property
 	def centre(self):
 		"""Get the geographical centre of the network."""
-		return [self.rec_df.lon.mean(), self.rec_df.lat.mean()]
+		return [self.receivers.lon.mean(), self.receivers.lat.mean()]

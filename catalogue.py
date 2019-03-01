@@ -237,6 +237,10 @@ class Catalogue(ABC):
 	def plotGeographic(self):
 		pass
 
+	@abstractmethod
+	def plotReceivers(self):
+		pass
+
 	# ----------------
 
 

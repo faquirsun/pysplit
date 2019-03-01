@@ -669,7 +669,7 @@ class TeleseismicCatalogue(Catalogue):
 				phase_arr = model.get_travel_times(source_depth_in_km=source.dep,
 												   distance_in_degree=tmp_dist,
 												   phase_list=phases,
-												   receiver_depth_in_km=receiver.elv)
+												   receiver_depth_in_km=receiver.elv / 1000)
 
 				if not phase_arr:
 					continue

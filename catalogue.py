@@ -95,7 +95,7 @@ class Catalogue(ABC):
 		self.src_file = self.cat_dir / "metafiles" / "sources.txt"
 		self._loadSources()
 		self.arr_file = self.cat_dir / "metafiles" / "arrivals.txt"
-		#self._loadArrivals()
+		#self.loadArrivals()
 
 		if new:
 			self._generateCatalogueMetafile()
@@ -169,15 +169,20 @@ class Catalogue(ABC):
 
 		self.arr_df.to_csv(self.arr_file, index=False)
 
-	def _loadSources(self):
+	def loadSources(self):
 		if self.src_file.is_file():
 			self.src_df = pd.read_csv(self.src_file)
 			self.src_df['otime'] = self.src_df['otime'].apply(UTCDateTime)
 
-	def _loadArrivals(self):
+	def loadArrivals(self):
 		if self.arr_file.is_file():
 			self.arr_df = pd.read_csv(self.arr_file)
 			self.arr_df["traveltime"] = self.arr_df["traveltime"].apply(ast.literal_eval)
+
+			return True
+
+		else:
+			return False
 
 	def loadWaveforms(self):
 		# Returns true if all waveforms have been downloaded

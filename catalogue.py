@@ -693,6 +693,7 @@ class TeleseismicCatalogue(Catalogue):
 									 "receiverid": rec.name,
 									 "traveltime": phase_dict,
 									 "waveform?": False}
+									 print(dict1)
 							rows_list.append(dict1)
 
 		self.arr_df = pd.DataFrame(rows_list, columns=self.arr_cols)

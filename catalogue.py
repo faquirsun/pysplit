@@ -661,15 +661,16 @@ class TeleseismicCatalogue(Catalogue):
 		"""
 		model = TauPyModel(model="ak135")
 
-		idx = -1
+		rows_list = []
 
 		for i, receiver in self.network.receivers.iterrows():
 			rec = psm.Receiver(receiver)
 			tmp_df = self.src_df[self.src_df['otime'].between(rec.deployment, rec.retrieval)]
 
 			for j, source in tmp_df.iterrows():
-				tmp_dist = locations2degrees(source.lat, source.lon, rec.latitude, rec.longitude)
-				phase_arr = model.get_travel_times(source_depth_in_km=source.dep,
+				src = psm.Source(source)
+				tmp_dist = locations2degrees(src.latitude, src.longitude, rec.latitude, rec.longitude)
+				phase_arr = model.get_travel_times(source_depth_in_km=src.depth,
 												   distance_in_degree=tmp_dist,
 												   phase_list=phases,
 												   receiver_depth_in_km=rec.elevation / 1000)
@@ -688,9 +689,13 @@ class TeleseismicCatalogue(Catalogue):
 							phase_dict[key] = []
 							phase_dict[key].append(time)
 
-						idx += 1
-						self.arr_df.loc[idx] = [int(source.sourceid), receiver.name, phase_dict, False]
+							dict1 = {"sourceid": src.sourceid,
+									 "receiverid": rec.name
+									 "traveltime": phase_dict
+									 "waveform?": False}
+							rows_list.append(dict1)
 
+		self.arr_df = pd.DataFrame(rows_list, columns=self.arr_cols)
 		self.arr_df.to_csv(self.arr_file, index=False)
 
 		available_receivers = self.network.filterReceivers(self.arr_df)

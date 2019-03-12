@@ -142,7 +142,6 @@ class SeisPick(qt.QMainWindow):
 		except FileNotFoundError:
 			qt.QMessageBox.about(self, "Error!", "Unable to find file containing the metadata for this catalogue. Please double-check it exists.")
 			return
-		print("test1")
 
 		self.createCatalogue(params=catalogue_parameters)
 
@@ -178,15 +177,9 @@ class SeisPick(qt.QMainWindow):
 			self.uiStatusBar.showMessage("Creating an instance of TeleseismicCatalogue...")
 			self.uiPlotOptionsStacked.setCurrentIndex(1)
 
-			print("test2")
-
 			self.catalogue = cat.TeleseismicCatalogue(new, **params)
 
-			print("test3")
-
 			self._populateCatalogueInformation(params)
-
-			print("test4")
 
 		elif params["catalogue_type"] == "local":
 			self.uiStatusBar.showMessage("Creating an instance of LocalCatalogue...")
@@ -194,15 +187,9 @@ class SeisPick(qt.QMainWindow):
 
 			self.catalogue = cat.LocalCatalogue(new, **params)
 
-		print("test5")
-
 		self._populateReceiverList()
 
-		print("test6")
-
 		self.plotCatalogueMap()
-
-		print("test7")
 
 	def loadArrivals(self):
 		"""
@@ -286,8 +273,6 @@ class SeisPick(qt.QMainWindow):
 		self.map_bg = None
 		self.map_drag = False
 		self.map_click = None
-
-		print("test8")
 
 		self.uiMapMpl.show()
 

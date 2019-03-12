@@ -18,10 +18,9 @@ import glob
 import ast
 import pandas as pd
 from obspy.clients.fdsn import Client
-from obspy import UTCDateTime
+from obspy import read, UTCDateTime
 from obspy.taup import TauPyModel
 from obspy.geodetics import locations2degrees
-from obspy.core import read
 from string import Template
 import numpy as np
 import cartopy.crs as ccrs

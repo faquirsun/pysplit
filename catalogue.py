@@ -18,7 +18,7 @@ import glob
 import ast
 import pandas as pd
 from obspy.clients.fdsn import Client
-from obspy import read, UTCDateTime
+from obspy import read, UTCDateTime, Stream
 from obspy.taup import TauPyModel
 from obspy.geodetics import locations2degrees
 from string import Template
@@ -252,7 +252,7 @@ class Catalogue(ABC):
 					self.arr_df.drop(i, inplace=True)
 					continue
 
-				st = obspy.Stream()
+				st = Stream()
 				for file in files:
 					st += read(str(file))
 

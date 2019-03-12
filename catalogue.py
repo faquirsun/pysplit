@@ -230,6 +230,8 @@ class Catalogue(ABC):
 																			receiver=receiver.station, 
 																			comp="*")))
 
+				print(evfiles)
+
 				if not evfiles or nxfiles:
 					self.arr_df.drop(index=arrival.index.item(), inplace=True)	
 					self.arr_df.to_csv(self.arr_file, index=False)

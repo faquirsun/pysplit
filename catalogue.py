@@ -232,7 +232,7 @@ class Catalogue(ABC):
 
 				print(evfiles)
 
-				if not evfiles or nxfiles:
+				if not evfiles:
 					self.arr_df.drop(index=arrival.index.item(), inplace=True)	
 					self.arr_df.to_csv(self.arr_file, index=False)
 

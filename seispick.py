@@ -114,9 +114,9 @@ class SeisPick(qt.QMainWindow):
 		if not self.newCatalogueDialogue.exec_():
 			return
 
-		print(self.newCatalogueDialogue)
+		catalogue_parameters = self.newCatalogueDialogue.catalogue_parameters
 
-		self.createCatalogue(params=self.catalogue_parameters, new=True)
+		self.createCatalogue(params=catalogue_parameters, new=True)
 
 	def loadCatalogue(self):
 		"""
@@ -127,10 +127,10 @@ class SeisPick(qt.QMainWindow):
 
 		"""
 
-		self.catalogue_path = qt.QFileDialog.getExistingDirectory(self, 'Choose catalogue directory')
+		catalogue_path = qt.QFileDialog.getExistingDirectory(self, 'Choose catalogue directory')
 
-		data_dir = pathlib.Path(self.catalogue_path) / "data"
-		meta_dir = pathlib.Path(self.catalogue_path) / "metafiles"
+		data_dir = pathlib.Path(catalogue_path) / "data"
+		meta_dir = pathlib.Path(catalogue_path) / "metafiles"
 
 		if not data_dir.exists() and meta_dir.exists():
 			qt.QMessageBox.about(self, "Error!", "The directory you have chosen is invalid, please try again.")
@@ -471,7 +471,7 @@ class SeisPick(qt.QMainWindow):
 
 		sources = list(self.catalogue.arr_df.query('receiverid == @receiver').sourceid.values)
 
-		data_dir = pathlib.Path(self.catalogue_path) / "data" / receiver.upper()
+		data_dir = pathlib.Path(self.catalogue.catalogue_path) / "data" / receiver.upper()
 		avail_sources = list(data_dir.glob("*.z"))
 		avail_sources = [x.parts[-1] for x in avail_sources]
 
@@ -735,7 +735,7 @@ class NewCatalogueDialogue(qt.QDialog):
 								'rec_file': rec_file,
 								'start_date': self.uiStartDateInput.date().toString(Qt.ISODate),
 								'end_date': self.uiEndDateInput.date().toString(Qt.ISODate)}
-		self.parent.catalogue_parameters = {**catalogue_parameters, **d_specific}
+		self.catalogue_parameters = {**catalogue_parameters, **d_specific}
 
 		# Send accept signal to Dialog
 		self.accept()
@@ -1075,7 +1075,7 @@ class SplittingAnalysisWindow(qt.QMainWindow):
 	# Class initialisation functions
 	# ------------------------------
 
-	def __init__(self, event, cataloge_type):
+	def __init__(self, event, catalogue_type):
 		super().__init__()
 
 		self.event = event

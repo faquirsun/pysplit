@@ -206,6 +206,8 @@ class Catalogue(ABC):
 		pick_dir.mkdir(exist_ok=True, parents=True)
 		tmp_dir  = self.cat_dir / "tmp"
 
+		archive_path = pathlib.Path(self.archive_path)
+
 		ttime_dict = arrival.traveltime.values[0]
 
 		for phase, ttimes in ttime_dict.items():
@@ -217,16 +219,14 @@ class Catalogue(ABC):
 				evjday = str(wbeg.julday).zfill(3)
 				nxjday = str((wbeg + 86400).julday).zfill(3)
 
-				evfiles = list(self.archive_path.glob(self.archive_format.format(year=evyear, 
-																				 jday=evjday, 
-																				 receiver=receiver.station, 
-																				 comp="*")))
-				nxfiles = list(self.archive_path.glob(self.archive_format.format(year=evyear, 
-																				 jday=nxjday, 
-																				 receiver=receiver.station, 
-																				 comp="*")))
-
-				print(evfiles, nxfiles)
+				evfiles = list(archive_path.glob(self.archive_format.format(year=evyear, 
+																			jday=evjday, 
+																			receiver=receiver.station, 
+																			comp="*")))
+				nxfiles = list(archive_path.glob(self.archive_format.format(year=evyear, 
+																			jday=nxjday, 
+																			receiver=receiver.station, 
+																			comp="*")))
 
 				if not evfiles or nxfiles:
 					self.arr_df.drop(index=arrival.index.item(), inplace=True)	

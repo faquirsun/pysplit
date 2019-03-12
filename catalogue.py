@@ -217,16 +217,14 @@ class Catalogue(ABC):
 				evjday = str(wbeg.julday).zfill(3)
 				nxjday = str((wbeg + 86400).julday).zfill(3)
 
-				print(self.archive_format.format(year=evyear, jday=evjday, receiver=receiver.station, comp="*"))
-
-				evfiles = list(self.cat_dir.glob(self.archive_format.format(year=evyear, 
-																			jday=evjday, 
-																			receiver=receiver.station, 
-																			comp="*")))
-				nxfiles = list(self.cat_dir.glob(self.archive_format.format(year=evyear, 
-																			jday=nxjday, 
-																			receiver=receiver.station, 
-																			comp="*")))
+				evfiles = list(self.archive_path.glob(self.archive_format.format(year=evyear, 
+																				 jday=evjday, 
+																				 receiver=receiver.station, 
+																				 comp="*")))
+				nxfiles = list(self.archive_path.glob(self.archive_format.format(year=evyear, 
+																				 jday=nxjday, 
+																				 receiver=receiver.station, 
+																				 comp="*")))
 
 				print(evfiles, nxfiles)
 

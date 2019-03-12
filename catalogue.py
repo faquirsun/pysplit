@@ -219,6 +219,8 @@ class Catalogue(ABC):
 				evjday = str(wbeg.julday).zfill(3)
 				nxjday = str((wbeg + 86400).julday).zfill(3)
 
+				print(str(archive_path), self.archive_format.format(year=evyear, jday=evjday, receiver=receiver.station, comp="*"))
+
 				evfiles = list(archive_path.glob(self.archive_format.format(year=evyear, 
 																			jday=evjday, 
 																			receiver=receiver.station, 

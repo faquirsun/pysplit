@@ -699,7 +699,7 @@ class NewCatalogueDialogue(qt.QDialog):
 			archive_format = "{year}/*/{receiver}/{comp}/*.{receiver}..{comp}.D.{year}.{jday}"
 		# Cambridge Volcano Seismology archive format
 		elif archive_type == "Cambridge Volcano Seismology":
-			archive_format = "{year}/{jday}/*_{receiver}_{comp}*"
+			archive_format = "{year}/{jday}/*_{receiver}_{comp}"
 		
 		# Receiver file
 		rec_file  = self.uiReceiverFileInput.text()

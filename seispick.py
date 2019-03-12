@@ -114,7 +114,9 @@ class SeisPick(qt.QMainWindow):
 		if not self.newCatalogueDialogue.exec_():
 			return
 
-		self.createCatalogue(new=True)
+		print(self.newCatalogueDialogue)
+
+		self.createCatalogue(params=self.catalogue_parameters, new=True)
 
 	def loadCatalogue(self):
 		"""

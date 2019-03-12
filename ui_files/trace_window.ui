@@ -867,15 +867,23 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>uiFilterTypeComboBox</tabstop>
+  <tabstop>uiPoleCountComboBox</tabstop>
+  <tabstop>uiZeroPhaseCheckBox</tabstop>
+  <tabstop>uiLowFreqInput</tabstop>
+  <tabstop>uiHighFreqInput</tabstop>
+  <tabstop>uiRemoveFilterButton</tabstop>
+  <tabstop>uiApplyFilterButton</tabstop>
+  <tabstop>uiPRadio</tabstop>
+  <tabstop>uiSRadio</tabstop>
+  <tabstop>uiCustomRadio</tabstop>
+  <tabstop>uiRotateCompButton</tabstop>
   <tabstop>uiViewSpectrogramButton</tabstop>
   <tabstop>uiNextTraceButton</tabstop>
   <tabstop>uiLastTraceButton</tabstop>
   <tabstop>uiRejectTraceButton</tabstop>
   <tabstop>uiToggleLimitsButton</tabstop>
   <tabstop>uiResetPlotButton</tabstop>
-  <tabstop>uiPRadio</tabstop>
-  <tabstop>uiSRadio</tabstop>
-  <tabstop>uiCustomRadio</tabstop>
  </tabstops>
  <resources/>
  <connections>

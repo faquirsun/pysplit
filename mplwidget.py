@@ -11,47 +11,65 @@ class MplCanvas(FigureCanvas):
 	Attributes
 	----------
 	fig : matplotlib Figure object
-		Figure that contains the 
-	"""
-	def __init__(self):
-		# Setup Matplotlib Figure and Axis
-		self.fig = Figure()
-		#self.ax = self.fig.add_subplot(111)
-		self.fig.set_tight_layout(True)
+		Figure that contains the Axes objects on which plots are drawn
 
-		# initialisation of the canvas
+	"""
+
+	def __init__(self):
+		"""
+		Initialisation of Qt
+		"""
+
+		self.fig = Figure()
+
 		FigureCanvas.__init__(self, self.fig)
 		FigureCanvas.setSizePolicy(self, qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)
-
-		# notify the system of updated policy
 		FigureCanvas.updateGeometry(self)
 
-	def _teleseismicMap(self, lon_cen, lat_cen):
+	def mapPlot(self, proj):
+		self.proj = proj
 		# Create a Cartopy axis of the calculated region and draw any coastlines
-		self.ax = self.fig.add_axes([0.01, 0.01, 0.98, 0.98], projection=ccrs.AzimuthalEquidistant(central_longitude=lon_cen, central_latitude=lat_cen))
+		self.ax = self.fig.add_axes([0.01, 0.01, 0.98, 0.98], projection=proj)
 		self.ax.set_global()
 		self.ax.coastlines(resolution='10m')
 
 		return self.ax
 
-	def _localMap(self, lon0, lat0, lon1, lat1):
-		# Create a Cartopy axis of the region and draw any coastlines
-		self.ax = self.fig.add_axes([0.001, 0.001, 0.998, 0.998], projection=ccrs.PlateCarree())
-		#self.ax.set_global()
-		self.ax.coastlines(resolution='10m')
+	def tracePlot(self, labels=None):
 
-		return self.ax
+		self.fig.set_tight_layout(True)
 
-	def _tracePlot(self):
 		self.ax = self.fig.add_subplot(111)
+
+		if labels != None:
+			self.ax.set_xlabel(labels["x"])
+			self.ax.set_ylabel(labels["y"])
+
+		self.ax.set_aspect("auto")
 
 
 class MplWidget(qt.QWidget):
-	"""Widget dedfined in Qt Designer"""
+	"""
+	Widget defined in Qt Designer
+
+	Parameters
+	----------
+	canvas : MplCanvas object
+		A custom MplCanvas object that contains the Axes objects on which
+		plots are drawn
+	vbl : qt.QVBoxLayout object
+		Vertical box layout object to contain the canvas object
+
+	"""
+
 	def __init__(self, parent=None):
-		# initialisation of Qt MainWindow widget
+		"""
+		Initialisation of Qt MainWindow widget
+
+		"""
+
 		qt.QWidget.__init__(self, parent)
-		# set the canvas to the Matplotlib widget
+
 		self.canvas = MplCanvas()
 
 		self.canvas.setFocusPolicy(QtCore.Qt.ClickFocus)

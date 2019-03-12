@@ -69,24 +69,11 @@
           <number>0</number>
          </property>
          <widget class="QWidget" name="uiStatusPage">
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
           <layout class="QGridLayout" name="gridLayout_15">
-           <item row="1" column="0">
-            <widget class="QPushButton" name="uiSourceLoadButton">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Load source file</string>
-             </property>
-             <property name="flat">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="0">
+           <item row="5" column="0">
             <widget class="QPushButton" name="uiWaveformLoadButton">
              <property name="enabled">
               <bool>false</bool>
@@ -96,17 +83,10 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="0">
+           <item row="3" column="0">
             <widget class="QPushButton" name="uiArrivalLoadButton">
              <property name="text">
               <string>Load arrivals file</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QPushButton" name="uiReceiverLoadButton">
-             <property name="text">
-              <string>Load receiver file</string>
              </property>
             </widget>
            </item>
@@ -336,6 +316,12 @@
            <height>0</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item row="0" column="2">
@@ -350,27 +336,14 @@
              <property name="title">
               <string>Plot options</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout_25" rowstretch="0,0,0,0,0,0,0,0,0,0">
-              <item row="0" column="0">
-               <widget class="QCheckBox" name="uiPickedCheckBox">
-                <property name="autoFillBackground">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>Picked</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="1">
+             <layout class="QGridLayout" name="gridLayout_25" rowstretch="0,0,0,0,0,0,0,0">
+              <item row="3" column="1">
                <widget class="QLineEdit" name="uiMinLonInput"/>
               </item>
-              <item row="7" column="1">
+              <item row="5" column="1">
                <widget class="QLineEdit" name="uiMaxLonInput"/>
               </item>
-              <item row="9" column="1">
+              <item row="7" column="1">
                <widget class="QPushButton" name="uiPlotMapButton">
                 <property name="text">
                  <string>Plot map</string>
@@ -380,7 +353,7 @@
                 </property>
                </widget>
               </item>
-              <item row="4" column="0">
+              <item row="2" column="0">
                <widget class="QLabel" name="uiMaxLatLabel">
                 <property name="styleSheet">
                  <string notr="true">font-weight: bold;</string>
@@ -393,23 +366,13 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
-               <widget class="QCheckBox" name="uiReceiversCheckBox">
-                <property name="text">
-                 <string>Stations</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="1">
+              <item row="2" column="1">
                <widget class="QLineEdit" name="uiMaxLatInput"/>
               </item>
-              <item row="3" column="1">
+              <item row="1" column="1">
                <widget class="QLineEdit" name="uiMinLatInput"/>
               </item>
-              <item row="3" column="0">
+              <item row="1" column="0">
                <widget class="QLabel" name="uiMinLatLabel">
                 <property name="styleSheet">
                  <string notr="true">font-weight: bold;</string>
@@ -422,7 +385,7 @@
                 </property>
                </widget>
               </item>
-              <item row="7" column="0">
+              <item row="5" column="0">
                <widget class="QLabel" name="uiMaxLonLabel">
                 <property name="styleSheet">
                  <string notr="true">font-weight: bold;</string>
@@ -435,7 +398,7 @@
                 </property>
                </widget>
               </item>
-              <item row="5" column="0">
+              <item row="3" column="0">
                <widget class="QLabel" name="uiMinLonLabel">
                 <property name="styleSheet">
                  <string notr="true">font-weight: bold;</string>
@@ -448,17 +411,7 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QCheckBox" name="uiUnpickedCheckBox">
-                <property name="text">
-                 <string>Unpicked</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="9" column="0">
+              <item row="7" column="0">
                <widget class="QPushButton" name="uiResetMapButton">
                 <property name="text">
                  <string>Reset map</string>
@@ -861,14 +814,6 @@
     <property name="title">
      <string>Mode</string>
     </property>
-    <widget class="QMenu" name="uiPickModeMenu">
-     <property name="title">
-      <string>Pick mode</string>
-     </property>
-     <addaction name="uiPickSourcesAction"/>
-     <addaction name="uiPickReceiversAction"/>
-    </widget>
-    <addaction name="uiPickModeMenu"/>
     <addaction name="uiAnalyseModeAction"/>
    </widget>
    <widget class="QMenu" name="uiSettingsMenu">
@@ -957,14 +902,16 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>uiPickedCheckBox</tabstop>
-  <tabstop>uiUnpickedCheckBox</tabstop>
-  <tabstop>uiReceiversCheckBox</tabstop>
   <tabstop>uiMinLatInput</tabstop>
   <tabstop>uiMaxLatInput</tabstop>
   <tabstop>uiMinLonInput</tabstop>
   <tabstop>uiMaxLonInput</tabstop>
+  <tabstop>uiResetMapButton</tabstop>
   <tabstop>uiPlotMapButton</tabstop>
+  <tabstop>uiArrivalLoadButton</tabstop>
+  <tabstop>uiWaveformLoadButton</tabstop>
+  <tabstop>uiReceiversListView</tabstop>
+  <tabstop>uiSourcesListView</tabstop>
  </tabstops>
  <resources/>
  <connections>

@@ -6,9 +6,7 @@ environment.
 
 TO-DO
 -----
-Consider breaking the 'Catalogue' class into 'Network' and 'Catalogue' and
-an object that describes the matching between these similar to 
-SourceReceiverPair
+
 
 Author: Hemmelig
 """
@@ -95,23 +93,25 @@ class SourceReceiverPair(object):
 		self.receiver = receiver
 
 		# Set source-receiver filename
-		srp_fname = self.file_format.format(source.sourceid, receiver.station)
+		self.file_name = self.file_format.format(source.sourceid, receiver.station)
 
 		# Pick files
 		pick_dir = pathlib.Path(catalogue_path) / "picks" / receiver.station
 		pick_dir.mkdir(exist_ok=True)
-		self.pick_path = pick_dir / srp_fname
+		self.pick_path = pick_dir / self.file_name
 
 		# Source files
-		data_dir = pathlib.Path(catalogue_path) / "data" / receiver.station
-		src_path = (data_dir / srp_fname).with_suffix(".*")
+		self.data_dir = pathlib.Path(catalogue_path) / "data" / receiver.station
+		data_path = (self.data_dir / self.file_name).with_suffix(".*")
 
-		self.stream = read(str(src_path))
+		self.stream = read(str(data_path))
 
 		self.components = "ZNE"
 
-		self._distance, self._az, self._baz = gps2dist_azimuth(source.latitude, source.longitude, 
-															   receiver.latitude, receiver.longitude)
+		self._distance, self._az, self._baz = gps2dist_azimuth(source.latitude, 
+															   source.longitude, 
+															   receiver.latitude, 
+															   receiver.longitude)
 
 		self._updateComponents(self.stream)
 		self._loadPicks()
@@ -127,11 +127,12 @@ class SourceReceiverPair(object):
 			None (default to None, which removes the filter)
 		filt : dict
 			Contains information about the filter
+
 		"""
 
 		tmp_stream = self.stream.copy()
 
-		if code == "sac":
+		if method == "sac":
 			### TO-DO : Adapt to handle filter in dictionary format
 			###			Move to pathlib from os
 			pass
@@ -161,7 +162,7 @@ class SourceReceiverPair(object):
 			# return tr
 		else:
 			(tmp_stream.detrend("linear")).detrend("demean")	
-			if code == "obspy":
+			if method == "obspy":
 				tmp_stream.taper(max_percentage=0.05)
 				tmp_stream.filter(**filt)
 
@@ -177,7 +178,9 @@ class SourceReceiverPair(object):
 			Specifies the rotation operation to be used
 		phi : float
 			Angle through which to rotate components (units: degrees)
+
 		"""
+
 		if not method:
 			rphi = np.deg2rad(phi)
 
@@ -195,9 +198,15 @@ class SourceReceiverPair(object):
 		Save pick data.
 
 		"""
+
 		p = self.pick_path.with_suffix(".pf")
 		with open(p, 'w') as f:
 			print(self.picks, file=f)
+
+	def removeFiles(self):
+		files = list(self.data_dir.glob("{}.*".format(self.file_name)))
+		for file in files:
+			file.unlink()
 
 	def addPick(self, info_type, value, pick_type):
 		"""
@@ -212,7 +221,9 @@ class SourceReceiverPair(object):
 		pick_type : str
 			Specifies what type of pick it is - either a specific phase
 			pick or a time window
+
 		"""
+
 		if info_type == "pick":
 			self.picks[pick_type] = {"rtime": value,
 									 "error": self.delta,
@@ -243,7 +254,8 @@ class SourceReceiverPair(object):
 			self.component_3 = stream.select(channel="*T")[0]
 
 	def _loadPicks(self):
-		"""Load pick data.
+		"""
+		Load pick data.
 
 		"""
 		p = self.pick_path.with_suffix(".pf")
@@ -283,7 +295,8 @@ class SourceReceiverPair(object):
 	### TO-DO : Add handling for when no axes are provided (should be default,
 	###			as it makes it stand-alone from seispick interface).
 	def plotTraces(self, axes=None, lims=None):
-		"""Plot component traces on provided axes with specified limits
+		"""
+		Plot component traces on provided axes with specified limits
 
 		Parameters
 		----------
@@ -310,9 +323,15 @@ class SourceReceiverPair(object):
 		axes[1].set_ylim(ylims)
 		axes[2].set_ylim(ylims)
 
-		axes[0].plot(self.component_1.times(type="relative"), self.component_1.data / self.norm_factor, linewidth=0.5)
-		axes[1].plot(self.component_2.times(type="relative"), self.component_2.data / self.norm_factor, linewidth=0.5)
-		axes[2].plot(self.component_3.times(type="relative"), self.component_3.data / self.norm_factor, linewidth=0.5)
+		axes[0].plot(self.component_1.times(type="relative"), 
+					 self.component_1.data / self.norm_factor,
+					 linewidth=0.5)
+		axes[1].plot(self.component_2.times(type="relative"), 
+					 self.component_2.data / self.norm_factor, 
+					 linewidth=0.5)
+		axes[2].plot(self.component_3.times(type="relative"), 
+					 self.component_3.data / self.norm_factor, 
+					 linewidth=0.5)
 
 		axes[0].set_ylabel("Z")
 		if self.components == "ZNE":
@@ -324,7 +343,8 @@ class SourceReceiverPair(object):
 			axes[2].set_ylabel("T")
 
 	def plotSpectrogram(self, ax=None, log=True):
-		"""Plot spectrogram of the stream data
+		"""
+		Plot spectrogram of the stream data
 
 		Parameters
 		----------
@@ -333,6 +353,7 @@ class SourceReceiverPair(object):
 		log : Boolean
 			Boolean variable that specifies whether to use a log scale
 			on the y-axis of the spectrogram (default True)
+
 		"""
 
 		self.stream.spectrogram(log=log, axes=ax)
@@ -482,6 +503,7 @@ class Receiver(object):
 	retrieval : UTCDateTime, optional
 		Date and time of receiver retrieval given in UTC
 		(default is an empty string)
+
 	"""
 
 	def __init__(self, rec_info):
@@ -490,22 +512,40 @@ class Receiver(object):
 		----------
 		rec_info : pandas DataFrame
 			Contains the information to initialise a receiver object
+
 		"""
 
-		try:
-			self._network = rec_info.network.values[0]
-		except AttributeError:
-			self._network = ""
-		self._station   = rec_info.name.values[0]
-		self._latitude  = rec_info.lat.values[0]
-		self._longitude = rec_info.lon.values[0]
-		self._elevation = rec_info.elv.values[0]
-		try:
-			self._deployment = UTCDateTime(rec_info.deployment.values[0])
-			self._retrieval  = UTCDateTime(rec_info.retrieval.values[0])
-		except AttributeError:
-			self._deployment = ""
-			self._retrieval  = ""
+		if type(rec_info) == pd.core.series.Series:
+			try:
+				self._network = rec_info["network"]
+			except KeyError:
+				self._network = ""
+			self._station   = rec_info["name"]
+			self._latitude  = rec_info["lat"]
+			self._longitude = rec_info["lon"]
+			self._elevation = rec_info["elv"]
+			try:
+				self._deployment = UTCDateTime(rec_info["deployment"])
+				self._retrieval  = UTCDateTime(rec_info["retrieval"])
+			except KeyError:
+				self._deployment = ""
+				self._retrieval  = ""
+
+		elif type(rec_info) == pd.core.frame.DataFrame:
+			try:
+				self._network = rec_info.network.values[0]
+			except AttributeError:
+				self._network = ""
+			self._station   = rec_info.name.values[0]
+			self._latitude  = rec_info.lat.values[0]
+			self._longitude = rec_info.lon.values[0]
+			self._elevation = rec_info.elv.values[0]
+			try:
+				self._deployment = UTCDateTime(rec_info.deployment.values[0])
+				self._retrieval  = UTCDateTime(rec_info.retrieval.values[0])
+			except AttributeError:
+				self._deployment = ""
+				self._retrieval  = ""
 
 	@property
 	def network(self):
@@ -544,7 +584,8 @@ class Receiver(object):
 		
 
 class Source(object):
-	"""Source class
+	"""
+	Source class
 
 	Object to capture the information that uniquely describes a source,
 	including the origin time, hypocenter location and magnitude.
@@ -561,6 +602,7 @@ class Source(object):
 		depth coordinate of source (unit: km)
 	magnitude : str, optional
 		magnitude of source
+
 	"""
 
 	def __init__(self, src_info):
@@ -569,16 +611,24 @@ class Source(object):
 		----------
 		src_info : pandas DataFrame
 			Contains the information to initialise a source object
+
 		"""
 
-		self._otime     = UTCDateTime(src_info.otime.values[0])
-		self._latitude  = src_info.lat.values[0]
-		self._longitude = src_info.lon.values[0]
-		self._depth     = src_info.dep.values[0]
-		self._magnitude = src_info.mag.values[0]
-		self._sourceid  = src_info.sourceid.values[0]
+		if type(src_info) == pd.core.series.Series:
+			self._otime     = UTCDateTime(src_info["otime"])
+			self._latitude  = src_info["lat"]
+			self._longitude = src_info["lon"]
+			self._depth     = src_info["dep"]
+			self._magnitude = src_info["mag"]
+			self._sourceid  = src_info["sourceid"]
 
-		print(self.sourceid)
+		elif type(src_info) == pd.core.frame.DataFrame:
+			self._otime     = UTCDateTime(src_info.otime.values[0])
+			self._latitude  = src_info.lat.values[0]
+			self._longitude = src_info.lon.values[0]
+			self._depth     = src_info.dep.values[0]
+			self._magnitude = src_info.mag.values[0]
+			self._sourceid  = src_info.sourceid.values[0]
 
 	@property
 	def otime(self):
@@ -657,6 +707,7 @@ class Network(object):
 			Path pointing to csv file containing receiver information
 
 		"""
+		
 		super().__init__()
 
 		self.receivers = pd.DataFrame(columns=self.rec_cols)
@@ -668,7 +719,7 @@ class Network(object):
 
 	def lookupReceiver(self, receiverid):
 		"""
-		Queries the network DataFrame for 'receiverid'.
+		Queries the network DataFrame for 'receiverid'
 
 		Parameters
 		----------
@@ -678,7 +729,9 @@ class Network(object):
 		Returns
 		-------
 		Receiver object
+
 		"""
+
 		if not type(receiverid) == str:
 			print("You must identify the receiver with a string.")
 			return
@@ -690,7 +743,7 @@ class Network(object):
 
 	def filterReceivers(self, arrivals):
 		available = arrivals.drop_duplicates(subset="receiverid", keep="first").receiverid.values
-		return self.receivers.loc[self.receivers['name'].isin(available)]
+		return self.receivers.loc[self.receivers["name"].isin(available)]
 
 	def _loadReceivers(self, rec_file):
 		if rec_file.is_file():

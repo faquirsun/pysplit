@@ -268,7 +268,7 @@ class Catalogue(ABC):
 					name = '{0}/data/{1}/source.{2}.{1}.{3}'.format(self.catalogue_path, 
 																	receiver.station, 
 															   		arrival.sourceid, 
-															   		comp.lower())
+															   		tr.stats.channel[-1].lower())
 					tr.write(name, format="MSEED")
 
 				for file in files:

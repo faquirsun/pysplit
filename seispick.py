@@ -109,12 +109,12 @@ class SeisPick(qt.QMainWindow):
 
 		"""
 
-		self.newCatalogueDialogue = NewCatalogueDialogue(self)
+		newCatalogueDialogue = NewCatalogueDialogue()
 
-		if not self.newCatalogueDialogue.exec_():
+		if not newCatalogueDialogue.exec_():
 			return
 
-		catalogue_parameters = self.newCatalogueDialogue.catalogue_parameters
+		catalogue_parameters = newCatalogueDialogue.catalogue_parameters
 
 		self.createCatalogue(params=catalogue_parameters, new=True)
 
@@ -209,10 +209,12 @@ class SeisPick(qt.QMainWindow):
 			elif self.catalogue.catalogue_type == "teleseismic":
 				self.input_phases = []
 				
-				self.telePhaseDialogue = TelePhaseDialogue(self)
+				telePhaseDialogue = TelePhaseDialogue()
 
-				if not self.telePhaseDialogue.exec_():
+				if not telePhaseDialogue.exec_():
 					return
+
+				self.input_phases = telePhaseDialogue.phases
 
 				self.catalogue.getArrivals(phases=self.input_phases)
 				self._populateReceiverList()
@@ -263,9 +265,7 @@ class SeisPick(qt.QMainWindow):
 		self.uiMinRadDisplay.setText(params["minrad"])
 		self.uiMaxRadDisplay.setText(params["maxrad"])
 		self.uiMinMagDisplay.setText(params["minmag"])
-
-		no_srcs = str(len(self.catalogue.src_df.index))
-		self.uiSourceCountDisplay.setText(no_srcs)
+		self.uiSourceCountDisplay.setText(self.catalogue.source_count)
 
 	def plotCatalogueMap(self, replot=False):
 		self.uiStatusBar.showMessage("Plotting catalogue map...")
@@ -553,10 +553,8 @@ class NewCatalogueDialogue(qt.QDialog):
 	# Class initialisation functions
 	# ------------------------------
 
-	def __init__(self, parent):
+	def __init__(self):
 		super().__init__()
-
-		self.parent = parent
 
 		self.initUI()
 
@@ -603,22 +601,20 @@ class NewCatalogueDialogue(qt.QDialog):
 		self.uiLocalInputFormatComboBox.currentIndexChanged.connect(self.inputSelect)		
 
 	def browseCatalogue(self):
-		self.catalogue_path = qt.QFileDialog.getExistingDirectory(self, 'Choose catalogue directory')
-		self.uiCatalogueDirectoryInput.setText(self.catalogue_path)
+		catalogue_path = qt.QFileDialog.getExistingDirectory(self, 'Choose catalogue directory')
+		self.uiCatalogueDirectoryInput.setText(catalogue_path)
 
 	def browseArchive(self):
-		self.archive_path = qt.QFileDialog.getExistingDirectory(self, 'Choose archive directory')
-		self.uiArchiveDirectoryInput.setText(self.archive_path)
+		archive_path = qt.QFileDialog.getExistingDirectory(self, 'Choose archive directory')
+		self.uiArchiveDirectoryInput.setText(archive_path)
 
 	def browseReceivers(self):
 		filename = qt.QFileDialog.getOpenFileName(self, 'Open file')
-		self.rec_file = filename[0]
-		self.uiReceiverFileInput.setText(self.rec_file)
+		self.uiReceiverFileInput.setText(filename[0])
 
 	def browseLocalFile(self):
 		filename = qt.QFileDialog.getOpenFileName(self, 'Open file')
-		self.input_file = filename[0]
-		self.uiLocalFileInput.setText(self.input_file)
+		self.uiLocalFileInput.setText(filename[0])
 
 	def browseLocalPath(self):
 		pathname = qt.QFileDialog.getExistingDirectory(self, 'Choose SeisLoc directory')
@@ -753,10 +749,8 @@ class TelePhaseDialogue(qt.QDialog):
 	# Class initialisation functions
 	# ------------------------------
 
-	def __init__(self, parent):
+	def __init__(self):
 		super().__init__()
-
-		self.parent = parent
 
 		self.phases = []
 
@@ -1616,9 +1610,7 @@ class PickingWindow(qt.QMainWindow):
 		else:
 			self._replotLines()
 
-		# Check if a filter has been specified, and apply it if so
-		if not self.filt == None:
-			self.current_sr.filter(method="obspy", filt=self.filt)
+		self.current_sr.filter(filt=self.filt)
 
 		# Plot the traces
 		self.current_sr.plotTraces([c1_canvas.ax, c2_canvas.ax, c3_canvas.ax], lims=self.lims)
@@ -1770,7 +1762,7 @@ class PickingWindow(qt.QMainWindow):
 
 		self.plotdisconnect()
 		self.filt = None
-		self.current_sr.removeFilter()
+		self.current_sr.filter()
 		self.plotTraces(replot=True)
 
 	def _populateFilter(self):

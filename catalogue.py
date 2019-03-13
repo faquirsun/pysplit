@@ -96,9 +96,6 @@ class Catalogue(ABC):
 	arr_cols :
 
 	network :
-
-
-
 	
 	Methods
 	-------
@@ -118,7 +115,7 @@ class Catalogue(ABC):
 		----------
 		new : bool, optional
 			If True, will also generate a metafile (default: False)
-		kwargs : Dict
+		kwargs : dict
 			Dictionary containing Catalogue attributes and values
 
 		"""
@@ -169,7 +166,7 @@ class Catalogue(ABC):
 
 			self.getWaveform(src, rec, arrival)
 
-			self.arr_df.loc[i, 'waveform?'] = True
+			self.arr_df.at[i, 'waveform?'] = True
 
 			if (i % 10) == 0:
 				self.arr_df.to_csv(self.arr_file, index=False)
@@ -218,8 +215,6 @@ class Catalogue(ABC):
 				evjday = str(wbeg.julday).zfill(3)
 				nxjday = str((wbeg + 86400).julday).zfill(3)
 
-				print(str(archive_path), self.archive_format.format(year=evyear, jday=evjday, receiver=receiver.station, comp="*"))
-
 				evfiles = list(archive_path.glob(self.archive_format.format(year=evyear, 
 																			jday=evjday, 
 																			receiver=receiver.station, 
@@ -228,8 +223,6 @@ class Catalogue(ABC):
 																			jday=nxjday, 
 																			receiver=receiver.station, 
 																			comp="*")))
-
-				print(evfiles)
 
 				if not evfiles:
 					self.arr_df.drop(index=arrival.index.item(), inplace=True)	
@@ -357,6 +350,11 @@ class Catalogue(ABC):
 	@window.setter
 	def window(self, value):
 		self._window = value
+
+	@property
+	def source_count(self):
+		"""Get the number of sources in the catalogue"""
+		return str(len(self.src_df.index))
 
 	@abstractmethod
 	def _generateCatalogueMetafile(self):

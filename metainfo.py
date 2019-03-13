@@ -116,7 +116,7 @@ class SourceReceiverPair(object):
 		self._updateComponents(self.stream)
 		self._loadPicks()
 
-	def filter(self, method=None, filt=None):
+	def filter(self, method="obspy", filt=None):
 		"""
 		Filters the seismic data and updates the component attributes.
 
@@ -132,37 +132,39 @@ class SourceReceiverPair(object):
 
 		tmp_stream = self.stream.copy()
 
-		if method == "sac":
-			### TO-DO : Adapt to handle filter in dictionary format
-			###			Move to pathlib from os
-			pass
-			# if filt["zero_phase"]:
-			# 	ph = 2
-			# else:
-			# 	ph = 1
-			# tmp_txt = """
-			#			sac<< EOF > /dev/null\n
-			#  			r f.sac\n
-			# 			rmean\n
-			#			taper\n
-			#	  		bp c {:f} {:f} n {:d} p {:d} \n
-			#			write over\n
-			#			q\n
-			#			EOF\n
-			#			"""
-			# tmp_dir = pathlib.(os.path.expanduser('~'), 'filter_temp')
-			# if not(os.path.exists(temp_dir)):
-			# 	os.makedirs(temp_dir)
-			# tr.write('{}/f.sac'.format(temp_dir), "SAC")
-			# text = temp_text.format(minfreq, maxfreq, n_poles, ph)
-			# os.chdir(temp_dir)
-			# open('s', 'w+').write(text)
-			# os.system('bash s')
-			# tr = read('{}/f.sac'.format(temp_dir))[0]
-			# return tr
+		if filt == None:
+			(tmp_stream.detrend("linear")).detrend("demean")
+
 		else:
-			(tmp_stream.detrend("linear")).detrend("demean")	
-			if method == "obspy":
+			if method == "sac":
+				### TO-DO : Adapt to handle filter in dictionary format
+				###			Move to pathlib from os
+				pass
+				# if filt["zero_phase"]:
+				# 	ph = 2
+				# else:
+				# 	ph = 1
+				# tmp_txt = """
+				#			sac<< EOF > /dev/null\n
+				#  			r f.sac\n
+				# 			rmean\n
+				#			taper\n
+				#	  		bp c {:f} {:f} n {:d} p {:d} \n
+				#			write over\n
+				#			q\n
+				#			EOF\n
+				#			"""
+				# tmp_dir = pathlib.(os.path.expanduser('~'), 'filter_temp')
+				# if not(os.path.exists(temp_dir)):
+				# 	os.makedirs(temp_dir)
+				# tr.write('{}/f.sac'.format(temp_dir), "SAC")
+				# text = temp_text.format(minfreq, maxfreq, n_poles, ph)
+				# os.chdir(temp_dir)
+				# open('s', 'w+').write(text)
+				# os.system('bash s')
+				# tr = read('{}/f.sac'.format(temp_dir))[0]
+				# return tr
+			elif method == "obspy":
 				tmp_stream.taper(max_percentage=0.05)
 				tmp_stream.filter(**filt)
 
@@ -242,6 +244,7 @@ class SourceReceiverPair(object):
 		----------
 		stream : Stream object
 			List like object of multiple ObsPy Trace objects
+
 		"""
 
 		if self.components == "ZNE":

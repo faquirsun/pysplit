@@ -1776,7 +1776,7 @@ class PickingWindow(qt.QMainWindow):
 		self.uiFilterTypeComboBox.setCurrentText(filter_type)
 		self.uiPoleCountComboBox.setCurrentText(str(self.default_filt["corners"]))
 
-		if filter_options["zerophase"]:
+		if self.default_filt["zerophase"]:
 			self.uiZeroPhaseCheckBox.setChecked(True)
 
 		if filter_type == "bandpass":

@@ -1780,8 +1780,8 @@ class PickingWindow(qt.QMainWindow):
 			self.uiZeroPhaseCheckBox.setChecked(True)
 
 		if filter_type == "bandpass":
-			self.uiLowFreqInput.setText(str(self.default_filt["minfreq"]))
-			self.uiHighFreqInput.setText(str(self.default_filt["maxfreq"]))
+			self.uiLowFreqInput.setText(str(self.default_filt["freqmin"]))
+			self.uiHighFreqInput.setText(str(self.default_filt["freqmax"]))
 
 		if filter_type == "lowpass":
 			self.uiLowFreqInput.setText(str(self.default_filt["freq"]))

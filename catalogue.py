@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
 
 """
-This module requires that 'obspy', 'numpy', 'cartopy' and 'matplotlib' are 
+This module requires that 'obspy', 'numpy', 'cartopy' and 'matplotlib' are
 installed in your Python environment.
 
 TO-DO
 -----
 Come up with a suitable sourceid scheme and implement in _generateCatalogue()
 
-Author: Hemmelig
 """
+__author__ = "Hemmelig"
+
 
 from abc import ABC, abstractmethod
-import os
-import sys
-import glob
 import ast
 import pandas as pd
 from obspy.clients.fdsn import Client
@@ -29,843 +27,872 @@ import pathlib
 import shutil
 import metainfo as psm
 
+
 def parseCatalogueMetafile(meta_dir):
-	"""
-	Parses the relevant catalogue metafile into a dictionary containing
-	the catalogue parameters
+    """
+    Parses the relevant catalogue metafile into a dictionary containing
+    the catalogue parameters
 
-	Parameters
-	----------
-	meta_dir : pathlib.Path object
-		Path to metafiles directory
+    Parameters
+    ----------
+    meta_dir : pathlib.Path object
+        Path to metafiles directory
 
-	Returns
-	-------
+    Returns
+    -------
 
-	"""
+    """
 
-	params = []
+    params = []
 
-	metafile = meta_dir / "catalogue_metafile.txt"
-	with metafile.open(mode='r') as f:
-		for line in f:
-			if "?" in line:
-				line = line.rstrip().split(" ? ")
-				params.append(line[1])
+    metafile = meta_dir / "catalogue_metafile.txt"
+    with metafile.open(mode='r') as f:
+        for line in f:
+            if "?" in line:
+                line = line.rstrip().split(" ? ")
+                params.append(line[1])
 
-	catalogue_parameters = {'catalogue_name': params[0],
-							'catalogue_type': params[1],
-							'catalogue_path': params[2],
-							'data_source': params[3],
-							'cdate': params[4],
-							'archive_path': params[5],
-							'archive_type': params[6],
-							'archive_format': params[7],
-							'rec_file': params[8],
-							'start_date': params[9],
-							'end_date':params[10]}
+    catalogue_parameters = {'catalogue_name': params[0],
+                            'catalogue_type': params[1],
+                            'catalogue_path': params[2],
+                            'data_source': params[3],
+                            'cdate': params[4],
+                            'archive_path': params[5],
+                            'archive_type': params[6],
+                            'archive_format': params[7],
+                            'rec_file': params[8],
+                            'start_date': params[9],
+                            'end_date': params[10]}
 
-	if catalogue_parameters['catalogue_type'] == "local":
-		d_specific = {'local_input': params[11]}
+    if catalogue_parameters['catalogue_type'] == "local":
+        d_specific = {'local_input': params[11]}
 
-	if catalogue_parameters['catalogue_type'] == "teleseismic":
-		d_specific = {'minmag': params[11],
-		 			  'clon': params[12],
-				 	  'clat': params[13],
-					  'minrad': params[14],
-					  'maxrad': params[15]}
+    if catalogue_parameters['catalogue_type'] == "teleseismic":
+        d_specific = {'minmag': params[11],
+                      'clon': params[12],
+                      'clat': params[13],
+                      'minrad': params[14],
+                      'maxrad': params[15]}
 
-	return {**catalogue_parameters, **d_specific}
+    return {**catalogue_parameters, **d_specific}
 
 
 class Catalogue(ABC):
-	"""
-	Catalogue class
+    """
+    Catalogue class
 
-	Abstract Base Class for LocalCatalogue and TeleseismicCatalogue. A catalogue
-	contains information pertaining to 
+    Abstract Base Class for LocalCatalogue and TeleseismicCatalogue.
+    A catalogue contains information pertaining to
 
-	Attributes
-	----------
-	src_df : 
+    Attributes
+    ----------
+    src_df :
 
-	src_cols :
+    src_cols :
 
-	arr_df :
-	
-	arr_cols :
+    arr_df :
 
-	network :
-	
-	Methods
-	-------
-	Load catalogue (load a pre-existing catalogue)
-	Teleseismic catalogue (create a new teleseismic catalogue - based on functionality from obspy)
-	Local catalogue (create a new local catalogue - can be generated from hyp file)
-	"""
+    arr_cols :
 
-	src_cols = ['otime', 'lat', 'lon', 'dep', 'mag', 'sourceid']
-	arr_cols = ['sourceid', 'receiverid', 'traveltime', 'waveform?']
+    network :
 
-	def __init__(self, new=False, **kwargs):
-		"""
-		Class initialisation
+    Methods
+    -------
+    Load catalogue (load a pre-existing catalogue)
+    Teleseismic catalogue (create a new teleseismic catalogue - based on functionality from obspy)
+    Local catalogue (create a new local catalogue - can be generated from hyp file)
+    """
 
-		Parameters
-		----------
-		new : bool, optional
-			If True, will also generate a metafile (default: False)
-		kwargs : dict
-			Dictionary containing Catalogue attributes and values
+    src_cols = ['otime', 'lat', 'lon', 'dep', 'mag', 'sourceid']
+    arr_cols = ['sourceid', 'receiverid', 'traveltime', 'waveform?']
 
-		"""
+    def __init__(self, new=False, **kwargs):
+        """
+        Class initialisation
 
-		super().__init__()
+        Parameters
+        ----------
+        new : bool, optional
+            If True, will also generate a metafile (default: False)
+        kwargs : dict
+            Dictionary containing Catalogue attributes and values
 
-		self.src_df = pd.DataFrame(columns=self.src_cols)
-		self.arr_df = pd.DataFrame(columns=self.arr_cols)
+        """
 
-		for key, value in kwargs.items():
-			setattr(self, key, value)
+        super().__init__()
 
-		self.network = psm.Network(self.rec_file)
+        self.src_df = pd.DataFrame(columns=self.src_cols)
+        self.arr_df = pd.DataFrame(columns=self.arr_cols)
 
-		self.cat_dir = pathlib.Path(self.catalogue_path)
-		dirs = ["", "metafiles", "data", "tmp", "plots", "picks"]
-		for dir_ in dirs:
-			new_dir = self.cat_dir / dir_
-			new_dir.mkdir(exist_ok=True)
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
-		new_rec_file = self.cat_dir / "metafiles" / "receivers.txt"
-		rec_file     = pathlib.Path(self.rec_file)
-		try:
-			shutil.copy(str(rec_file), str(new_rec_file))
-		except shutil.SameFileError:
-			pass
+        self.network = psm.Network(self.rec_file)
 
-		self.src_file = self.cat_dir / "metafiles" / "sources.txt"
-		self.loadSources()
-		self.arr_file = self.cat_dir / "metafiles" / "arrivals.txt"
+        self.cat_dir = pathlib.Path(self.catalogue_path)
+        dirs = ["", "metafiles", "data", "tmp", "plots", "picks"]
+        for dir_ in dirs:
+            new_dir = self.cat_dir / dir_
+            new_dir.mkdir(exist_ok=True)
 
-		if new:
-			self._generateCatalogueMetafile()
-			self._generateCatalogue()
+        new_rec_file = self.cat_dir / "metafiles" / "receivers.txt"
+        rec_file = pathlib.Path(self.rec_file)
+        try:
+            shutil.copy(str(rec_file), str(new_rec_file))
+        except shutil.SameFileError:
+            pass
 
-	def getWaveforms(self):
-		"""
-		Retrieve waveform data from an archive.
+        self.src_file = self.cat_dir / "metafiles" / "sources.txt"
+        self.loadSources()
+        self.arr_file = self.cat_dir / "metafiles" / "arrivals.txt"
 
-		"""
+        if new:
+            self._generateCatalogueMetafile()
+            self._generateCatalogue()
 
-		for i, arrival in self.arr_df.iterrows():
-			if arrival['waveform?']:
-				continue
+    def getWaveforms(self):
+        """
+        Retrieve waveform data from an archive.
 
-			rec = self.network.lookupReceiver(arrival.receiverid)
-			src = self.lookupSource(arrival.sourceid)
+        """
 
-			self.getWaveform(src, rec, arrival)
+        for i, arrival in self.arr_df.iterrows():
+            if arrival['waveform?']:
+                continue
 
-			self.arr_df.at[i, 'waveform?'] = True
+            rec = self.network.lookupReceiver(arrival.receiverid)
+            src = self.lookupSource(arrival.sourceid)
 
-			if (i % 10) == 0:
-				self.arr_df.to_csv(self.arr_file, index=False)
+            self.getWaveform(src, rec, arrival)
 
-		self.arr_df.to_csv(self.arr_file, index=False)
+            self.arr_df.at[i, 'waveform?'] = True
 
-	def getWaveform(self, source, receiver, arrival=None):
-		"""
-		Retrieves waveform data for a single source-receiver pair from an 
-		archive.
+            if (i % 10) == 0:
+                self.arr_df.to_csv(self.arr_file, index=False)
 
-		Parameters
-		----------
-		source : Source object
-
-		receiver : Receiver object
+        self.arr_df.to_csv(self.arr_file, index=False)
 
-		arrival : DataFrame, optional
-			DataFrame containing arrival information for the provided source 
-			and receiver
+    def getWaveform(self, source, receiver, arrival=None):
+        """
+        Retrieves waveform data for a single source-receiver pair from an
+        archive.
 
-		"""
-
-		if not arrival:
-			arrival = self.lookupArrival(source.sourceid, receiver.station)
-
-		if arrival["waveform?"].values[0]:
-			return True
+        Parameters
+        ----------
+        source : Source object
+
+        receiver : Receiver object
+
+        arrival : DataFrame, optional
+            DataFrame containing arrival information for the provided source
+            and receiver
+
+        """
+
+        if not arrival:
+            arrival = self.lookupArrival(source.sourceid, receiver.station)
+
+        if arrival["waveform?"].values[0]:
+            return True
+
+        data_dir = self.cat_dir / "data" / receiver.station
+        data_dir.mkdir(exist_ok=True, parents=True)
+        pick_dir = self.cat_dir / "picks" / receiver.station
+        pick_dir.mkdir(exist_ok=True, parents=True)
+        tmp_dir = self.cat_dir / "tmp"
 
-		data_dir = self.cat_dir / "data" / receiver.station
-		data_dir.mkdir(exist_ok=True, parents=True)
-		pick_dir = self.cat_dir / "picks" / receiver.station
-		pick_dir.mkdir(exist_ok=True, parents=True)
-		tmp_dir  = self.cat_dir / "tmp"
+        archive_path = pathlib.Path(self.archive_path)
 
-		archive_path = pathlib.Path(self.archive_path)
+        ttime_dict = arrival.traveltime.values[0]
 
-		ttime_dict = arrival.traveltime.values[0]
+        for phase, ttimes in ttime_dict.items():
+            for traveltime in ttimes:
+                wbeg = source.otime + float(traveltime) - self.window
+                wend = source.otime + float(traveltime) + self.window
 
-		for phase, ttimes in ttime_dict.items():
-			for traveltime in ttimes:
-				wbeg = source.otime + float(traveltime) - self.window
-				wend = source.otime + float(traveltime) + self.window
+                evyear = str(wbeg.year)
+                evjday = str(wbeg.julday).zfill(3)
+                nxjday = str((wbeg + 86400).julday).zfill(3)
 
-				evyear = str(wbeg.year)
-				evjday = str(wbeg.julday).zfill(3)
-				nxjday = str((wbeg + 86400).julday).zfill(3)
-
-				evfiles = list(archive_path.glob(self.archive_format.format(year=evyear, 
-																			jday=evjday, 
-																			receiver=receiver.station, 
-																			comp="*")))
-				nxfiles = list(archive_path.glob(self.archive_format.format(year=evyear, 
-																			jday=nxjday, 
-																			receiver=receiver.station, 
-																			comp="*")))
-
-				if not evfiles:
-					self.arr_df.drop(index=arrival.index.item(), inplace=True)	
-					self.arr_df.to_csv(self.arr_file, index=False)
-
-					return False
-
-				for evfile in evfiles:
-					shutil.copy(str(evfile), str(tmp_dir))
-
-				if (wbeg.julday != wend.julday):
-					for nxfile in nxfiles:
-						shutil.copy(str(nxfile), str(tmp_dir))
-
-				files = list(tmp_dir.glob("*"))
-
-				# Only want to use data where we have all 3 components
-				# The first test ensures we also capture any next day files
-				if (len(files) % 3 != 0) and (len(files) != 0):
-					self.arr_df.drop(i, inplace=True)
-					continue
-
-				st = Stream()
-				for file in files:
-					st += read(str(file))
-
-				try:
-					st.trim(wbeg, wend)
-				except IndexError:
-					print("Window required not within time frame of data.")
-					for file in files:
-						file.unlink()
-					continue
-
-				for tr in st:
-					name = '{0}/data/{1}/source.{2}.{1}.{3}'.format(self.catalogue_path, 
-																	receiver.station, 
-															   		arrival.sourceid.values[0], 
-															   		tr.stats.channel[-1].lower())
-					tr.write(name, format="MSEED")
-
-				for file in files:
-					file.unlink()
-
-		self.arr_df.at[arrival.index.item(), "waveform?"] = True
-		self.arr_df.to_csv(self.arr_file, index=False)
-
-		return True
-
-	def loadSources(self):
-		if self.src_file.is_file():
-			self.src_df = pd.read_csv(self.src_file)
-			self.src_df['otime'] = self.src_df['otime'].apply(UTCDateTime)
-
-	def loadArrivals(self):
-		if self.arr_file.is_file():
-			self.arr_df = pd.read_csv(self.arr_file)
-			self.arr_df["traveltime"] = self.arr_df["traveltime"].apply(ast.literal_eval)
-
-			return True
-		else:
-			return False
-
-	def loadWaveforms(self):
-		"""
-		Check to see if the waveforms for all of the arrivals in the arrivals
-		DataFrame have been downloaded.
-
-		Returns
-		-------
-
-		"""
-
-		return self.arr_df["waveform?"].all()
-
-	def lookupSource(self, sourceid):
-		"""
-		Queries the source DataFrame for 'sourceid'.
-
-		Parameters
-		----------
-		source : str
-			Source name/unique identifier
-
-		Returns
-		-------
-		Source object
-
-		"""
-
-		if type(sourceid) != str:
-			print("You must identify the source with a string.")
-			return
-		try:
-			src = self.src_df[self.src_df["sourceid"] == int(sourceid)]
-			return psm.Source(src)
-		except IndexError:
-			print("There is no source with id \"{}\" in this catalogue".format(sourceid))
-
-	def lookupArrival(self, sourceid, receiverid):
-		"""
-		Queries the arrivals DataFrame for 'sourceid' and 'receiverid'
-
-		Parameters
-		----------
-		sourceid : str
-			Source name/unique identifier
-		receiverid : str
-			Receiver name/unique identifier
-
-		Returns
-		-------
-		DataFrame
-		
-		"""
-
-		return self.arr_df.loc[self.arr_df[["sourceid", "receiverid"]].isin([sourceid, receiverid]).all(1)]
-
-	@property
-	def window(self):
-		"""Get and set the time window padding either side of the arrival of
-		the signal at the receiver. Used when slicing mSEED files. (units: s)"""
-		return self._window
-
-	@window.setter
-	def window(self, value):
-		self._window = value
-
-	@property
-	def source_count(self):
-		"""Get the number of sources in the catalogue"""
-		return str(len(self.src_df.index))
-
-	@abstractmethod
-	def _generateCatalogueMetafile(self):
-		pass
-
-	@abstractmethod
-	def _generateCatalogue(self):
-		pass
-
-	@abstractmethod
-	def getArrivals(self):
-		pass
-
-	@abstractmethod
-	def plotGeographic(self):
-		pass
+                evpath = self.archive_format.format(year=evyear, jday=evjday,
+                                                    receiver=receiver.station,
+                                                    comp="*")
+                evfiles = list(archive_path.glob(evpath))
+                nxpath = self.archive_format.format(year=evyear, jday=nxjday,
+                                                    receiver=receiver.station,
+                                                    comp="*")
+                nxfiles = list(archive_path.glob(nxpath))
+
+                if evfiles is None:
+                    self.arr_df.drop(index=arrival.index.item(), inplace=True)
+                    self.arr_df.to_csv(self.arr_file, index=False)
+
+                    return False
+
+                for evfile in evfiles:
+                    shutil.copy(str(evfile), str(tmp_dir))
+
+                if (wbeg.julday != wend.julday):
+                    for nxfile in nxfiles:
+                        shutil.copy(str(nxfile), str(tmp_dir))
+
+                files = list(tmp_dir.glob("*"))
+
+                # Only want to use data where we have all 3 components
+                # The first test ensures we also capture any next day files
+                if (len(files) % 3 != 0):
+                    self.arr_df.drop(index=arrival.index.item(), inplace=True)
+                    for file in files:
+                        file.unlink()
+                    continue
+
+                st = Stream()
+                for file in files:
+                    st += read(str(file))
+
+                try:
+                    st.trim(wbeg, wend)
+                except IndexError:
+                    print("Window required not within time frame of data.")
+                    for file in files:
+                        file.unlink()
+                    continue
+
+                for tr in st:
+                    name = "{0}/data/{1}/source.{2}.{1}.{3}"
+                    name = name.format(self.catalogue_path, receiver.station,
+                                       arrival.sourceid.values[0],
+                                       tr.stats.channel[-1].lower())
+                    tr.write(name, format="MSEED")
+
+                for file in files:
+                    file.unlink()
+
+        self.arr_df.at[arrival.index.item(), "waveform?"] = True
+        self.arr_df.to_csv(self.arr_file, index=False)
+
+        return True
+
+    def loadSources(self):
+        if self.src_file.is_file():
+            self.src_df = pd.read_csv(self.src_file)
+            self.src_df['otime'] = self.src_df['otime'].apply(UTCDateTime)
+
+    def loadArrivals(self):
+        if self.arr_file.is_file():
+            self.arr_df = pd.read_csv(self.arr_file)
+            self.arr_df["traveltime"] = self.arr_df["traveltime"].apply(ast.literal_eval)
+
+            return True
+        else:
+            return False
+
+    def loadWaveforms(self):
+        """
+        Check to see if the waveforms for all of the arrivals in the arrivals
+        DataFrame have been downloaded.
+
+        Returns
+        -------
+
+        """
+
+        return self.arr_df["waveform?"].all()
+
+    def lookupSource(self, sourceid):
+        """
+        Queries the source DataFrame for 'sourceid'.
+
+        Parameters
+        ----------
+        source : str
+            Source name/unique identifier
+
+        Returns
+        -------
+        Source object
+
+        """
+
+        if type(sourceid) != str:
+            print("You must identify the source with a string.")
+            return
+        try:
+            src = self.src_df[self.src_df["sourceid"] == int(sourceid)]
+            return psm.Source(src)
+        except IndexError:
+            msg = "There is no source with id \"{}\" in this catalogue"
+            print(msg.format(sourceid))
+
+    def lookupArrival(self, sourceid, receiverid):
+        """
+        Queries the arrivals DataFrame for 'sourceid' and 'receiverid'
+
+        Parameters
+        ----------
+        sourceid : str
+            Source name/unique identifier
+        receiverid : str
+            Receiver name/unique identifier
+
+        Returns
+        -------
+        DataFrame
+
+        """
+
+        return self.arr_df.loc[self.arr_df[["sourceid",
+                                            "receiverid"]].isin([sourceid,
+                                                                 receiverid]).all(1)]
+
+    @property
+    def window(self):
+        """Get and set the time window padding either side of the arrival of
+        the signal at the receiver. Used when slicing mSEED files. (units: s)
+
+        """
+        return self._window
+
+    @window.setter
+    def window(self, value):
+        self._window = value
+
+    @property
+    def source_count(self):
+        """Get the number of sources in the catalogue"""
+        return str(len(self.src_df.index))
+
+    @abstractmethod
+    def _generateCatalogueMetafile(self):
+        pass
+
+    @abstractmethod
+    def _generateCatalogue(self):
+        pass
+
+    @abstractmethod
+    def getArrivals(self):
+        pass
+
+    @abstractmethod
+    def plot(self):
+        pass
 
 
 class LocalCatalogue(Catalogue):
-	"""
-	LocalCatalogue class
+    """
+    LocalCatalogue class
 
-	Inherits from Catalogue class, providing functionality specific to 
-	catalogues of local sources
+    Inherits from Catalogue class, providing functionality specific to
+    catalogues of local sources
 
-	Attributes
-	----------
-	window : float
-		Time window 
+    Attributes
+    ----------
+    window : float
+        Time window
 
-	Methods
-	-------
+    Methods
+    -------
 
-	Properties
-	----------
+    Properties
+    ----------
 
-	"""
+    """
 
-	window = 60.
+    window = 60.
 
-	def _generateCatalogueMetafile(self):
-		"""
-		Generates a metafile from a template.
+    def _generateCatalogueMetafile(self):
+        """
+        Generates a metafile from a template.
 
-		"""
+        """
 
-		filein = open('templates/local_metafile_template.txt')
-		src = Template(filein.read())
+        filein = open('templates/local_metafile_template.txt')
+        src = Template(filein.read())
 
-		d_cat = {'catalogue_name': self.catalogue_name,
-			 	 'catalogue_type': self.catalogue_type,
-				 'catalogue_path': self.catalogue_path,
-				 'data_source': self.data_source,
-				 'creation_date': self.creation_date,
-				 'archive_path': self.archive_path,
-				 'archive_type': self.archive_type,
-				 'archive_format': self.archive_format,
-				 'rec_file': self.rec_file,
-				 'start_date': self.start_date,
-				 'end_date': self.end_date,
-				 'local_input': self.local_input}
+        d_cat = {'catalogue_name': self.catalogue_name,
+                 'catalogue_type': self.catalogue_type,
+                 'catalogue_path': self.catalogue_path,
+                 'data_source': self.data_source,
+                 'creation_date': self.creation_date,
+                 'archive_path': self.archive_path,
+                 'archive_type': self.archive_type,
+                 'archive_format': self.archive_format,
+                 'rec_file': self.rec_file,
+                 'start_date': self.start_date,
+                 'end_date': self.end_date,
+                 'local_input': self.local_input}
 
-		# Safe substitute writes "" for missing template variables
-		output = src.safe_substitute(d_cat)
+        # Safe substitute writes "" for missing template variables
+        output = src.safe_substitute(d_cat)
 
-		meta_path = self.cat_dir / "metafiles" / "catalogue_metafile.txt"
-		with meta_path.open(mode='w') as f:
-			f.write(output)
+        meta_path = self.cat_dir / "metafiles" / "catalogue_metafile.txt"
+        with meta_path.open(mode='w') as f:
+            f.write(output)
 
-	def _generateCatalogue(self):
-		"""
-		Extracts earthquake source information from an input file and
-		creates a catalogue.
+    def _generateCatalogue(self):
+        """
+        Extracts earthquake source information from an input file and
+        creates a catalogue.
 
-		Supported input types:
-			SeisLoc directory
-			PySplit catalogue
-			.hyp file
-			IRIS catalogue - not yet supported
-		"""
+        Supported input types:
+            SeisLoc directory
+            PySplit catalogue
+            .hyp file
+            IRIS catalogue - not yet supported
 
-		src_path = pathlib.Path(self.local_input)
+        """
 
-		if not src_path.exists():
-			print("File doesn't exist.")
-			print("Please provide a valid path.")
-			return
+        src_path = pathlib.Path(self.local_input)
 
-		if self.data_source == "SeisLoc":
-			sources = list(src_path.glob("outputs/*.event"))
+        if not src_path.exists():
+            print("File doesn't exist.")
+            print("Please provide a valid path.")
+            return
 
-			# Preallocate memory
-			self.src_df = pd.DataFrame(index=np.arange(0, len(sources)), columns=self.src_cols)
+        if self.data_source == "SeisLoc":
+            sources = list(src_path.glob("outputs/*.event"))
 
-			# Needed to track variable lengths of arrival files
-			idx = 0
-			for i, source in enumerate(sources):
-				with source.open(mode='r') as f:
-					for j, line in enumerate(f):
-						if j == 0:
-							continue
-						else:
-							src_info = line.rstrip().split(",")
-							break
+            # Preallocate memory
+            self.src_df = pd.DataFrame(index=np.arange(0, len(sources)),
+                                       columns=self.src_cols)
 
-				otime = UTCDateTime(src_info[0].replace(" ", "T"))
-				lon   = src_info[2]
-				lat   = src_info[3]
-				dep   = src_info[4]
-				mag   = ""
-				sourceid = "" ###
+            # Needed to track variable lengths of arrival files
+            idx = 0
+            for i, source in enumerate(sources):
+                with source.open(mode='r') as f:
+                    for j, line in enumerate(f):
+                        if j == 0:
+                            continue
+                        else:
+                            src_info = line.rstrip().split(",")
+                            break
 
-				self.src_df.loc[i] = [otime, lat, lon, dep, mag, i]
+                otime = UTCDateTime(src_info[0].replace(" ", "T"))
+                lon = src_info[2]
+                lat = src_info[3]
+                dep = src_info[4]
+                mag = ""
+                sourceid = ""  # TO-DO
 
-				arrival = path / "outputs" / "{}.stn".format(source[:-6])
-				with arrival.open(mode='r') as f:
-					for j, line in enumerate(f):
-						if j == 0:
-							continue
+                self.src_df.loc[i] = [otime, lat, lon, dep, mag, i]
 
-						line.rstrip().split(",")
-						receiver = line[0]
-						phase   = line[1]
-						model_t = UTCDateTime(line[2].replace(" ", "T"))
-						if line[3] == -1.0:
-							pass
-						else:
-							pick_t = UTCDateTime(line[3].replace(" ", "T"))
-						if line[4] == -1.0:
-							pick_e = None
+                arrival = path / "outputs" / "{}.stn".format(source[:-6])
+                with arrival.open(mode='r') as f:
+                    for j, line in enumerate(f):
+                        if j == 0:
+                            continue
 
-						ttime = model_t - otime
+                        line.rstrip().split(",")
+                        receiver = line[0]
+                        phase = line[1]
+                        model_t = UTCDateTime(line[2].replace(" ", "T"))
+                        if line[3] == -1.0:
+                            pass
+                        else:
+                            pick_t = UTCDateTime(line[3].replace(" ", "T"))
+                        if line[4] == -1.0:
+                            pick_e = None
 
-						self.arr_df.loc[idx] = [i, receiver, ttime, False]
+                        ttime = model_t - otime
 
-						idx += 1
+                        self.arr_df.loc[idx] = [i, receiver, ttime, False]
 
-		elif self.data_source == "PySplit":
-			out_dir = self.cat_dir / "metafiles" / src_path.parts[-1]
-			shutil.copy(str(src_path), str(out_dir))
+                        idx += 1
 
-			self.src_df = pd.read_csv(input_file)
-			self.src_df["otime"] = self.src_df["otime"].apply(UTCDateTime)
-			self.src_df["sourceid"] = self.src_df.index
+        elif self.data_source == "PySplit":
+            out_dir = self.cat_dir / "metafiles" / src_path.parts[-1]
+            shutil.copy(str(src_path), str(out_dir))
 
-		elif self.data_source == ".hyp file":
-			out_dir = self.cat_dir / "metafiles" / src_path.parts[-1]
-			shutil.copy(str(src_path), str(out_dir))
+            self.src_df = pd.read_csv(input_file)
+            self.src_df["otime"] = self.src_df["otime"].apply(UTCDateTime)
+            self.src_df["sourceid"] = self.src_df.index
 
-			if src_path.suffix == ".hyp":
-				lines = []
-				with src_path.open(mode='r') as f:
-					for line in f:
-						if "GEOGRAPHIC" in line:
-							lines.append(line)
-				lines = [x.rstrip().split() for x in lines]
+        elif self.data_source == ".hyp file":
+            out_dir = self.cat_dir / "metafiles" / src_path.parts[-1]
+            shutil.copy(str(src_path), str(out_dir))
 
-				# Preallocate memory
-				self.src_df = pd.DataFrame(index=np.arange(0, len(lines)), columns=self.src_cols)
+            if src_path.suffix == ".hyp":
+                lines = []
+                with src_path.open(mode='r') as f:
+                    for line in f:
+                        if "GEOGRAPHIC" in line:
+                            lines.append(line)
+                lines = [x.rstrip().split() for x in lines]
 
-				for i, line in enumerate(lines):
-					evyear, evmonth, evday  = int(line[2]), int(line[3]), int(line[4])
-					evhour, evmin, evsecflt = int(line[5]), int(line[6]), float(line[7])
-					evsec  = int(evsecflt)
-					evmsec = int(1e6 * (evsecflt - evsec))
-					otime  = UTCDateTime(evyear, evmonth, evday, evhour, evmin, evsec, evmsec)
+                # Preallocate memory
+                self.src_df = pd.DataFrame(index=np.arange(0, len(lines)), columns=self.src_cols)
 
-					lat = float(line[9])
-					lon = float(line[11])
-					dep = float(line[13])
-					mag = "?" #### ADD PROPER HANDLING FOR HYP FILES THAT HAVE MAGNITUDES IN
-					sourceid = ""
+                for i, line in enumerate(lines):
+                    evyear, evmonth, evday = int(line[2]), int(line[3]), int(line[4])
+                    evhour, evmin, evsecflt = int(line[5]), int(line[6]), float(line[7])
+                    evsec = int(evsecflt)
+                    evmsec = int(1e6 * (evsecflt - evsec))
+                    otime = UTCDateTime(evyear, evmonth, evday, evhour,
+                                        evmin, evsec, evmsec)
 
-					self.src_df.loc[i] = [otime, lat, lon, dep, mag, i]
+                    lat = float(line[9])
+                    lon = float(line[11])
+                    dep = float(line[13])
+                    mag = "?"  # ADD PROPER HANDLING FOR HYP FILES THAT HAVE MAGNITUDES IN
+                    sourceid = ""
 
-			else:
-				print("Please provide a .hyp file.")
+                    self.src_df.loc[i] = [otime, lat, lon, dep, mag, i]
 
-		elif self.data_source == "IRIS":
-			# TO-DO: Implement support for IRIS inputs
-			pass
+            else:
+                print("Please provide a .hyp file.")
 
-		self.src_df.to_csv(self.src_file, index=False)
+        elif self.data_source == "IRIS":
+            # TO-DO: Implement support for IRIS inputs
+            pass
 
-	def getArrivals(self, phases=None):
-		"""
-		Extracts seismic phase arrival times from an input file and 
-		creates a list of arrivals.
+        self.src_df.to_csv(self.src_file, index=False)
 
-		Parameters
-		----------
-		phases : list, optional
-			List of phase identification strings
-		input_file : 
+    def getArrivals(self, phases=None):
+        """
+        Extracts seismic phase arrival times from an input file and
+        creates a list of arrivals.
 
-		input_type : , optional
+        Parameters
+        ----------
+        phases : list, optional
+            List of phase identification strings
+        input_file : 
 
-		"""
+        input_type : , optional
 
-		if self.data_source == "PySplit":
-			srcs_df = pd.read_csv(self.local_input)
-			
-			idx = 0
-			self.arr_df = pd.DataFrame(index=np.arange(0, len(self.network.receivers) * len(srcs_df)), columns=self.arr_cols)
-			for i, source in sources_df.iterrows():
-				for j, receiver in self.network.receivers.iterrows():
-					# Want to check if the receiver was available at the time of the source
-					otime = UTCDateTime(source["otime"])
-					stdp  = UTCDateTime(receiver["deployment"])
-					etdp  = UTCDateTime(receiver["retrieval"])
-					if (otime >= stdp) & (otime <= etdp):
-						self.arr_df.loc[idx] = [idx, receiver['receiverid'], "{'{}': [0.0]}", False]
-					else:
-						self.arr_df.loc[idx] = ["-", "-", "-", "-"]
-					idx += 1
+        """
 
-		elif self.data_source == ".hyp file":
-			srcs = pathlib.Path(self.local_input)
-			lines = []
-			S_lines = []
-			with srcs.open(mode='r') as f:
-				for line in f:
-					if ">" in line:
-						if " P " in line:
-							continue
-						else:
-							lines.append(line)
+        if self.data_source == "PySplit":
+            srcs_df = pd.read_csv(self.local_input)
 
-					if (">" in line) and (" S " in line):
-						S_lines.append(line)
+            idx = 0
+            self.arr_df = pd.DataFrame(index=np.arange(0, len(self.network.receivers) * len(srcs_df)),
+                                       columns=self.arr_cols)
+            for i, source in srcs_df.iterrows():
+                for j, receiver in self.network.receivers.iterrows():
+                    # Check if the receiver was available at the source time
+                    otime = UTCDateTime(source["otime"])
+                    stdp = UTCDateTime(receiver["deployment"])
+                    etdp = UTCDateTime(receiver["retrieval"])
+                    if (otime >= stdp) & (otime <= etdp):
+                        self.arr_df.loc[idx] = [idx, receiver['receiverid'],
+                                                "{'{}': [0.0]}", False]
+                    else:
+                        self.arr_df.loc[idx] = ["-", "-", "-", "-"]
+                    idx += 1
 
-			# Preallocate memory
-			self.arr_df = pd.DataFrame(index=np.arange(0, len(S_lines)), columns=self.arr_cols)
+        elif self.data_source == ".hyp file":
+            srcs = pathlib.Path(self.local_input)
+            lines = []
+            S_lines = []
+            with srcs.open(mode='r') as f:
+                for line in f:
+                    if ">" in line:
+                        if " P " in line:
+                            continue
+                        else:
+                            lines.append(line)
 
-			sourceid = -1
-			# Every time a line starting with PHASE is passed, increment the sourceid
-			for i in range(len(lines)):
-				line = lines[i].rstrip().split()
+                    if (">" in line) and (" S " in line):
+                        S_lines.append(line)
 
-				if line[0] == "PHASE":
-					sourceid += 1
-					continue
+            # Preallocate memory
+            self.arr_df = pd.DataFrame(index=np.arange(0, len(S_lines)),
+                                       columns=self.arr_cols)
 
-				else:
-					idx = i - (sourceid + 1)
-					receiver = line[0]
-					phase = "S_pred"
-					self.arr_df.loc[idx] = [sourceid, receiver, str({phase: [line[15]]}), False]
+            sourceid = -1
+            # Increment the sourceid for each line starting with PHASE
+            for i in range(len(lines)):
+                line = lines[i].rstrip().split()
 
-		# Remove all sources that didn't have complete information
-		self.arr_df.drop(self.arr_df[self.arr_df.sourceid == "-"].index, inplace=True)
-		self.arr_df.reset_index(drop=True, inplace=True)
-		self.arr_df.to_csv(self.arr_file, index=False)
+                if line[0] == "PHASE":
+                    sourceid += 1
+                    continue
 
-		available_receivers = self.network.filterReceivers(self.arr_df)
-		available_receivers.to_csv(self.rec_file, index=False)
+                else:
+                    idx = i - (sourceid + 1)
+                    receiver = line[0]
+                    phase = "S_pred"
+                    self.arr_df.loc[idx] = [sourceid, receiver,
+                                            str({phase: [line[15]]}), False]
 
-	def removeArrival(self, sourceid, receiverid):
-		self.arr_df.drop(self.arr_df[(self.arr_df.sourceid == sourceid) \
-								   & (self.arr_df.receiverid == receiverid)].index, \
-								      inplace=True)
-		self.src_df.reset_index(drop=True, inplace=True)
-		self.src_df.to_csv(self.src_file, index=False)
+        # Remove all sources that didn't have complete information
+        self.arr_df.drop(self.arr_df[self.arr_df.sourceid == "-"].index,
+                         inplace=True)
+        self.arr_df.reset_index(drop=True, inplace=True)
+        self.arr_df.to_csv(self.arr_file, index=False)
 
-	def plotGeographic(self, map_widget, lims=None, receivers=False):
-		"""
-		Creates a geographic representation of the catalogue.
+        available_receivers = self.network.filterReceivers(self.arr_df)
+        available_receivers.to_csv(self.rec_file, index=False)
 
-		Parameters
-		----------
-		map_widget : Axes object, optional
-			The axes object on which to plot the map. One is generated
-			if not provided
-		lims : list of floats, optional
-			Contains the geograhical boundaries of the map. If not provided,
-			suitable limits are calculated from the source locations
+    def removeArrival(self, sourceid, receiverid):
+        self.arr_df.drop(self.arr_df[(self.arr_df.sourceid == sourceid)
+                         & (self.arr_df.receiverid == receiverid)].index,
+                         inplace=True)
+        self.src_df.reset_index(drop=True, inplace=True)
+        self.src_df.to_csv(self.src_file, index=False)
 
-		"""
+    def plot(self, map_widget, lims=None, receivers=False):
+        """
+        Creates a geographic representation of the catalogue.
 
-		lons = self.src_df.lon.values
-		lats = self.src_df.lat.values
+        Parameters
+        ----------
+        map_widget : Axes object, optional
+            The axes object on which to plot the map. One is generated
+            if not provided
+        lims : list of floats, optional
+            Contains the geograhical boundaries of the map. If not provided,
+            suitable limits are calculated from the source locations
 
-		if lims == None: 
-			londiff = (max(lons) - min(lons)) * 0.1
-			latdiff = (max(lats) - min(lats)) * 0.1
-			self.lon0 = min(lons) - londiff
-			self.lon1 = max(lons) + londiff
-			self.lat0 = min(lats) - latdiff
-			self.lat1 = max(lats) + latdiff
-		else:
-			self.lon0 = lims["lon0"]
-			self.lon1 = lims["lon1"]
-			self.lat0 = lims["lat0"]
-			self.lat1 = lims["lat1"]
+        """
 
-		proj = ccrs.PlateCarree()
-		self.map = map_widget.canvas.mapPlot(proj)
-		self.map.set_xlabel("Longitude, degrees", fontsize=10)
-		self.map.set_ylabel("Latitude, degrees", fontsize=10)
-		self.map.set_extent([self.lon0, self.lon1, self.lat0, self.lat1], proj)
-		self.map.set_aspect('auto')
+        lons = self.src_df.lon.values
+        lats = self.src_df.lat.values
 
-		self._plotSources()
-		if receivers:
-			self._plotReceivers()		
+        if lims is None:
+            londiff = (max(lons) - min(lons)) * 0.1
+            latdiff = (max(lats) - min(lats)) * 0.1
+            self.lon0 = min(lons) - londiff
+            self.lon1 = max(lons) + londiff
+            self.lat0 = min(lats) - latdiff
+            self.lat1 = max(lats) + latdiff
+        else:
+            self.lon0 = lims["lon0"]
+            self.lon1 = lims["lon1"]
+            self.lat0 = lims["lat0"]
+            self.lat1 = lims["lat1"]
 
-	def _plotSources(self):
-		lons = self.src_df.lon.values
-		lats = self.src_df.lat.values
-		sids = self.src_df.sourceid.values
+        proj = ccrs.PlateCarree()
+        self.map = map_widget.canvas.mapPlot(proj)
+        self.map.set_xlabel("Longitude, degrees", fontsize=10)
+        self.map.set_ylabel("Latitude, degrees", fontsize=10)
+        self.map.set_extent([self.lon0, self.lon1, self.lat0, self.lat1], proj)
+        self.map.set_aspect('auto')
 
-		tolerance = 10
-		for i in range(len(lons)):
-			self.map.scatter(lons[i], lats[i], 12, marker='o', color='k', picker=tolerance, zorder=10, label="SOURCE: {}".format(sids[i]))
+        self._plotSources()
+        if receivers:
+            self._plotReceivers()
 
-	def _plotReceivers(self):
-		lons = self.network.receivers.lon.values
-		lats = self.network.receivers.lat.values
-		rids = self.network.receivers.name.values
-		tolerance = 10
-		for i in range(len(lons)):
-			self.map.scatter(lons[i], lats[i], 75, marker="v", color="green", picker=tolerance, zorder=15, label="REC: {}".format(rids[i]))
+    def _plotSources(self):
+        lons = self.src_df.lon.values
+        lats = self.src_df.lat.values
+        sids = self.src_df.sourceid.values
+
+        tolerance = 10
+        for i in range(len(lons)):
+            self.map.scatter(lons[i], lats[i], 12, marker='o', color='k',
+                             picker=tolerance, zorder=10,
+                             label="SOURCE: {}".format(sids[i]))
+
+    def _plotReceivers(self):
+        lons = self.network.receivers.lon.values
+        lats = self.network.receivers.lat.values
+        rids = self.network.receivers.name.values
+        tolerance = 10
+        for i in range(len(lons)):
+            self.map.scatter(lons[i], lats[i], 75, marker="v", color="green",
+                             picker=tolerance, zorder=15,
+                             label="REC: {}".format(rids[i]))
 
 
 class TeleseismicCatalogue(Catalogue):
-	"""TeleseismicCatalogue class
+    """TeleseismicCatalogue class
 
-	Inherits from Catalogue class, providing functionality specific to catalogues
-	of teleseismic sources
+    Inherits from Catalogue class, providing functionality specific to
+    catalogues of teleseismic sources
 
-	Attributes
-	----------
-	window : float
-		Default 
+    Attributes
+    ----------
+    window : float
+        Default 
 
-	Methods
-	-------
+    Methods
+    -------
 
-	Properties
-	----------
+    Properties
+    ----------
 
-	"""
+    """
 
-	window = 300.
+    window = 300.
 
-	def _generateCatalogueMetafile(self):
-		"""
-		Generates a metafile from a template.
+    def _generateCatalogueMetafile(self):
+        """
+        Generates a metafile from a template.
 
-		"""
+        """
 
-		filein = open('templates/teleseismic_metafile_template.txt')
-		src = Template(filein.read())
+        filein = open('templates/teleseismic_metafile_template.txt')
+        src = Template(filein.read())
 
-		d_cat = {'catalogue_name': self.catalogue_name,
-			 	 'catalogue_type': self.catalogue_type,
-				 'catalogue_path': self.catalogue_path,
-				 'data_source': self.data_source,
-				 'creation_date': self.creation_date,
-				 'archive_path': self.archive_path,
-				 'archive_type': self.archive_type,
-				 'archive_format': self.archive_format,
-				 'rec_file': self.rec_file,
-				 'start_date': self.start_date,
-				 'end_date': self.end_date,
-				 'minmag': self.minmag,
-				 'clon': self.clon,
-				 'clat': self.clat,
-				 'minrad': self.minrad,
-				 'maxrad': self.maxrad}
+        d_cat = {'catalogue_name': self.catalogue_name,
+                 'catalogue_type': self.catalogue_type,
+                 'catalogue_path': self.catalogue_path,
+                 'data_source': self.data_source,
+                 'creation_date': self.creation_date,
+                 'archive_path': self.archive_path,
+                 'archive_type': self.archive_type,
+                 'archive_format': self.archive_format,
+                 'rec_file': self.rec_file,
+                 'start_date': self.start_date,
+                 'end_date': self.end_date,
+                 'minmag': self.minmag,
+                 'clon': self.clon,
+                 'clat': self.clat,
+                 'minrad': self.minrad,
+                 'maxrad': self.maxrad}
 
-		# Safe substitute writes "" for missing template variables
-		output = src.safe_substitute(d_cat)
+        # Safe substitute writes "" for missing template variables
+        output = src.safe_substitute(d_cat)
 
-		meta_path = self.cat_dir / "metafiles" / "catalogue_metafile.txt"
-		with meta_path.open(mode='w') as f:
-			f.write(output)
+        meta_path = self.cat_dir / "metafiles" / "catalogue_metafile.txt"
+        with meta_path.open(mode='w') as f:
+            f.write(output)
 
-	def _generateCatalogue(self):
-		"""
-		Generates a catalogue from the IRIS webclient API.
+    def _generateCatalogue(self):
+        """
+        Generates a catalogue from the IRIS webclient API.
 
-		"""
-		client = Client("IRIS")
+        """
+        client = Client("IRIS")
 
-		st = UTCDateTime(self.start_date)
-		et = UTCDateTime(self.end_date)
+        st = UTCDateTime(self.start_date)
+        et = UTCDateTime(self.end_date)
 
-		sources = client.get_events(starttime=st, 
-									endtime=et, 
-									minmagnitude=self.minmag,
-									latitude=self.clat, 
-									longitude=self.clon, 
-									minradius=self.minrad, 
-									maxradius=self.maxrad)
+        sources = client.get_events(starttime=st,
+                                    endtime=et,
+                                    minmagnitude=self.minmag,
+                                    latitude=self.clat,
+                                    longitude=self.clon,
+                                    minradius=self.minrad,
+                                    maxradius=self.maxrad)
 
-		# Preallocate memory
-		self.src_df = pd.DataFrame(index=np.arange(0, sources.count()), columns=self.src_cols)
+        # Preallocate memory
+        self.src_df = pd.DataFrame(index=np.arange(0, sources.count()),
+                                   columns=self.src_cols)
 
-		for i in range(sources.count()):
-			try:
-				source = sources[i]
-				otime = source.preferred_origin().get('time')
-				lat = source.preferred_origin().get('latitude')
-				lon = source.preferred_origin().get('longitude')
-				dep = source.preferred_origin().get('depth') / 1000.0
-				mag = source.preferred_magnitude().get('mag')
-			except TypeError:
-				otime = lat = lon = dep = mag = "-"
+        for i in range(sources.count()):
+            try:
+                source = sources[i]
+                otime = source.preferred_origin().get('time')
+                lat = source.preferred_origin().get('latitude')
+                lon = source.preferred_origin().get('longitude')
+                dep = source.preferred_origin().get('depth') / 1000.0
+                mag = source.preferred_magnitude().get('mag')
+            except TypeError:
+                otime = lat = lon = dep = mag = "-"
 
-			# sourceid = ### Come up with file naming format
-			sourceid = i
+            # sourceid = ### Come up with file naming format
+            sourceid = i
 
-			self.src_df.loc[i] = [otime, lat, lon, dep, mag, sourceid]
+            self.src_df.loc[i] = [otime, lat, lon, dep, mag, sourceid]
 
-		self.src_df.drop(self.src_df[self.src_df.otime == "-"].index, inplace=True)
-		self.src_df.reset_index(drop=True, inplace=True)
-		self.src_df.to_csv(self.src_file, index=False)
+        self.src_df.drop(self.src_df[self.src_df.otime == "-"].index,
+                         inplace=True)
+        self.src_df.reset_index(drop=True, inplace=True)
+        self.src_df.to_csv(self.src_file, index=False)
 
-	def getArrivals(self, phases=["SKS"]):
-		"""
-		Generates predicted arrival times using a whole earth velocity model
+    def getArrivals(self, phases=["SKS"]):
+        """
+        Generates predicted arrival times using a whole earth velocity model
 
-		Parameters
-		----------
-		phases : list of strings, optional
-			List containing the seismic phases for which to calculate 
-			predicted traveltimes. Defaults to "SKS"
+        Parameters
+        ----------
+        phases : list of strings, optional
+            List containing the seismic phases for which to calculate
+            predicted traveltimes. Defaults to "SKS"
 
-		"""
-		model = TauPyModel(model="ak135")
+        """
+        model = TauPyModel(model="ak135")
 
-		rows_list = []
-		for i, receiver in self.network.receivers.iterrows():
-			rec = psm.Receiver(receiver)
-			tmp_df = self.src_df[self.src_df['otime'].between(rec.deployment, rec.retrieval)]
+        rows_list = []
+        for i, receiver in self.network.receivers.iterrows():
+            rec = psm.Receiver(receiver)
+            tmp_df = self.src_df[self.src_df['otime'].between(rec.deployment,
+                                                              rec.retrieval)]
 
-			for j, source in tmp_df.iterrows():
-				src = psm.Source(source)
-				tmp_dist = locations2degrees(src.latitude, src.longitude, rec.latitude, rec.longitude)
-				phase_arr = model.get_travel_times(source_depth_in_km=src.depth,
-												   distance_in_degree=tmp_dist,
-												   phase_list=phases,
-												   receiver_depth_in_km=rec.elevation / 1000)
+            for j, source in tmp_df.iterrows():
+                src = psm.Source(source)
+                tmp_dist = locations2degrees(src.latitude, src.longitude,
+                                             rec.latitude, rec.longitude)
+                phase_arr = model.get_travel_times(source_depth_in_km=src.depth,
+                                                   distance_in_degree=tmp_dist,
+                                                   phase_list=phases,
+                                                   receiver_depth_in_km=rec.elevation / 1000)
 
-				if not phase_arr:
-					continue
-				else:
-					phase_dict = {}
-					for k in range(len(phase_arr)):
-						key  = phase_arr[k].purist_name
-						time = phase_arr[k].time
-						
-						if key in phase_dict:
-							phase_dict[key].append(phase_arr[k].time)
-						else:
-							phase_dict[key] = []
-							phase_dict[key].append(time)
+                if not phase_arr:
+                    continue
+                else:
+                    phase_dict = {}
+                    for k in range(len(phase_arr)):
+                        key = phase_arr[k].purist_name
+                        time = phase_arr[k].time
 
-							dict1 = {"sourceid": src.sourceid,
-									 "receiverid": rec.station,
-									 "traveltime": phase_dict,
-									 "waveform?": False}
-							print(dict1)
-							rows_list.append(dict1)
+                        if key in phase_dict:
+                            phase_dict[key].append(phase_arr[k].time)
+                        else:
+                            phase_dict[key] = []
+                            phase_dict[key].append(time)
 
-		self.arr_df = pd.DataFrame(rows_list, columns=self.arr_cols)
-		self.arr_df.to_csv(self.arr_file, index=False)
+                            dict1 = {"sourceid": src.sourceid,
+                                     "receiverid": rec.station,
+                                     "traveltime": phase_dict,
+                                     "waveform?": False}
+                            print(dict1)
+                            rows_list.append(dict1)
 
-		available_receivers = self.network.filterReceivers(self.arr_df)
-		available_receivers.to_csv(self.rec_file, index=False)
+        self.arr_df = pd.DataFrame(rows_list, columns=self.arr_cols)
+        self.arr_df.to_csv(self.arr_file, index=False)
 
-	def plotGeographic(self, map_widget=None):
-		"""
-		Creates a geographic representation of the catalogue.
+        available_receivers = self.network.filterReceivers(self.arr_df)
+        available_receivers.to_csv(self.rec_file, index=False)
 
-		Parameters
-		----------
-		map_widget : Axes object, optional
-			The axes object on which to plot the map. One is generated
-			if not provided
+    def plot(self, map_widget=None):
+        """
+        Creates a geographic representation of the catalogue.
 
-		"""
+        Parameters
+        ----------
+        map_widget : Axes object, optional
+            The axes object on which to plot the map. One is generated
+            if not provided
 
-		network_centre = self.network.centre
-		lons = self.src_df.lon.values
-		lats = self.src_df.lat.values
-		sids = self.src_df.sourceid.values
+        """
 
-		proj = ccrs.AzimuthalEquidistant(central_longitude=network_centre[0], central_latitude=network_centre[1])
+        network_centre = self.network.centre
+        lons = self.src_df.lon.values
+        lats = self.src_df.lat.values
+        sids = self.src_df.sourceid.values
 
-		if not map_widget:
-			return
-		else:
-			ax = map_widget.canvas.mapPlot(proj)
-		
-		minr = compute_radius(proj, self.minrad, network_centre)
-		ax.add_patch(Circle(xy=network_centre, radius=minr, edgecolor="red",
-							linewidth=4.0, fill=False, alpha=0.3, transform=proj,
-						    zorder=15))
-		if float(self.maxrad) >= 150.:
-			pass
-		else:
-			maxr = compute_radius(proj, self.maxrad, network_centre)
-			ax.add_patch(Circle(xy=network_centre, radius=maxr, edgecolor="red",
-								linewidth=4.0, fill=False, alpha=0.3, transform=proj, 
-								zorder=15))
+        proj = ccrs.AzimuthalEquidistant(central_longitude=network_centre[0],
+                                         central_latitude=network_centre[1])
 
-		tolerance = 10
-		for i in range(len(lons)):
-			ax.scatter(lons[i], lats[i], 18, marker='o', color='k', picker=tolerance, zorder=20, label="SOURCE: {}".format(sids[i]), transform=ccrs.Geodetic())
+        if not map_widget:
+            return
+        else:
+            ax = map_widget.canvas.mapPlot(proj)
+
+        minr = compute_radius(proj, self.minrad, network_centre)
+        ax.add_patch(Circle(xy=network_centre, radius=minr, edgecolor="red",
+                            linewidth=4.0, fill=False, alpha=0.3,
+                            transform=proj, zorder=15))
+        if float(self.maxrad) >= 150.:
+            pass
+        else:
+            maxr = compute_radius(proj, self.maxrad, network_centre)
+            ax.add_patch(Circle(xy=network_centre, radius=maxr, edgecolor="red",
+                                linewidth=4.0, fill=False, alpha=0.3,
+                                transform=proj, zorder=15))
+
+        tolerance = 10
+        for i in range(len(lons)):
+            ax.scatter(lons[i], lats[i], 18, marker='o', color='k',
+                       picker=tolerance, zorder=20,
+                       label="SOURCE: {}".format(sids[i]),
+                       transform=ccrs.Geodetic())
+
 
 def compute_radius(ortho, radius_degrees, netcen):
     phi1 = netcen[1] + float(radius_degrees) if netcen[1] <= 0 else netcen[1] - float(radius_degrees)

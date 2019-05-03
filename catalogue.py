@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-This module requires that 'obspy', 'numpy', 'cartopy' and 'matplotlib' are
+This module requires that "obspy", "numpy", "cartopy" and "matplotlib" are
 installed in your Python environment.
 
 TO-DO
@@ -9,22 +9,24 @@ TO-DO
 Come up with a suitable sourceid scheme and implement in _generateCatalogue()
 
 """
-__author__ = "Hemmelig"
+__author__ = "hemmelig"
 
 
 from abc import ABC, abstractmethod
 import ast
-import pandas as pd
-from obspy.clients.fdsn import Client
-from obspy import read, UTCDateTime, Stream
-from obspy.taup import TauPyModel
-from obspy.geodetics import locations2degrees
-from string import Template
-import numpy as np
-import cartopy.crs as ccrs
-from matplotlib.patches import Circle
 import pathlib
 import shutil
+from string import Template
+
+import cartopy.crs as ccrs
+from matplotlib.patches import Circle
+import numpy as np
+from obspy import read, UTCDateTime, Stream
+from obspy.clients.fdsn import Client
+from obspy.geodetics import locations2degrees
+from obspy.taup import TauPyModel
+import pandas as pd
+
 import metainfo as psm
 
 
@@ -46,33 +48,33 @@ def parseCatalogueMetafile(meta_dir):
     params = []
 
     metafile = meta_dir / "catalogue_metafile.txt"
-    with metafile.open(mode='r') as f:
+    with metafile.open(mode="r") as f:
         for line in f:
             if "?" in line:
                 line = line.rstrip().split(" ? ")
                 params.append(line[1])
 
-    catalogue_parameters = {'catalogue_name': params[0],
-                            'catalogue_type': params[1],
-                            'catalogue_path': params[2],
-                            'data_source': params[3],
-                            'cdate': params[4],
-                            'archive_path': params[5],
-                            'archive_type': params[6],
-                            'archive_format': params[7],
-                            'rec_file': params[8],
-                            'start_date': params[9],
-                            'end_date': params[10]}
+    catalogue_parameters = {"catalogue_name": params[0],
+                            "catalogue_type": params[1],
+                            "catalogue_path": params[2],
+                            "data_source": params[3],
+                            "cdate": params[4],
+                            "archive_path": params[5],
+                            "archive_type": params[6],
+                            "archive_format": params[7],
+                            "rec_file": params[8],
+                            "start_date": params[9],
+                            "end_date": params[10]}
 
-    if catalogue_parameters['catalogue_type'] == "local":
-        d_specific = {'local_input': params[11]}
+    if catalogue_parameters["catalogue_type"] == "local":
+        d_specific = {"local_input": params[11]}
 
-    if catalogue_parameters['catalogue_type'] == "teleseismic":
-        d_specific = {'minmag': params[11],
-                      'clon': params[12],
-                      'clat': params[13],
-                      'minrad': params[14],
-                      'maxrad': params[15]}
+    if catalogue_parameters["catalogue_type"] == "teleseismic":
+        d_specific = {"minmag": params[11],
+                      "clon": params[12],
+                      "clat": params[13],
+                      "minrad": params[14],
+                      "maxrad": params[15]}
 
     return {**catalogue_parameters, **d_specific}
 
@@ -103,8 +105,8 @@ class Catalogue(ABC):
     Local catalogue (create a new local catalogue - can be generated from hyp file)
     """
 
-    src_cols = ['otime', 'lat', 'lon', 'dep', 'mag', 'sourceid']
-    arr_cols = ['sourceid', 'receiverid', 'traveltime', 'waveform?']
+    src_cols = ["otime", "lat", "lon", "dep", "mag", "sourceid"]
+    arr_cols = ["sourceid", "receiverid", "traveltime", "waveform?"]
 
     def __init__(self, new=False, **kwargs):
         """
@@ -157,7 +159,7 @@ class Catalogue(ABC):
         """
 
         for i, arrival in self.arr_df.iterrows():
-            if arrival['waveform?']:
+            if arrival["waveform?"]:
                 continue
 
             rec = self.network.lookupReceiver(arrival.receiverid)
@@ -165,7 +167,7 @@ class Catalogue(ABC):
 
             self.getWaveform(src, rec, arrival)
 
-            self.arr_df.at[i, 'waveform?'] = True
+            self.arr_df.at[i, "waveform?"] = True
 
             if (i % 10) == 0:
                 self.arr_df.to_csv(self.arr_file, index=False)
@@ -276,7 +278,7 @@ class Catalogue(ABC):
     def loadSources(self):
         if self.src_file.is_file():
             self.src_df = pd.read_csv(self.src_file)
-            self.src_df['otime'] = self.src_df['otime'].apply(UTCDateTime)
+            self.src_df["otime"] = self.src_df["otime"].apply(UTCDateTime)
 
     def loadArrivals(self):
         if self.arr_file.is_file():
@@ -301,7 +303,7 @@ class Catalogue(ABC):
 
     def lookupSource(self, sourceid):
         """
-        Queries the source DataFrame for 'sourceid'.
+        Queries the source DataFrame for "sourceid".
 
         Parameters
         ----------
@@ -326,7 +328,7 @@ class Catalogue(ABC):
 
     def lookupArrival(self, sourceid, receiverid):
         """
-        Queries the arrivals DataFrame for 'sourceid' and 'receiverid'
+        Queries the arrivals DataFrame for "sourceid" and "receiverid"
 
         Parameters
         ----------
@@ -407,27 +409,27 @@ class LocalCatalogue(Catalogue):
 
         """
 
-        filein = open('templates/local_metafile_template.txt')
+        filein = open("templates/local_metafile_template.txt")
         src = Template(filein.read())
 
-        d_cat = {'catalogue_name': self.catalogue_name,
-                 'catalogue_type': self.catalogue_type,
-                 'catalogue_path': self.catalogue_path,
-                 'data_source': self.data_source,
-                 'creation_date': self.creation_date,
-                 'archive_path': self.archive_path,
-                 'archive_type': self.archive_type,
-                 'archive_format': self.archive_format,
-                 'rec_file': self.rec_file,
-                 'start_date': self.start_date,
-                 'end_date': self.end_date,
-                 'local_input': self.local_input}
+        d_cat = {"catalogue_name": self.catalogue_name,
+                 "catalogue_type": self.catalogue_type,
+                 "catalogue_path": self.catalogue_path,
+                 "data_source": self.data_source,
+                 "creation_date": self.creation_date,
+                 "archive_path": self.archive_path,
+                 "archive_type": self.archive_type,
+                 "archive_format": self.archive_format,
+                 "rec_file": self.rec_file,
+                 "start_date": self.start_date,
+                 "end_date": self.end_date,
+                 "local_input": self.local_input}
 
         # Safe substitute writes "" for missing template variables
         output = src.safe_substitute(d_cat)
 
         meta_path = self.cat_dir / "metafiles" / "catalogue_metafile.txt"
-        with meta_path.open(mode='w') as f:
+        with meta_path.open(mode="w") as f:
             f.write(output)
 
     def _generateCatalogue(self):
@@ -446,7 +448,7 @@ class LocalCatalogue(Catalogue):
         src_path = pathlib.Path(self.local_input)
 
         if not src_path.exists():
-            print("File doesn't exist.")
+            print("File does not exist.")
             print("Please provide a valid path.")
             return
 
@@ -460,7 +462,7 @@ class LocalCatalogue(Catalogue):
             # Needed to track variable lengths of arrival files
             idx = 0
             for i, source in enumerate(sources):
-                with source.open(mode='r') as f:
+                with source.open(mode="r") as f:
                     for j, line in enumerate(f):
                         if j == 0:
                             continue
@@ -478,7 +480,7 @@ class LocalCatalogue(Catalogue):
                 self.src_df.loc[i] = [otime, lat, lon, dep, mag, i]
 
                 arrival = path / "outputs" / "{}.stn".format(source[:-6])
-                with arrival.open(mode='r') as f:
+                with arrival.open(mode="r") as f:
                     for j, line in enumerate(f):
                         if j == 0:
                             continue
@@ -514,7 +516,7 @@ class LocalCatalogue(Catalogue):
 
             if src_path.suffix == ".hyp":
                 lines = []
-                with src_path.open(mode='r') as f:
+                with src_path.open(mode="r") as f:
                     for line in f:
                         if "GEOGRAPHIC" in line:
                             lines.append(line)
@@ -576,7 +578,7 @@ class LocalCatalogue(Catalogue):
                     stdp = UTCDateTime(receiver["deployment"])
                     etdp = UTCDateTime(receiver["retrieval"])
                     if (otime >= stdp) & (otime <= etdp):
-                        self.arr_df.loc[idx] = [idx, receiver['receiverid'],
+                        self.arr_df.loc[idx] = [idx, receiver["receiverid"],
                                                 "{'{}': [0.0]}", False]
                     else:
                         self.arr_df.loc[idx] = ["-", "-", "-", "-"]
@@ -586,7 +588,7 @@ class LocalCatalogue(Catalogue):
             srcs = pathlib.Path(self.local_input)
             lines = []
             S_lines = []
-            with srcs.open(mode='r') as f:
+            with srcs.open(mode="r") as f:
                 for line in f:
                     if ">" in line:
                         if " P " in line:
@@ -617,7 +619,7 @@ class LocalCatalogue(Catalogue):
                     self.arr_df.loc[idx] = [sourceid, receiver,
                                             str({phase: [line[15]]}), False]
 
-        # Remove all sources that didn't have complete information
+        # Remove all sources that didn"t have complete information
         self.arr_df.drop(self.arr_df[self.arr_df.sourceid == "-"].index,
                          inplace=True)
         self.arr_df.reset_index(drop=True, inplace=True)
@@ -669,7 +671,7 @@ class LocalCatalogue(Catalogue):
         self.map.set_xlabel("Longitude, degrees", fontsize=10)
         self.map.set_ylabel("Latitude, degrees", fontsize=10)
         self.map.set_extent([self.lon0, self.lon1, self.lat0, self.lat1], proj)
-        self.map.set_aspect('auto')
+        self.map.set_aspect("auto")
 
         self._plotSources()
         if receivers:
@@ -682,7 +684,7 @@ class LocalCatalogue(Catalogue):
 
         tolerance = 10
         for i in range(len(lons)):
-            self.map.scatter(lons[i], lats[i], 12, marker='o', color='k',
+            self.map.scatter(lons[i], lats[i], 12, marker="o", color="k",
                              picker=tolerance, zorder=10,
                              label="SOURCE: {}".format(sids[i]))
 
@@ -724,31 +726,31 @@ class TeleseismicCatalogue(Catalogue):
 
         """
 
-        filein = open('templates/teleseismic_metafile_template.txt')
+        filein = open("templates/teleseismic_metafile_template.txt")
         src = Template(filein.read())
 
-        d_cat = {'catalogue_name': self.catalogue_name,
-                 'catalogue_type': self.catalogue_type,
-                 'catalogue_path': self.catalogue_path,
-                 'data_source': self.data_source,
-                 'creation_date': self.creation_date,
-                 'archive_path': self.archive_path,
-                 'archive_type': self.archive_type,
-                 'archive_format': self.archive_format,
-                 'rec_file': self.rec_file,
-                 'start_date': self.start_date,
-                 'end_date': self.end_date,
-                 'minmag': self.minmag,
-                 'clon': self.clon,
-                 'clat': self.clat,
-                 'minrad': self.minrad,
-                 'maxrad': self.maxrad}
+        d_cat = {"catalogue_name": self.catalogue_name,
+                 "catalogue_type": self.catalogue_type,
+                 "catalogue_path": self.catalogue_path,
+                 "data_source": self.data_source,
+                 "creation_date": self.creation_date,
+                 "archive_path": self.archive_path,
+                 "archive_type": self.archive_type,
+                 "archive_format": self.archive_format,
+                 "rec_file": self.rec_file,
+                 "start_date": self.start_date,
+                 "end_date": self.end_date,
+                 "minmag": self.minmag,
+                 "clon": self.clon,
+                 "clat": self.clat,
+                 "minrad": self.minrad,
+                 "maxrad": self.maxrad}
 
         # Safe substitute writes "" for missing template variables
         output = src.safe_substitute(d_cat)
 
         meta_path = self.cat_dir / "metafiles" / "catalogue_metafile.txt"
-        with meta_path.open(mode='w') as f:
+        with meta_path.open(mode="w") as f:
             f.write(output)
 
     def _generateCatalogue(self):
@@ -776,11 +778,11 @@ class TeleseismicCatalogue(Catalogue):
         for i in range(sources.count()):
             try:
                 source = sources[i]
-                otime = source.preferred_origin().get('time')
-                lat = source.preferred_origin().get('latitude')
-                lon = source.preferred_origin().get('longitude')
-                dep = source.preferred_origin().get('depth') / 1000.0
-                mag = source.preferred_magnitude().get('mag')
+                otime = source.preferred_origin().get("time")
+                lat = source.preferred_origin().get("latitude")
+                lon = source.preferred_origin().get("longitude")
+                dep = source.preferred_origin().get("depth") / 1000.0
+                mag = source.preferred_magnitude().get("mag")
             except TypeError:
                 otime = lat = lon = dep = mag = "-"
 
@@ -810,7 +812,7 @@ class TeleseismicCatalogue(Catalogue):
         rows_list = []
         for i, receiver in self.network.receivers.iterrows():
             rec = psm.Receiver(receiver)
-            tmp_df = self.src_df[self.src_df['otime'].between(rec.deployment,
+            tmp_df = self.src_df[self.src_df["otime"].between(rec.deployment,
                                                               rec.retrieval)]
 
             for j, source in tmp_df.iterrows():
@@ -888,7 +890,7 @@ class TeleseismicCatalogue(Catalogue):
 
         tolerance = 10
         for i in range(len(lons)):
-            ax.scatter(lons[i], lats[i], 18, marker='o', color='k',
+            ax.scatter(lons[i], lats[i], 18, marker="o", color="k",
                        picker=tolerance, zorder=20,
                        label="SOURCE: {}".format(sids[i]),
                        transform=ccrs.Geodetic())

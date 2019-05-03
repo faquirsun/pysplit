@@ -1,26 +1,27 @@
 #!/usr/bin/env python3
 
 """
-This module requires that 'numpy', 'pandas', 'matplotlib' and 'PyQT5' are
+This module requires that "numpy", "pandas", "matplotlib" and "PyQT5" are
 installed in your Python environment
 
 The back-end is found within the seispick.metainfo and seispick.catalogue
 modules.
 
-Author: Hemmelig
 """
+__author__ = "hemmelig"
 
+import os
+import pathlib
+import sys
+
+from matplotlib.patches import Rectangle
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
 from PyQt5.QtCore import Qt, QDateTime
 import PyQt5.QtWidgets as qt
 import PyQt5.QtGui as QtGui
 from PyQt5 import uic
-import sys
-import os
-import pathlib
 
 import metainfo as psm
 import catalogue as cat
@@ -60,14 +61,14 @@ class SeisPick(qt.QMainWindow):
 
         """
 
-        uic.loadUi('ui_files/main.ui', self)
+        uic.loadUi("ui_files/main.ui", self)
 
         self.connect()
 
         self.uiMapMpl.hide()
         self.uiStatusStacked.setCurrentIndex(1)
 
-        self.setWindowTitle('SeisPick - Main catalogue window')
+        self.setWindowTitle("SeisPick - Main catalogue window")
         self.setWindowIcon(QtGui.QIcon("misc/icon.png"))
         self.show()
 
@@ -81,13 +82,13 @@ class SeisPick(qt.QMainWindow):
         self.uiLoadCatalogueAction.triggered.connect(self.loadCatalogue)
         self.uiDefaultFilterAction.triggered.connect(self.defaultFilter)
 
-        self.uiMapMpl.canvas.mpl_connect('pick_event',
+        self.uiMapMpl.canvas.mpl_connect("pick_event",
                                          self._onPick)
-        self.uiMapMpl.canvas.mpl_connect('button_press_event',
+        self.uiMapMpl.canvas.mpl_connect("button_press_event",
                                          self._onMapClick)
-        self.uiMapMpl.canvas.mpl_connect('motion_notify_event',
+        self.uiMapMpl.canvas.mpl_connect("motion_notify_event",
                                          self._onMapMove)
-        self.uiMapMpl.canvas.mpl_connect('button_release_event',
+        self.uiMapMpl.canvas.mpl_connect("button_release_event",
                                          self._onMapRelease)
 
         self.uiReceiversListView.doubleClicked.connect(self.receiverSelect)
@@ -141,7 +142,7 @@ class SeisPick(qt.QMainWindow):
             qt.QMessageBox.about(self, "Error!", msg)
             return
 
-        self.uiStatusBar.showMessage('Parsing catalogue metafile...')
+        self.uiStatusBar.showMessage("Parsing catalogue metafile...")
         try:
             catalogue_parameters = cat.parseCatalogueMetafile(meta_dir)
         except FileNotFoundError:
@@ -311,7 +312,7 @@ class SeisPick(qt.QMainWindow):
                 self.catalogue.plot(map_widget=self.uiMapMpl)
 
         # Connect to the map to grab background once Qt has done resizing
-        self.uiMapMpl.canvas.mpl_connect('draw_event', self._mapDrawEvent)
+        self.uiMapMpl.canvas.mpl_connect("draw_event", self._mapDrawEvent)
 
         # Draw the canvas once Qt has done all resizing
         self.uiMapMpl.canvas.draw_idle()
@@ -416,7 +417,7 @@ class SeisPick(qt.QMainWindow):
 
         # Set rectangle values
         map_rectangle = Rectangle((xpress, ypress), dx, dy,
-                                  edgecolor='red', fill=False,
+                                  edgecolor="red", fill=False,
                                   transform=self.uiMapMpl.canvas.proj)
         self.uiMapMpl.canvas.ax.add_patch(map_rectangle)
         self.uiMapMpl.canvas.ax.draw_artist(map_rectangle)
@@ -453,7 +454,7 @@ class SeisPick(qt.QMainWindow):
 
         # Draw the final rectangle
         map_rectangle = Rectangle((xpress, ypress), dx, dy,
-                                  edgecolor='red', fill=False)
+                                  edgecolor="red", fill=False)
         self.uiMapMpl.canvas.ax.add_patch(map_rectangle)
         self.uiMapMpl.canvas.ax.draw_artist(map_rectangle)
 
@@ -482,7 +483,7 @@ class SeisPick(qt.QMainWindow):
         self.receiver = self.catalogue.network.lookupReceiver(receiver)
         self.list_receiver = self.receiver
 
-        sources = list(self.catalogue.arr_df.query('receiverid == @receiver').sourceid.values)
+        sources = list(self.catalogue.arr_df.query("receiverid == @receiver").sourceid.values)
 
         data_dir = pathlib.Path(self.catalogue.catalogue_path) / "data" / receiver.upper()
         avail_sources = list(data_dir.glob("*.z"))
@@ -504,7 +505,7 @@ class SeisPick(qt.QMainWindow):
 
         If the waveform files have not been downloaded, it attempts to retrieve
         them from the archive. If the file does not exist, the arrival is
-        removed from the catalogue's arrivals DataFrame.
+        removed from the catalogue"s arrivals DataFrame.
 
         Parameters
         ----------
@@ -573,7 +574,7 @@ class NewCatalogueDialogue(qt.QDialog):
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('ui_files/new_catalogue_dialogue.ui', self)
+        uic.loadUi("ui_files/new_catalogue_dialogue.ui", self)
 
         # Initialise with teleseismic catalogue selected
         self.uiTeleseismicRadio.setChecked(True)
@@ -585,7 +586,7 @@ class NewCatalogueDialogue(qt.QDialog):
         # Connect to actions and interactive widgets
         self.connect()
 
-        self.setWindowTitle('SeisPick - New catalogue')
+        self.setWindowTitle("SeisPick - New catalogue")
         self.setWindowIcon(QtGui.QIcon("misc/icon.png"))
         self.show()
 
@@ -707,11 +708,11 @@ class NewCatalogueDialogue(qt.QDialog):
             data_source = "IRIS"
 
             # Create dictionary of variables specific to teleseismic catalogues
-            d_specific = {'minmag': self.uiMinMagInput.text(),
-                          'clon': self.uiCenLonInput.text(),
-                          'clat': self.uiCenLatInput.text(),
-                          'minrad': self.uiMinRadInput.text(),
-                          'maxrad': self.uiMaxRadInput.text()}
+            d_specific = {"minmag": self.uiMinMagInput.text(),
+                          "clon": self.uiCenLonInput.text(),
+                          "clat": self.uiCenLatInput.text(),
+                          "minrad": self.uiMinRadInput.text(),
+                          "maxrad": self.uiMaxRadInput.text()}
 
         elif self.uiLocalRadio.isChecked():
             # Set catalogue type and data source
@@ -730,20 +731,20 @@ class NewCatalogueDialogue(qt.QDialog):
                     return
 
             # Create dictionary of variables specific to local catalogues
-            d_specific = {'local_input': local_input}
+            d_specific = {"local_input": local_input}
 
         # Create catalogue parameter dictionary and merge with catalogue type specific parameters
-        catalogue_parameters = {'catalogue_name': catalogue_name,
-                                'catalogue_type': catalogue_type,
-                                'catalogue_path': "{}/{}".format(catalogue_path, catalogue_name),
-                                'data_source': data_source,
-                                'creation_date': QDateTime.currentDateTime().toUTC().toString(Qt.ISODate),
-                                'archive_path': archive_path,
-                                'archive_type': archive_type,
-                                'archive_format': archive_format,
-                                'rec_file': rec_file,
-                                'start_date': self.uiStartDateInput.date().toString(Qt.ISODate),
-                                'end_date': self.uiEndDateInput.date().toString(Qt.ISODate)}
+        catalogue_parameters = {"catalogue_name": catalogue_name,
+                                "catalogue_type": catalogue_type,
+                                "catalogue_path": "{}/{}".format(catalogue_path, catalogue_name),
+                                "data_source": data_source,
+                                "creation_date": QDateTime.currentDateTime().toUTC().toString(Qt.ISODate),
+                                "archive_path": archive_path,
+                                "archive_type": archive_type,
+                                "archive_format": archive_format,
+                                "rec_file": rec_file,
+                                "start_date": self.uiStartDateInput.date().toString(Qt.ISODate),
+                                "end_date": self.uiEndDateInput.date().toString(Qt.ISODate)}
         self.catalogue_parameters = {**catalogue_parameters, **d_specific}
 
         # Send accept signal to Dialog
@@ -770,7 +771,7 @@ class TelePhaseDialogue(qt.QDialog):
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('ui_files/tele_phase_dialogue.ui', self)
+        uic.loadUi("ui_files/tele_phase_dialogue.ui", self)
 
         # Connect to actions and interactive widgets
         self.connect()
@@ -778,7 +779,7 @@ class TelePhaseDialogue(qt.QDialog):
         # Populate the receiver list
         self.model = QtGui.QStandardItemModel(self.uiPhaseListView)
 
-        self.setWindowTitle('SeisPick - Teleseismic phase selection')
+        self.setWindowTitle("SeisPick - Teleseismic phase selection")
         self.setWindowIcon(QtGui.QIcon("misc/icon.png"))
         self.show()
 
@@ -858,12 +859,12 @@ class DefaultFilterDialogue(qt.QDialog):
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('ui_files/default_filter_dialogue.ui', self)
+        uic.loadUi("ui_files/default_filter_dialogue.ui", self)
 
         # Connect to actions and interactive widgets
         self.connect()
 
-        self.setWindowTitle('SeisPick - Set default filter')
+        self.setWindowTitle("SeisPick - Set default filter")
         self.setWindowIcon(QtGui.QIcon("misc/icon.png"))
         self.show()
 
@@ -909,8 +910,8 @@ class DefaultFilterDialogue(qt.QDialog):
                 return
 
             # Create filter options dictionary
-            filter_freqs = {'freqmin': freqmin,
-                            'freqmax': freqmax}
+            filter_freqs = {"freqmin": freqmin,
+                            "freqmax": freqmax}
 
         elif filter_type == "lowpass":
             try:
@@ -920,7 +921,7 @@ class DefaultFilterDialogue(qt.QDialog):
                 return
 
             # Create filter options dictionary
-            filter_freqs = {'freq': freq}
+            filter_freqs = {"freq": freq}
 
         elif filter_type == "highpass":
             try:
@@ -930,7 +931,7 @@ class DefaultFilterDialogue(qt.QDialog):
                 return
 
             # Create filter options dictionary
-            filter_freqs = {'freq': freq}
+            filter_freqs = {"freq": freq}
 
         # Update the default filter in parent class
         self.parent.filt = {**filter_options, **filter_freqs}
@@ -953,9 +954,9 @@ class CustomPickDialogue(qt.QDialog):
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('ui_files/custom_phase_dialogue.ui', self)
+        uic.loadUi("ui_files/custom_phase_dialogue.ui", self)
 
-        self.setWindowTitle('SeisPick - Set custom phase pick')
+        self.setWindowTitle("SeisPick - Set custom phase pick")
         self.setWindowIcon(QtGui.QIcon("misc/icon.png"))
         self.show()
 
@@ -1002,14 +1003,14 @@ class WadatiWindow(qt.QMainWindow):
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('ui_files/wadati_window.ui', self)
+        uic.loadUi("ui_files/wadati_window.ui", self)
 
         self.uiWadatiPlotMpl.canvas.tracePlot(labels=self.wad_labels)
         self.uiDistancePlotMpl.canvas.tracePlot(labels=self.dist_labels)
 
         self.connect()
 
-        self.setWindowTitle('SeisPick - Wadati plot window')
+        self.setWindowTitle("SeisPick - Wadati plot window")
         self.setWindowIcon(QtGui.QIcon("misc/icon.png"))
         self.show()
 
@@ -1018,8 +1019,8 @@ class WadatiWindow(qt.QMainWindow):
         self.uiCalcVpVsButton.clicked.connect(self.calcVpVs)
 
         # Plot connection
-        self.uiWadatiPlotMpl.canvas.mpl_connect('pick_event', self._onPick)
-        self.uiDistancePlotMpl.canvas.mpl_connect('pick_event', self._onPick)
+        self.uiWadatiPlotMpl.canvas.mpl_connect("pick_event", self._onPick)
+        self.uiDistancePlotMpl.canvas.mpl_connect("pick_event", self._onPick)
 
     def calcVpVs(self):
         # Insert code to calc best fitting line to p travel and s-p times
@@ -1050,7 +1051,7 @@ class WadatiWindow(qt.QMainWindow):
         tolerance = 10
         for i in range(len(self.ptravels)):
             wadati_canvas.ax.scatter(self.ptravels[i], self.sptimes[i], 12,
-                                     marker='o', color='k', picker=tolerance,
+                                     marker="o", color="k", picker=tolerance,
                                      zorder=10, label=self.receivers[i])
 
         wadati_canvas.draw_idle()
@@ -1061,10 +1062,10 @@ class WadatiWindow(qt.QMainWindow):
         tolerance = 10
         for i in range(len(self.ptravels)):
             distance_canvas.ax.scatter(self.dists[i], self.ptravels[i], 12,
-                                       marker='o', color="red", picker=tolerance,
+                                       marker="o", color="red", picker=tolerance,
                                        zorder=10, label=self.receivers[i])
             distance_canvas.ax.scatter(self.dists[i], self.stravels[i], 12,
-                                       marker='o', color="blue", picker=tolerance,
+                                       marker="o", color="blue", picker=tolerance,
                                        zorder=10, label=self.receivers[i])
 
         distance_canvas.draw_idle()
@@ -1125,7 +1126,7 @@ class SplittingAnalysisWindow(qt.QMainWindow):
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('ui_files/sws_window.ui', self)
+        uic.loadUi("ui_files/sws_window.ui", self)
 
         # Populate source and receiver information boxes
         self._updateSourceInformation()
@@ -1312,7 +1313,7 @@ class PickingWindow(qt.QMainWindow):
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('ui_files/trace_window.ui', self)
+        uic.loadUi("ui_files/trace_window.ui", self)
         self.uiToggleSpectrogramStacked.setCurrentIndex(0)
 
         self._updateSourceInformation(self.current_sr.source)
@@ -1330,7 +1331,7 @@ class PickingWindow(qt.QMainWindow):
 
         self.connect()
 
-        self.setWindowTitle('SeisPick - Trace picking window')
+        self.setWindowTitle("SeisPick - Trace picking window")
         self.setWindowIcon(QtGui.QIcon("misc/icon.png"))
         self.show()
 
@@ -1364,17 +1365,17 @@ class PickingWindow(qt.QMainWindow):
 
         """
 
-        self.c1_moveid = self.uiComponent1Mpl.canvas.mpl_connect('motion_notify_event', self._onMove)
-        self.c2_moveid = self.uiComponent2Mpl.canvas.mpl_connect('motion_notify_event', self._onMove)
-        self.c3_moveid = self.uiComponent3Mpl.canvas.mpl_connect('motion_notify_event', self._onMove)
+        self.c1_moveid = self.uiComponent1Mpl.canvas.mpl_connect("motion_notify_event", self._onMove)
+        self.c2_moveid = self.uiComponent2Mpl.canvas.mpl_connect("motion_notify_event", self._onMove)
+        self.c3_moveid = self.uiComponent3Mpl.canvas.mpl_connect("motion_notify_event", self._onMove)
 
-        self.c1_clickid = self.uiComponent1Mpl.canvas.mpl_connect('button_press_event', self._onClick)
-        self.c2_clickid = self.uiComponent2Mpl.canvas.mpl_connect('button_press_event', self._onClick)
-        self.c3_clickid = self.uiComponent3Mpl.canvas.mpl_connect('button_press_event', self._onClick)
+        self.c1_clickid = self.uiComponent1Mpl.canvas.mpl_connect("button_press_event", self._onClick)
+        self.c2_clickid = self.uiComponent2Mpl.canvas.mpl_connect("button_press_event", self._onClick)
+        self.c3_clickid = self.uiComponent3Mpl.canvas.mpl_connect("button_press_event", self._onClick)
 
-        self.c1_releaseid = self.uiComponent1Mpl.canvas.mpl_connect('button_release_event', self._onRelease)
-        self.c2_releaseid = self.uiComponent2Mpl.canvas.mpl_connect('button_release_event', self._onRelease)
-        self.c3_releaseid = self.uiComponent3Mpl.canvas.mpl_connect('button_release_event', self._onRelease)
+        self.c1_releaseid = self.uiComponent1Mpl.canvas.mpl_connect("button_release_event", self._onRelease)
+        self.c2_releaseid = self.uiComponent2Mpl.canvas.mpl_connect("button_release_event", self._onRelease)
+        self.c3_releaseid = self.uiComponent3Mpl.canvas.mpl_connect("button_release_event", self._onRelease)
 
     def plotdisconnect(self):
         """
@@ -1459,11 +1460,11 @@ class PickingWindow(qt.QMainWindow):
             dy = ymove - ypress
 
             rect1 = Rectangle((xpress, ypress), dx, dy,
-                              edgecolor='red', fill=False)
+                              edgecolor="red", fill=False)
             rect2 = Rectangle((xpress, ypress), dx, dy,
-                              edgecolor='red', fill=False)
+                              edgecolor="red", fill=False)
             rect3 = Rectangle((xpress, ypress), dx, dy,
-                              edgecolor='red', fill=False)
+                              edgecolor="red", fill=False)
 
             c1_canvas.ax.add_patch(rect1)
             c2_canvas.ax.add_patch(rect2)
@@ -1636,9 +1637,9 @@ class PickingWindow(qt.QMainWindow):
                                    lims=self.lims)
 
         # Connect to each trace to grab the background once Qt has done resizing
-        c1_canvas.mpl_connect('draw_event', self._c1DrawEvent)
-        c2_canvas.mpl_connect('draw_event', self._c2DrawEvent)
-        c3_canvas.mpl_connect('draw_event', self._c3DrawEvent)
+        c1_canvas.mpl_connect("draw_event", self._c1DrawEvent)
+        c2_canvas.mpl_connect("draw_event", self._c2DrawEvent)
+        c3_canvas.mpl_connect("draw_event", self._c3DrawEvent)
 
         # Draw when Qt has done all resizing
         c1_canvas.draw_idle()
@@ -1646,13 +1647,13 @@ class PickingWindow(qt.QMainWindow):
         c3_canvas.draw_idle()
 
         # Initialise the cursor to track mouse position on the axes
-        self.c1_cursor = c1_canvas.ax.axvline(5, linewidth=1, color='0.5',
+        self.c1_cursor = c1_canvas.ax.axvline(5, linewidth=1, color="0.5",
                                               animated=True)
         _, self.c1_y = self.c1_cursor.get_data()
-        self.c2_cursor = c2_canvas.ax.axvline(5, linewidth=1, color='0.5',
+        self.c2_cursor = c2_canvas.ax.axvline(5, linewidth=1, color="0.5",
                                               animated=True)
         _, self.c2_y = self.c2_cursor.get_data()
-        self.c3_cursor = c3_canvas.ax.axvline(5, linewidth=1, color='0.5',
+        self.c3_cursor = c3_canvas.ax.axvline(5, linewidth=1, color="0.5",
                                               animated=True)
         _, self.c3_y = self.c3_cursor.get_data()
 
@@ -1765,11 +1766,11 @@ class PickingWindow(qt.QMainWindow):
             freqmin = float(self.uiLowFreqInput.text())
             freqmax = float(self.uiHighFreqInput.text())
 
-            self.filt = {'type': filt_type,
-                         'corners': corners,
-                         'zerophase': zerophase,
-                         'freqmin': freqmin,
-                         'freqmax': freqmax}
+            self.filt = {"type": filt_type,
+                         "corners": corners,
+                         "zerophase": zerophase,
+                         "freqmin": freqmin,
+                         "freqmax": freqmax}
         except ValueError:
             qt.QMessageBox.about(self, "Warning!", "You appear to have tried to use an incomplete/incorrect filter. Fill in all of the options and try again.")
             return

@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 
 """
-This module requires that 'obspy' and 'numpy' are installed in your Python
+This module requires that "obspy" and "numpy" are installed in your Python
 environment.
 
 TO-DO
 -----
 
-
-Author: Hemmelig
 """
+__author__ = "hemmelig"
 
-from obspy import read, UTCDateTime
-from obspy.geodetics import gps2dist_azimuth
-import numpy as np
 import ast
 import pathlib
+
+import numpy as np
+from obspy import read, UTCDateTime
+from obspy.geodetics import gps2dist_azimuth
 import pandas as pd
 
 
@@ -156,15 +156,15 @@ class SourceReceiverPair(object):
                 #            q\n
                 #            EOF\n
                 #            """
-                # tmp_dir = pathlib.(os.path.expanduser('~'), 'filter_temp')
+                # tmp_dir = pathlib.(os.path.expanduser("~"), "filter_temp")
                 # if not(os.path.exists(temp_dir)):
                 #     os.makedirs(temp_dir)
-                # tr.write('{}/f.sac'.format(temp_dir), "SAC")
+                # tr.write("{}/f.sac".format(temp_dir), "SAC")
                 # text = temp_text.format(minfreq, maxfreq, n_poles, ph)
                 # os.chdir(temp_dir)
-                # open('s', 'w+').write(text)
-                # os.system('bash s')
-                # tr = read('{}/f.sac'.format(temp_dir))[0]
+                # open("s", "w+").write(text)
+                # os.system("bash s")
+                # tr = read("{}/f.sac".format(temp_dir))[0]
                 # return tr
             elif method == "obspy":
                 tmp_stream.taper(max_percentage=0.05)
@@ -204,7 +204,7 @@ class SourceReceiverPair(object):
         """
 
         p = self.pick_path.with_suffix(".pf")
-        with open(p, 'w') as f:
+        with open(p, "w") as f:
             print(self.picks, file=f)
 
     def removeFiles(self):
@@ -665,7 +665,7 @@ class Source(object):
         if type(value) == float:
             self._magnitude = value
         else:
-            # raise TypeError("Magnitudes must be of type 'float'")
+            # raise TypeError("Magnitudes must be of type "float"")
             self._magnitude = None
 
     @property
@@ -700,8 +700,8 @@ class Network(object):
 
     """
 
-    rec_cols = ['network', 'name', 'lat', 'lon', 'elv',
-                'deployment', 'retrieval']
+    rec_cols = ["network", "name", "lat", "lon", "elv",
+                "deployment", "retrieval"]
 
     def __init__(self, rec_file):
         """
@@ -725,7 +725,7 @@ class Network(object):
 
     def lookupReceiver(self, receiverid):
         """
-        Queries the network DataFrame for 'receiverid'
+        Queries the network DataFrame for "receiverid"
 
         Parameters
         ----------
@@ -757,8 +757,8 @@ class Network(object):
         if rec_file.is_file():
             self.receivers = pd.read_csv(rec_file)
             try:
-                self.receivers['deployment'] = self.receivers['deployment'].apply(UTCDateTime)
-                self.receivers['retrieval'] = self.receivers['retrieval'].apply(UTCDateTime)
+                self.receivers["deployment"] = self.receivers["deployment"].apply(UTCDateTime)
+                self.receivers["retrieval"] = self.receivers["retrieval"].apply(UTCDateTime)
             except TypeError:
                 pass
 

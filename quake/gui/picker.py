@@ -80,7 +80,10 @@ class Picker(qt.QMainWindow):
         self._updateReceiverInformation(self.arrival.receiver)
         if self.default_filt is not None:
             self._populateFilter()
-        self.plotTraces()
+        try:
+            self.plotTraces()
+        except AttributeError:
+            print("No files available in the archive for this arrival.")
 
         self.setWindowTitle("Quake - trace picker")
         self.setWindowIcon(QtGui.QIcon("gui/ui/resources/icon.png"))

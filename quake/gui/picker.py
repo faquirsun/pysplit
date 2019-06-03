@@ -80,10 +80,7 @@ class Picker(qt.QMainWindow):
         self._updateReceiverInformation(self.arrival.receiver)
         if self.default_filt is not None:
             self._populateFilter()
-        try:
-            self.plotTraces()
-        except AttributeError:
-            print("No files available in the archive for this arrival.")
+        self.plotTraces()
 
         self.setWindowTitle("Quake - trace picker")
         self.setWindowIcon(QtGui.QIcon("gui/ui/resources/icon.png"))
@@ -94,6 +91,8 @@ class Picker(qt.QMainWindow):
         Connect all signals from Qt to functions
 
         """
+
+        self.uiSaveAction.triggered.connect(self.save)
 
         self.uiPPickAction.triggered.connect(lambda: self.updatePick("P"))
         self.uiSPickAction.triggered.connect(lambda: self.updatePick("S"))
@@ -111,6 +110,15 @@ class Picker(qt.QMainWindow):
         self.uiRejectTraceButton.clicked.connect(self.rejectTrace)
         self.uiToggleLimitsButton.clicked.connect(self.toggleLims)
         self.uiResetPlotButton.clicked.connect(self.resetPlot)
+
+    def save(self):
+        """
+        Save the current state of the catalogue, including any picks made
+        since the last save
+
+        """
+
+        self.catalogue.save()
 
     def _plotconnect(self):
         """
@@ -314,10 +322,13 @@ class Picker(qt.QMainWindow):
         else:
             self._replotLines()
 
-        self.arrival.filter(filt=self.filt)
+        try:
+            self.arrival.filter(filt=self.filt)
 
-        # Plot the traces
-        self.arrival.plot(canvas.axes, lims=self.lims)
+            # Plot the traces
+            self.arrival.plot(canvas.axes, lims=self.lims)
+        except AttributeError:
+            print("No files available in the archive for this arrival.")
 
         # Connect to trace to grab the background once Qt has done resizing
         canvas.mpl_connect("draw_event", self._drawEvent)
@@ -569,7 +580,10 @@ class Picker(qt.QMainWindow):
         self.uiPickTimeDisplay.setText(self.pick_time)
         self.uiPhaseDisplay.setText(self.pick_phase)
 
-        self._plotdisconnect()
+        try:
+            self._plotdisconnect()
+        except AttributeError:
+            pass
         self.plotTraces()
 
     def rejectTrace(self):

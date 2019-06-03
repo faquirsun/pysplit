@@ -109,7 +109,7 @@ class Quake(qt.QMainWindow):
 
         """
 
-        dlg = DefaultFilterDialogue(self)
+        dlg = DefaultFilterDialogue()
 
         if not dlg.exec_():
             return
@@ -813,10 +813,8 @@ class TelePhaseDialogue(qt.QDialog):
 
 class DefaultFilterDialogue(qt.QDialog):
 
-    def __init__(self, parent):
+    def __init__(self):
         super().__init__()
-
-        self.parent = parent
 
         self.initUI()
 
@@ -830,22 +828,10 @@ class DefaultFilterDialogue(qt.QDialog):
         self.setWindowIcon(QtGui.QIcon("gui/ui/resources/icon.png"))
         self.show()
 
-    # ------------------------------
-
-    # ------------------------------
-    # Connection and event functions
-    # ------------------------------
-
     def connect(self):
         # Connect to accept/reject actions
         self.uiButtonBox.accepted.connect(self.actionAccept)
         self.uiButtonBox.rejected.connect(self.actionReject)
-
-    # ------------------------------
-
-    # ------------------------------
-    # Accept/Reject action overrides
-    # ------------------------------
 
     def actionAccept(self):
         # Builds a dictionary of keyword arguments for the filter
@@ -896,7 +882,7 @@ class DefaultFilterDialogue(qt.QDialog):
             filter_freqs = {"freq": freq}
 
         # Update the default filter in parent class
-        self.parent.filt = {**filter_options, **filter_freqs}
+        self.filt = {**filter_options, **filter_freqs}
 
         # Send accept signal to Dialog
         self.accept()

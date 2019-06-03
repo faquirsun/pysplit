@@ -79,7 +79,7 @@ class Arrival(object):
 
     uid_stub = "{}_{}"
 
-    def __init__(self, source, receiver, load_stream=False):
+    def __init__(self, source, receiver, load_waveforms=False):
         """
         Object initialisation
 
@@ -98,12 +98,10 @@ class Arrival(object):
 
         self.uid = self.uid_stub.format(source.uid, receiver.uid)
 
-        # self.path = source.catalogue.path
-
         self.components = "ZNE"
 
-        if load_stream:
-            self.load_stream()
+        if load_waveforms:
+            self.load_waveforms()
 
         self.picks = {}
 
@@ -118,6 +116,8 @@ class Arrival(object):
         """
 
         for uid, pick in picks.items():
+            for i, v in enumerate(pick["ttime"]):
+                pick["ttime"][i] = float(v)
             pk = Pick(uid, pick["ttime"], pick["error"], pick["polarity"])
             self + pk
 
@@ -145,17 +145,6 @@ class Arrival(object):
                     self.picks[pick_id].ttime.append(time)
                 else:
                     self + pick
-
-    # def load_stream(self):
-    #     """
-    #     Load streams
-
-    #     """
-    #     path = self.path / "data" / self.receiver.uid / self.uid
-    #     path = path.with_suffix(".*")
-
-    #     self.stream = read(str(path))
-    #     self._update_components(self.stream)
 
     @property
     def output(self):
@@ -483,11 +472,18 @@ class Arrival(object):
 
         """
 
+        if archive.schema == "QuakeMigrate":
+            st_file = archive.path / archive.structure.format(self.source.uid)
+            st = read(str(st_file))
+
+            self.stream = st
+
+            self._update_components(self.stream)
+            return
+
         # Check first to see if already retrieved
         tmp = outpath / "mseed" / self.receiver.uid / self.source.uid
-        print(tmp)
         if tmp.with_suffix(".e").is_file():
-            print("Hello")
             st = read(str(tmp.with_suffix(".e")))
             st += read(str(tmp.with_suffix(".n")))
             st += read(str(tmp.with_suffix(".z")))
@@ -558,7 +554,8 @@ class Arrival(object):
             # Do some more handling here?
 
     def _update_components(self, stream):
-        """Update the component attributes
+        """
+        Update the component attributes
 
         Parameters
         ----------

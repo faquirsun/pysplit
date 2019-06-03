@@ -4,10 +4,6 @@
 This module requires that "obspy", "numpy", "cartopy" and "matplotlib" are
 installed in your Python environment.
 
-TO-DO
------
-Come up with a suitable sourceid scheme and implement in _generateCatalogue()
-
 """
 __author__ = "hemmelig"
 
@@ -19,7 +15,6 @@ import shutil
 from string import Template
 
 import cartopy.crs as ccrs
-from matplotlib.patches import Circle
 import numpy as np
 from obspy import read, UTCDateTime, Stream
 from obspy.clients.fdsn import Client
@@ -27,17 +22,19 @@ from obspy.geodetics import locations2degrees
 from obspy.taup import TauPyModel
 import pandas as pd
 
-import metainfo as psm
+from quake.core.network import Network
+from quake.core.receiver import Receiver
+from quake.core.source import Source
 
 
-def parseCatalogueMetafile(meta_dir):
+def parse_metafile(path):
     """
     Parses the relevant catalogue metafile into a dictionary containing
     the catalogue parameters
 
     Parameters
     ----------
-    meta_dir : pathlib.Path object
+    path : pathlib.Path object
         Path to metafiles directory
 
     Returns
@@ -47,7 +44,7 @@ def parseCatalogueMetafile(meta_dir):
 
     params = []
 
-    metafile = meta_dir / "catalogue_metafile.txt"
+    metafile = path / "catalogue_metafile.txt"
     with metafile.open(mode="r") as f:
         for line in f:
             if "?" in line:
@@ -105,9 +102,6 @@ class Catalogue(ABC):
     Local catalogue (create a new local catalogue - can be generated from hyp file)
     """
 
-    src_cols = ["otime", "lat", "lon", "dep", "mag", "sourceid"]
-    arr_cols = ["sourceid", "receiverid", "traveltime", "waveform?"]
-
     def __init__(self, new=False, **kwargs):
         """
         Class initialisation
@@ -123,30 +117,29 @@ class Catalogue(ABC):
 
         super().__init__()
 
-        self.src_df = pd.DataFrame(columns=self.src_cols)
-        self.arr_df = pd.DataFrame(columns=self.arr_cols)
+        self.sources = {}
 
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-        self.network = psm.Network(self.rec_file)
+        self.network = Network(self.rec_file)
 
         self.cat_dir = pathlib.Path(self.catalogue_path)
-        dirs = ["", "metafiles", "data", "tmp", "plots", "picks"]
+        dirs = ["", "meta", "mseed", "tmp", "plots", "picks"]
         for dir_ in dirs:
             new_dir = self.cat_dir / dir_
             new_dir.mkdir(exist_ok=True)
 
-        new_rec_file = self.cat_dir / "metafiles" / "receivers.txt"
+        new_rec_file = self.cat_dir / "meta" / "receivers.txt"
         rec_file = pathlib.Path(self.rec_file)
         try:
             shutil.copy(str(rec_file), str(new_rec_file))
         except shutil.SameFileError:
             pass
 
-        self.src_file = self.cat_dir / "metafiles" / "sources.txt"
+        self.src_file = self.cat_dir / "meta" / "sources.txt"
         self.loadSources()
-        self.arr_file = self.cat_dir / "metafiles" / "arrivals.txt"
+        self.arr_file = self.cat_dir / "meta" / "arrivals.txt"
 
         if new:
             self._generateCatalogueMetafile()
@@ -321,7 +314,7 @@ class Catalogue(ABC):
             return
         try:
             src = self.src_df[self.src_df["sourceid"] == int(sourceid)]
-            return psm.Source(src)
+            return Source(src)
         except IndexError:
             msg = "There is no source with id \"{}\" in this catalogue"
             print(msg.format(sourceid))
@@ -443,6 +436,10 @@ class LocalCatalogue(Catalogue):
             .hyp file
             IRIS catalogue - not yet supported
 
+        TO-DO
+        -----
+        Handling magnitudes from .hyp files
+
         """
 
         src_path = pathlib.Path(self.local_input)
@@ -475,11 +472,13 @@ class LocalCatalogue(Catalogue):
                 lat = src_info[3]
                 dep = src_info[4]
                 mag = ""
-                sourceid = ""  # TO-DO
+                sourceid = otime.isoformat()
+                for char_ in [":", "-", "T", ".", " "]:
+                    sourceid = sourceid.replace(char_, "")
 
                 self.src_df.loc[i] = [otime, lat, lon, dep, mag, i]
 
-                arrival = path / "outputs" / "{}.stn".format(source[:-6])
+                arrival = src_path / "outputs" / "{}.stn".format(source[:-6])
                 with arrival.open(mode="r") as f:
                     for j, line in enumerate(f):
                         if j == 0:
@@ -536,10 +535,12 @@ class LocalCatalogue(Catalogue):
                     lat = float(line[9])
                     lon = float(line[11])
                     dep = float(line[13])
-                    mag = "?"  # ADD PROPER HANDLING FOR HYP FILES THAT HAVE MAGNITUDES IN
-                    sourceid = ""
+                    mag = "?"
+                    sourceid = otime.isoformat()
+                    for char_ in [":", "-", "T", ".", " "]:
+                        sourceid = sourceid.replace(char_, "")
 
-                    self.src_df.loc[i] = [otime, lat, lon, dep, mag, i]
+                    self.src_df.loc[i] = [otime, lat, lon, dep, mag, sourceid]
 
             else:
                 print("Please provide a .hyp file.")
@@ -559,9 +560,6 @@ class LocalCatalogue(Catalogue):
         ----------
         phases : list, optional
             List of phase identification strings
-        input_file : 
-
-        input_type : , optional
 
         """
 
@@ -811,12 +809,12 @@ class TeleseismicCatalogue(Catalogue):
 
         rows_list = []
         for i, receiver in self.network.receivers.iterrows():
-            rec = psm.Receiver(receiver)
+            rec = Receiver(receiver)
             tmp_df = self.src_df[self.src_df["otime"].between(rec.deployment,
                                                               rec.retrieval)]
 
             for j, source in tmp_df.iterrows():
-                src = psm.Source(source)
+                src = Source(source)
                 tmp_dist = locations2degrees(src.latitude, src.longitude,
                                              rec.latitude, rec.longitude)
                 phase_arr = model.get_travel_times(source_depth_in_km=src.depth,
@@ -876,27 +874,9 @@ class TeleseismicCatalogue(Catalogue):
         else:
             ax = map_widget.canvas.mapPlot(proj)
 
-        minr = compute_radius(proj, self.minrad, network_centre)
-        ax.add_patch(Circle(xy=network_centre, radius=minr, edgecolor="red",
-                            linewidth=4.0, fill=False, alpha=0.3,
-                            transform=proj, zorder=15))
-        if float(self.maxrad) >= 150.:
-            pass
-        else:
-            maxr = compute_radius(proj, self.maxrad, network_centre)
-            ax.add_patch(Circle(xy=network_centre, radius=maxr, edgecolor="red",
-                                linewidth=4.0, fill=False, alpha=0.3,
-                                transform=proj, zorder=15))
-
-        tolerance = 10
+        tolerance = 15
         for i in range(len(lons)):
-            ax.scatter(lons[i], lats[i], 18, marker="o", color="k",
-                       picker=tolerance, zorder=20,
+            ax.scatter(lons[i], lats[i], s=45, marker="o", color="white",
+                       picker=tolerance, zorder=20, alpha=0.9,
                        label="SOURCE: {}".format(sids[i]),
-                       transform=ccrs.Geodetic())
-
-
-def compute_radius(ortho, radius_degrees, netcen):
-    phi1 = netcen[1] + float(radius_degrees) if netcen[1] <= 0 else netcen[1] - float(radius_degrees)
-    _, y1 = ortho.transform_point(netcen[0], phi1, ccrs.PlateCarree())
-    return abs(y1)
+                       transform=ccrs.Geodetic(), edgecolors="k")

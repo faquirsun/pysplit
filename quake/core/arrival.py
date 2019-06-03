@@ -539,8 +539,10 @@ class Arrival(object):
             else:
                 # Write to files
                 for tr in st:
-                    name = "{stat}/{sourceid}.{comp}"
-                    out = outpath / "mseed" / name.format(
+                    station_dir = outpath / "mseed" / self.receiver.uid
+                    station_dir.mkdir(parents=True, exist_ok=True)
+                    name = "{sourceid}.{comp}"
+                    out = station_dir / name.format(
                         stat=self.receiver.uid,
                         sourceid=self.source.uid,
                         comp=tr.stats.channel[-1].lower())

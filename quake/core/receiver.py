@@ -93,7 +93,7 @@ class Receiver(object):
         if isinstance(self.deployment, str) or isinstance(self.retrieval, str):
             return True
 
-        if time.between(self.deployment, self.retrieval):
+        if time >= self.deployment and time <= self.retrieval:
             return True
         else:
             return False

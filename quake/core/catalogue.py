@@ -10,9 +10,6 @@ import json
 import pathlib
 
 import cartopy.crs as ccrs
-from obspy import UTCDateTime
-from obspy.clients.fdsn import Client
-from obspy.taup import TauPyModel
 
 from quake.core.source import Source
 
@@ -76,69 +73,6 @@ class Catalogue(object):
             with metafile.open("w") as f:
                 json.dump(params, f, sort_keys=True,
                           indent=4, ensure_ascii=False)
-
-    def sources_from_datacentre(self):
-        """
-        Generates a Catalogue of Sources from the IRIS webclient API.
-
-        """
-
-        client = Client("IRIS")
-
-        st = UTCDateTime(self.sdate)
-        et = UTCDateTime(self.edate)
-
-        sources = client.get_events(starttime=st,
-                                    endtime=et,
-                                    minmagnitude=self.minmag,
-                                    latitude=self.network.centre[1],
-                                    longitude=self.network.centre[0],
-                                    minradius=self.minrad,
-                                    maxradius=self.maxrad)
-
-        for source in sources:
-            try:
-                otime = source.preferred_origin().time
-                lat = source.preferred_origin().latitude
-                lon = source.preferred_origin().longitude
-                dep = source.preferred_origin().depth / 1000.0
-                mag = source.preferred_magnitude().mag
-
-                sourceid = otime.isoformat()
-                for char_ in [":", "-", "T", ".", " ", "Z"]:
-                    sourceid = sourceid.replace(char_, "")
-
-                src_info = {"otime": otime,
-                            "latitude": lat,
-                            "longitude": lon,
-                            "depth": dep,
-                            "magnitude": mag,
-                            "uid": sourceid}
-
-                self + Source(self, **src_info)
-            except TypeError:
-                pass
-
-        self.save()
-
-    def arrivals_from_datacentre(self, phases, vmodel="ak135"):
-        # def get_arrivals(self, phases=["P", "S"], vmodel="ak135"):
-        """
-        Generates predicted arrival times using a whole earth velocity model
-
-        Parameters
-        ----------
-        phases : list of strings, optional
-            List containing the seismic phases for which to calculate
-            predicted traveltimes. Defaults to "SKS"
-
-        """
-        model = TauPyModel(model=vmodel)
-
-        for sourceid, source in self.sources.items():
-            source.get_iris_arrivals(phases, model, self.network.receivers)
-
-        self.save()
 
     def lookup(self, sourceid):
         """
@@ -237,12 +171,17 @@ class Catalogue(object):
         lats = [s.latitude for u, s in self.sources.items()]
 
         if lims is None:
-            londiff = (max(lons) - min(lons)) * 0.1
-            latdiff = (max(lats) - min(lats)) * 0.1
-            self.lon0 = min(lons) - londiff
-            self.lon1 = max(lons) + londiff
-            self.lat0 = min(lats) - latdiff
-            self.lat1 = max(lats) + latdiff
+            extent = self.network.extent
+            minlon = min(extent[0], min(lons))
+            maxlon = max(extent[2], max(lons))
+            minlat = min(extent[1], min(lats))
+            maxlat = max(extent[3], max(lats))
+            londiff = (maxlon - minlon) * 0.1
+            latdiff = (maxlat - minlat) * 0.1
+            self.lon0 = minlon - londiff
+            self.lon1 = maxlon + londiff
+            self.lat0 = minlat - latdiff
+            self.lat1 = maxlat + latdiff
         else:
             self.lon0 = lims["lon0"]
             self.lon1 = lims["lon1"]

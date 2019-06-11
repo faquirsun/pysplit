@@ -63,11 +63,11 @@ class Receiver(object):
         elif not hasattr(self, "network"):
             self.network = ""
 
-        if hasattr(self, "deployment"):
+        if hasattr(self, "deployment") and self.deployment != "":
             self.deployment = UTCDateTime(self.deployment)
         else:
             self.deployment = ""
-        if hasattr(self, "retrieval"):
+        if hasattr(self, "retrieval") and self.deployment != "":
             self.retrieval = UTCDateTime(self.retrieval)
         else:
             self.retrieval = ""

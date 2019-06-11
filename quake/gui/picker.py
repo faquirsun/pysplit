@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module requires that "numpy", "pandas", "matplotlib" and "PyQT5" are
+This module requires that "numpy", "pandas", "matplotlib" and "PyQt5" are
 installed in your Python environment
 
 The back-end is powered by a series of classes in quake.core
@@ -72,6 +72,8 @@ class Picker(qt.QMainWindow):
         """
 
         uic.loadUi("gui/ui/pick.ui", self)
+
+        self.showMaximized()
 
         self.connect()
 
@@ -156,7 +158,7 @@ class Picker(qt.QMainWindow):
         """
 
         if event.key() == Qt.Key_U or event.key() == Qt.Key_D:
-            if not self.pick_line:
+            if self.pick_type not in self.lines.keys():
                 return
             else:
                 pick_polarity = chr(event.key())
@@ -206,7 +208,7 @@ class Picker(qt.QMainWindow):
                 cursor.set_data([x, x], self.y)
                 ax.draw_artist(cursor)
 
-        self._replotLines()
+        self._plotPicks()
 
         for ax in canvas.axes:
             canvas.blit()
@@ -238,7 +240,8 @@ class Picker(qt.QMainWindow):
             color = self.pick_line_color
             pick_type = self.pick_type
 
-            pick = Pick(pick_type, adjusted_xdata)
+            pick = Pick(pick_type, adjusted_xdata
+                        - (self.source.otime - self.arrival.starttime))
             self.arrival + pick
 
             pick_time = self.arrival.starttime + adjusted_xdata
@@ -246,7 +249,7 @@ class Picker(qt.QMainWindow):
             self.uiPhaseDisplay.setText(pick_type)
         elif event.button == 3:
             # Implement pick delete option
-            pass
+            return
 
         lines = []
         for ax in canvas.axes:
@@ -258,7 +261,7 @@ class Picker(qt.QMainWindow):
         for bg in self.bgs:
             canvas.restore_region(bg)
 
-        self._replotLines()
+        self._plotPicks()
 
         for ax in canvas.axes:
             canvas.blit(ax.bbox)
@@ -296,39 +299,37 @@ class Picker(qt.QMainWindow):
 
         self.trace_drag = False
         self.trace_click = None
-
-        if not replot:
-            # Add limits variable
-            self.previous_lims = None
-            self.lims = None
-
-            # Set filter to default filter
-            self.filt = self.default_filt
-
-            # Look up any picks and make vertical lines
-            for uid, pick in self.arrival.picks.items():
-                pick_times = pick.ttime
-                if uid == "window":
-                    c = "green"
-                else:
-                    c = "gray"
-
-                print(pick_times)
-
-                for time in pick_times:
-                    for ax in canvas.axes:
-                        ax.axvline(time, linewidth=0.75, color=c, alpha=0.4)
-
-        else:
-            self._replotLines()
-
         try:
+            if not replot:
+                # Add limits variable
+                self.previous_lims = None
+                self.lims = None
+
+                # Set filter to default filter
+                self.filt = self.default_filt
+
+                # Look up any picks and make vertical lines
+                for uid, pick in self.arrival.picks.items():
+                    pick_times = pick.ttime
+                    c = "gray"
+                    for time in pick_times:
+                        lines = []
+                        for ax in canvas.axes:
+                            line = ax.axvline(time
+                                              + (self.source.otime
+                                                 - self.arrival.starttime),
+                                              linewidth=0.75,
+                                              color=c, alpha=0.4)
+                            lines.append(line)
+
+                            self.lines[uid] = lines
+
             self.arrival.filter(filt=self.filt)
 
             # Plot the traces
             self.arrival.plot(canvas.axes, lims=self.lims)
         except AttributeError:
-            print("No files available in the archive for this arrival.")
+            pass
 
         # Connect to trace to grab the background once Qt has done resizing
         canvas.mpl_connect("draw_event", self._drawEvent)
@@ -358,7 +359,7 @@ class Picker(qt.QMainWindow):
         for ax in event.canvas.axes:
             self.bgs.append(event.canvas.copy_from_bbox(ax.bbox))
 
-    def _replotLines(self):
+    def _plotPicks(self):
         """
         Replot any picked lines
 
@@ -382,15 +383,20 @@ class Picker(qt.QMainWindow):
 
         """
 
-        ddate = rec.deployment.isoformat().split("T")[0]
-        rdate = rec.retrieval.isoformat().split("T")[0]
-
         self.uiReceiverNameDisplay.setText(rec.uid)
         self.uiReceiverLonDisplay.setText(f'{rec.longitude:.4f}')
         self.uiReceiverLatDisplay.setText(f'{rec.latitude:.4f}')
         self.uiReceiverElevDisplay.setText(f'{rec.elevation:.4f}')
-        self.uiReceiverDepDisplay.setText(ddate)
-        self.uiReceiverRetDisplay.setText(rdate)
+
+        try:
+            ddate = rec.deployment.isoformat().split("T")[0]
+            rdate = rec.retrieval.isoformat().split("T")[0]
+
+            self.uiReceiverDepDisplay.setText(ddate)
+            self.uiReceiverRetDisplay.setText(rdate)
+        except AttributeError:
+            self.uiReceiverDepDisplay.setText("n/a")
+            self.uiReceiverRetDisplay.setText("n/a")
 
     def _updateSourceInformation(self, src):
         """

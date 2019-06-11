@@ -8,7 +8,6 @@ Author: Conor Bacon
 from obspy import UTCDateTime
 
 from quake.core.arrival import Arrival
-from quake.core.pick import Pick
 
 
 class Source(object):
@@ -40,10 +39,6 @@ class Source(object):
     -------
     lookup(receiverid)
         Queries the source with the identifier and returns an Arrival object
-    get_iris_arrivals(phases, model, receivers)
-        Populates Source with Arrival objects using obpsy TauPyModel
-    get_hyp_arrival(receiver, pick)
-        Parses a line from a .hyp file into an Arrival object
     load_waveforms()
         Read waveform data into all Arrivals associated with this Source
 
@@ -109,31 +104,6 @@ class Source(object):
             arr = Arrival(self, self.network.lookup(uid))
             arr.load_picks(arrival["picks"])
             self + arr
-
-    def get_iris_arrivals(self, phases, model, receivers):
-        """
-        Get the predicted traveltimes of the specified seismic phases at the
-        set of receivers and generate a suite of Arrival objects
-
-        Parameters
-        ----------
-        phases : list-like
-            List of seismic phase codes for which to calculate arrival times
-        model : TauPyModel object
-            Velocity model within which to calculate arrival times
-        receivers : dict
-            Dictionary of receivers at which to calculate arrival times
-
-        """
-
-        available = [receiver
-                     for uid, receiver in receivers.items()
-                     if receiver.available(self.otime)]
-
-        for receiver in available:
-            arrival = Arrival(self, receiver)
-            arrival.get_iris_picks(phases, model)
-            self + arrival
 
     def load_waveforms(self):
         """

@@ -118,12 +118,14 @@ class Network(object):
                 receiver = Receiver(receiver)
                 self + receiver
             self.centre = network["centre"]
+            self.extent = network["extent"]
         else:
             receivers = pd.read_csv(infile)
             for receiver in receivers.to_dict("records"):
                 receiver = Receiver(receiver)
                 self + receiver
             self.centre = self._get_centre()
+            self.extent = self._get_extent()
 
     @property
     def output(self):
@@ -144,6 +146,7 @@ class Network(object):
 
         out = {"uid": self.uid,
                "centre": self.centre,
+               "extent": self.extent,
                "receivers": receivers}
 
         return out
@@ -191,3 +194,10 @@ class Network(object):
         clat = (max(lats) + min(lats)) / 2
 
         return [clon, clat]
+
+    def _get_extent(self):
+        """Get the lon/lat extent of the network"""
+        lons = [s.longitude for u, s in self.receivers.items()]
+        lats = [s.latitude for u, s in self.receivers.items()]
+
+        return [min(lons), min(lats), max(lons), max(lats)]

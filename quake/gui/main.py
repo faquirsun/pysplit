@@ -227,11 +227,10 @@ class Quake(qt.QMainWindow):
             self.uiStatusBar.showMessage(msg)
 
             if self.catalogue.type == "local":
-                qimport.parse(self.catalogue.local_input, self.catalogue,
-                              self.network)
+                qimport.parse_local(self.catalogue.local_input, self.catalogue,
+                                    self.network)
             else:
-                self.catalogue.sources_from_datacentre()
-                self.catalogue.arrivals_from_datacentre(phases=["P", "S", "SKS"])
+                qimport.parse_teleseismic(self.catalogue, self.network)
 
             if len(self.catalogue) == 0:
                 msg = "No available sources from file/datacentre."
@@ -492,15 +491,20 @@ class Quake(qt.QMainWindow):
 
         """
 
-        ddate = rec.deployment.isoformat().split("T")[0]
-        rdate = rec.retrieval.isoformat().split("T")[0]
-
         self.uiReceiverNameDisplay.setText(rec.uid)
         self.uiReceiverLonDisplay.setText(f'{rec.longitude:.4f}')
         self.uiReceiverLatDisplay.setText(f'{rec.latitude:.4f}')
         self.uiReceiverElevDisplay.setText(f'{rec.elevation:.4f}')
-        self.uiReceiverDepDisplay.setText(ddate)
-        self.uiReceiverRetDisplay.setText(rdate)
+
+        try:
+            ddate = rec.deployment.isoformat().split("T")[0]
+            rdate = rec.retrieval.isoformat().split("T")[0]
+
+            self.uiReceiverDepDisplay.setText(ddate)
+            self.uiReceiverRetDisplay.setText(rdate)
+        except AttributeError:
+            self.uiReceiverDepDisplay.setText("n/a")
+            self.uiReceiverRetDisplay.setText("n/a")
 
     def _updateSourceInformation(self, src):
         """

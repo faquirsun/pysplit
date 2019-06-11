@@ -10,7 +10,6 @@ from itertools import chain
 
 import numpy as np
 from obspy.geodetics import gps2dist_azimuth
-from obspy.geodetics import locations2degrees
 from obspy import read, Stream
 
 from quake.core.pick import Pick
@@ -120,31 +119,6 @@ class Arrival(object):
                 pick["ttime"][i] = float(v)
             pk = Pick(uid, pick["ttime"], pick["error"], pick["polarity"])
             self + pk
-
-    def get_iris_picks(self, phases, model):
-        dist = locations2degrees(
-            self.source.latitude, self.source.longitude,
-            self.receiver.latitude, self.receiver.longitude)
-
-        phases = model.get_travel_times(
-            source_depth_in_km=self.depth,
-            distance_in_degree=dist,
-            phase_list=phases,
-            receiver_depth_in_km=self.receiver.elevation / 1000)
-
-        if not phases:
-            return
-        else:
-            for phase in phases:
-                pick_id = "{}_model".format(phase.purist_name)
-                time = phase.time
-
-                pick = Pick(pick_id, time)
-
-                if pick_id in self.picks:
-                    self.picks[pick_id].ttime.append(time)
-                else:
-                    self + pick
 
     @property
     def output(self):

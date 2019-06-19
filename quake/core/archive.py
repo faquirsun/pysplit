@@ -63,7 +63,7 @@ class Archive(object):
         self.schema = schema
 
         if schema == "SeisComp3":
-            self.structure = "{year}/*/{receiver}/*/*.{receiver}..*.D.{year}.{jday}"
+            self.structure = "{year}/*/{receiver}/*/*.{receiver}.*.D.{year}.{jday}"
         elif schema == "Cambridge Volcano Seismology":
             self.structure = "{year}/{jday}/*_{receiver}_*"
         elif schema == "QuakeMigrate":

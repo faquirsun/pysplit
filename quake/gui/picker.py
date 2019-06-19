@@ -60,6 +60,7 @@ class Picker(qt.QMainWindow):
             self.arrival.load_waveform(self.archive, self.catalogue.path)
         except StopIteration:
             print("No available arrivals.")
+            self.close()
 
         # self.wadatiWindow = WadatiWindow(self)
 

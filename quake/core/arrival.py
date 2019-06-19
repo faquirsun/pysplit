@@ -467,8 +467,7 @@ class Arrival(object):
             self._update_components(self.stream)
             return
 
-        # Get max traveltime by searching through available picks. If none,
-        # simply take base window of 300 seconds?
+        # Get max traveltime by searching through available picks
         window = self.max_ttime
 
         wbeg = self.source.otime - 60.

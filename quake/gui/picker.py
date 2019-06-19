@@ -58,13 +58,10 @@ class Picker(qt.QMainWindow):
         try:
             uid, self.arrival = next(self.arrivals)
             self.arrival.load_waveform(self.archive, self.catalogue.path)
+            self.initUI()
         except StopIteration:
             print("No available arrivals.")
             self.close()
-
-        # self.wadatiWindow = WadatiWindow(self)
-
-        self.initUI()
 
     def initUI(self):
         """
